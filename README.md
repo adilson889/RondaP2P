@@ -2,7 +2,7 @@
 
 # Plataforma-Kixikila
 
-Rede coletiva de poupanças
+# >Rede Coletiva de Poupança
 
 Sistema de poupança coletiva que permite criar grupos com amigos e familiares para economizar juntos de forma segura e transparente. Cada membro contribui com um valor definido e o sistema organiza automaticamente a ordem de recebimento.
 
