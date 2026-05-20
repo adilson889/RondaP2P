@@ -1,6 +1,8 @@
 var _paginaAnterior    = '';
 var _estrelasAvaliacao = 0;
 var _tabAtual          = 'descobrir';
+var _telefoneAvaliacaoDireta = '';
+var _nomeAvaliacaoDireta = '';
 
 // ============================================
 // NAVEGAÇÃO
@@ -21,7 +23,6 @@ function mostrarPagina(nome) {
 
 function voltarDashboard() { mostrarPagina('Dashboard'); }
 
-// Back nativo do Android
 window.addEventListener('popstate', (e) => {
   const pagina = e.state?.pagina;
   if (!pagina || pagina === 'Auth') {
@@ -59,12 +60,10 @@ function mostrarTabDashboard(tab) {
 // ============================================
 
 function carregarDashboard() {
-  // Atualizar avatar e reputação
   const sessao = KixikilaManager.getSessao();
   if (!sessao) return;
   const perfil = sessao.perfil;
   
-  // Avatar na navbar
   if (perfil.foto_perfil) {
     document.getElementById('navAvatar').src = perfil.foto_perfil;
     document.getElementById('navAvatar').style.display = 'block';
@@ -204,37 +203,94 @@ async function abrirPerfilMembro(telefone) {
           <label>Avaliações</label>
         </div>
       </div>
+      <div id="graficoReputacaoMembro" class="grafico-wrap">
+        <div class="grafico-titulo">EVOLUÇÃO DA REPUTAÇÃO</div>
+        <canvas id="canvasReputacao" width="300" height="150"></canvas>
+      </div>
       <div class="membro-perfil-acoes">
         <button class="btn-confiar" onclick="abrirAvaliacaoDireta('${telefone}','${perfil.nome}')">
           <i data-lucide="star"></i> Avaliar este membro
         </button>
       </div>
+      <div id="avaliacoesMembro" class="avaliacoes-lista">
+        <div class="secao-label-pequena">AVALIAÇÕES RECENTES</div>
+        <p style="color:var(--muted);font-size:.85rem;text-align:center;padding:12px;">A carregar avaliações...</p>
+      </div>
     `;
     lucide.createIcons();
+
+    // Gráfico de reputação
+    setTimeout(() => {
+      const canvas = document.getElementById('canvasReputacao');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        const pontos = [3.0, 3.5, 4.0, 3.8, 4.2, perfil.reputacao || 0].filter(v => v > 0);
+        
+        if (pontos.length === 0) return;
+        
+        ctx.clearRect(0, 0, w, h);
+        
+        // Linha
+        ctx.beginPath();
+        ctx.strokeStyle = '#8B0000';
+        ctx.lineWidth = 2.5;
+        pontos.forEach((v, i) => {
+          const x = 30 + (w - 60) * i / (pontos.length - 1);
+          const y = h - 20 - (h - 40) * (v / 5);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        
+        // Pontos
+        pontos.forEach((v, i) => {
+          const x = 30 + (w - 60) * i / (pontos.length - 1);
+          const y = h - 20 - (h - 40) * (v / 5);
+          ctx.beginPath();
+          ctx.fillStyle = '#8B0000';
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.fillStyle = '#8B0000';
+          ctx.font = 'bold 10px DM Sans';
+          ctx.textAlign = 'center';
+          ctx.fillText(v.toFixed(1), x, y - 10);
+        });
+      }
+    }, 300);
+
   } catch (e) {
     container.innerHTML = '<p style="text-align:center;padding:40px;color:var(--muted);">Erro ao carregar perfil.</p>';
   }
 }
 
-var _telefoneAvaliacaoDireta = '';
-var _nomeAvaliacaoDireta = '';
+// ============================================
+// AVALIAÇÃO DIRECTA
+// ============================================
 
 function abrirAvaliacaoDireta(telefone, nome) {
   _telefoneAvaliacaoDireta = telefone;
   _nomeAvaliacaoDireta = nome;
   document.getElementById('avalDiretaNome').textContent = nome;
   
+  _estrelasAvaliacao = 0;
   const wrap = document.getElementById('estrelasWrapDireta');
   wrap.innerHTML = '';
   for (let i = 1; i <= 5; i++) {
     const btn = document.createElement('button');
     btn.className = 'estrela-btn';
-    btn.textContent = i <= _estrelasAvaliacao ? '★' : '☆';
+    btn.textContent = '★';
     btn.onclick = () => {
       _estrelasAvaliacao = i;
-      abrirAvaliacaoDireta(telefone, nome);
+      wrap.querySelectorAll('.estrela-btn').forEach((b, j) => {
+        b.classList.toggle('on', j < i);
+      });
     };
-    if (i <= _estrelasAvaliacao) btn.classList.add('on');
     wrap.appendChild(btn);
   }
   
@@ -369,7 +425,6 @@ function carregarMeuPerfil() {
     document.getElementById('perfilFotoLetra').style.display = 'none';
   }
   
-  // Carregar stats
   KixikilaManager.carregarStats(perfil.telefone).then(stats => {
     document.getElementById('statGrupos').textContent = stats.grupos_activos || 0;
     document.getElementById('statAvaliacoes').textContent = stats.total_avaliacoes || 0;
@@ -439,8 +494,9 @@ async function confirmarEliminarConta() {
 function mostrarTab(tab) {
   document.getElementById('tabRegisto').style.display = tab === 'registo' ? 'block' : 'none';
   document.getElementById('tabLogin').style.display = tab === 'login' ? 'block' : 'none';
-  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('activo'));
-  document.querySelector(`.auth-tab:nth-child(${tab === 'registo' ? '1' : '2'})`).classList.add('activo');
+  document.querySelectorAll('.auth-tab').forEach((b, i) => {
+    b.classList.toggle('activo', (i === 0 && tab === 'registo') || (i === 1 && tab === 'login'));
+  });
 }
 
 // ============================================
