@@ -1,8 +1,8 @@
 /* AUTH */
 .auth-container {
-  max-width: 420px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 22px 24px;
   overflow-y: auto;
   height: 100%;
 }
@@ -127,6 +127,66 @@
   font-size: .82rem;
   color: var(--muted);
   margin-top: 4px;
+}
+
+/* FEED / DESCOBRIR GRUPOS */
+.feed-grupo-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.feed-grupo-card:hover {
+  border-color: rgba(139,0,0,0.3);
+  transform: translateY(-1px);
+}
+
+.feed-grupo-card .feed-info h4 {
+  font-size: .95rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.feed-grupo-card .feed-info .feed-valor {
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--r);
+}
+
+.feed-grupo-card .feed-info .feed-criador {
+  font-size: .72rem;
+  color: var(--muted);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.feed-grupo-card .feed-info .feed-criador span {
+  cursor: pointer;
+  color: var(--r);
+  font-weight: 600;
+}
+
+.feed-grupo-card .feed-info .feed-criador span:hover {
+  text-decoration: underline;
+}
+
+.feed-grupo-card .feed-meta {
+  text-align: right;
+  font-size: .72rem;
+  color: var(--muted);
+}
+
+.feed-grupo-card .feed-meta .feed-vagas {
+  color: var(--r);
+  font-weight: 600;
 }
 
 /* CARDS DE GRUPO */
@@ -503,6 +563,24 @@
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--r);
+  margin-bottom: 16px;
+}
+
+/* ZONA DE PERIGO */
+.card-perigo {
+  margin: 16px;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  border: 2px solid var(--r2);
+}
+
+.card-perigo h4 {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--r2);
   margin-bottom: 16px;
 }
 
