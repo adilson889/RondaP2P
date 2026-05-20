@@ -1,239 +1,117 @@
-/**
- * KixikilaManager.js — Versão Web (PWA)
- * Comunicação com a API Vercel + Cache Local (localStorage)
- * Convertido de: KixikilaManager.kt
- */
-
 const KixikilaManager = (() => {
-    const BASE_URL = "https://sire-kixikila-api.vercel.app/";
+  const BASE_URL = 'https://sire-kixikila-api.vercel.app/';
 
-    // ── CACHE LOCAL (localStorage) ──────────────────────────────
-    function salvarGrupoLocal(codigo, grupo) {
-        localStorage.setItem(`grupo_${codigo}`, JSON.stringify(grupo));
-    }
+  // Sessão em memória — limpa ao fechar o browser
+  let _sessao = null; // { perfil }
 
-    function carregarGrupoLocal(codigo) {
-        const json = localStorage.getItem(`grupo_${codigo}`);
-        return json ? JSON.parse(json) : null;
-    }
+  function getSessao()          { return _sessao; }
+  function setSessao(perfil)    { _sessao = { perfil }; }
+  function limparSessao()       { _sessao = null; }
 
-    function salvarMeusGrupos(codigos) {
-        localStorage.setItem("meus_grupos", JSON.stringify(codigos));
-    }
+  async function post(endpoint, corpo) {
+    const r = await fetch(BASE_URL + endpoint, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(corpo)
+    });
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.erro || dados.message || `Erro ${r.status}`);
+    return dados;
+  }
 
-    function carregarMeusGrupos() {
-        const json = localStorage.getItem("meus_grupos");
-        return json ? JSON.parse(json) : [];
-    }
+  async function get(endpoint) {
+    const r = await fetch(BASE_URL + endpoint);
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.erro || `Erro ${r.status}`);
+    return dados;
+  }
 
-    function salvarPerfilLocal(perfil) {
-        localStorage.setItem("perfil_kixikila", JSON.stringify(perfil));
-    }
+  // ── AUTH ──────────────────────────────────────────────────
+  async function registar({ telefone, nome, senha, foto_perfil }) {
+    const dados = await post('auth/registar', { telefone, nome, senha, foto_perfil });
+    setSessao(dados.perfil);
+    return dados.perfil;
+  }
 
-    function carregarPerfilLocal() {
-        const json = localStorage.getItem("perfil_kixikila");
-        return json ? JSON.parse(json) : null;
-    }
+  async function entrar({ telefone, senha }) {
+    const dados = await post('auth/entrar', { telefone, senha });
+    setSessao(dados.perfil);
+    return dados.perfil;
+  }
 
-    function marcarPerfilComoVisto(telefone) {
-        localStorage.setItem(`visto_${telefone}`, "true");
-    }
+  // ── PERFIL ────────────────────────────────────────────────
+  async function atualizarPerfil({ telefone, nome, genero, cor, foto_perfil, senha }) {
+    const dados = await post('perfil', { telefone, nome, genero, cor, foto_perfil, senha });
+    if (_sessao) _sessao.perfil = dados.perfil;
+    return dados.perfil;
+  }
 
-    function perfilJaVisto(telefone) {
-        return localStorage.getItem(`visto_${telefone}`) === "true";
-    }
+  async function carregarPerfil(telefone) {
+    return get(`perfil/${telefone.replace(/\+/g, '')}`);
+  }
 
-    // ── API CALLS ──────────────────────────────────────────────
+  async function carregarMeusGrupos() {
+    const telefone = _sessao?.perfil?.telefone;
+    if (!telefone) throw new Error('Sessão inválida');
+    const dados = await get(`perfil/${telefone.replace(/\+/g, '')}/grupos`);
+    return dados.grupos || [];
+  }
 
-    /**
-     * Sincroniza o perfil do utilizador com o servidor.
-     * Equivalente a: sincronizarPerfil() no Kotlin
-     */
-    async function sincronizarPerfil(telefone, nome, genero, cor) {
-        const resposta = await fetch(`${BASE_URL}perfil`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ telefone, nome, genero, cor })
-        });
-        if (!resposta.ok) throw new Error(`Erro no servidor: ${resposta.status}`);
-        const dados = await resposta.json();
-        salvarPerfilLocal(dados.perfil || dados);
-        return dados;
-    }
+  // ── GRUPOS ────────────────────────────────────────────────
+  async function criarGrupo(nome, telefone, nomeAdmin, valor, frequencia, maxMembros) {
+    const dados = await post('grupo/criar', {
+      nome, telefone, nomeAdmin, valor, periodicidade: frequencia, maxMembros
+    });
+    return dados.codigo;
+  }
 
-    /**
-     * Carrega o perfil de um membro (apenas uma vez).
-     * Equivalente a: carregarPerfil() no Kotlin
-     */
-    async function carregarPerfil(telefone) {
-        if (perfilJaVisto(telefone)) {
-            throw new Error("view_once");
-        }
-        const resposta = await fetch(`${BASE_URL}perfil/${telefone.replace(/\+/g, "")}`);
-        if (!resposta.ok) throw new Error("Não encontrado");
-        const perfil = await resposta.json();
-        marcarPerfilComoVisto(telefone);
-        return perfil;
-    }
+  async function carregarGrupo(codigo) {
+    return get(`grupo/${codigo}`);
+  }
 
-    /**
-     * Cria um novo grupo de poupança.
-     * Equivalente a: criarGrupo() no Kotlin
-     */
-    async function criarGrupo(nome, telefone, nomeAdmin, valor, frequencia, maxMembros) {
-        const resposta = await fetch(`${BASE_URL}grupo/criar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nome, telefone, nomeAdmin, valor, periodicidade: frequencia, maxMembros })
-        });
-        if (!resposta.ok) {
-            const erro = await resposta.text();
-            throw new Error(`Erro ${resposta.status}: ${erro}`);
-        }
-        const dados = await resposta.json();
-        const codigo = dados.codigo;
-        
-        // Guardar na lista de meus grupos
-        const meus = carregarMeusGrupos();
-        if (!meus.includes(codigo)) {
-            meus.push(codigo);
-            salvarMeusGrupos(meus);
-        }
-        return codigo;
-    }
+  async function entrarGrupo(codigo, telefone, nomeUsuario) {
+    return post(`grupo/${codigo}/entrar`, { telefone, nome: nomeUsuario });
+  }
 
-    /**
-     * Carrega os dados de um grupo (online ou cache local).
-     * Equivalente a: carregarGrupo() no Kotlin
-     */
-    async function carregarGrupo(codigo) {
-        try {
-            const resposta = await fetch(`${BASE_URL}grupo/${codigo}`);
-            if (resposta.ok) {
-                const grupo = await resposta.json();
-                salvarGrupoLocal(codigo, grupo);
-                return grupo;
-            }
-        } catch (erro) {
-            console.warn("Offline, a carregar da cache local...");
-        }
-        // Fallback para cache local
-        const local = carregarGrupoLocal(codigo);
-        if (local) return local;
-        throw new Error("Grupo não encontrado");
-    }
+  async function registarPagamento(codigo, telefone) {
+    const dados = await post(`grupo/${codigo}/pagar`, { telefone });
+    return { todosPagaram: dados.todos_pagaram || false, proximo: dados.proximo || 1 };
+  }
 
-    /**
-     * Entra num grupo existente.
-     * Equivalente a: entrarGrupo() no Kotlin
-     */
-    async function entrarGrupo(codigo, telefone, nomeUsuario) {
-        const resposta = await fetch(`${BASE_URL}grupo/${codigo}/entrar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ telefone, nome: nomeUsuario })
-        });
-        if (!resposta.ok) {
-            const erro = await resposta.json();
-            throw new Error(erro.erro || "Código inválido ou grupo cheio");
-        }
-        const dados = await resposta.json();
-        
-        // Guardar na lista de meus grupos
-        const meus = carregarMeusGrupos();
-        if (!meus.includes(codigo)) {
-            meus.push(codigo);
-            salvarMeusGrupos(meus);
-        }
-        return codigo;
-    }
+  async function enviarMensagem(codigo, telefone, nome, texto) {
+    return post(`grupo/${codigo}/mensagem`, { telefone, nome, texto });
+  }
 
-    /**
-     * Regista o pagamento de um membro.
-     * Equivalente a: registarPagamento() no Kotlin
-     */
-    async function registarPagamento(codigo, telefone) {
-        const resposta = await fetch(`${BASE_URL}grupo/${codigo}/pagar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ telefone })
-        });
-        if (!resposta.ok) throw new Error("Erro ao registar pagamento");
-        const dados = await resposta.json();
-        return {
-            todosPagaram: dados.todos_pagaram || false,
-            proximo: dados.proximo || 1
-        };
-    }
+  async function avaliar(avaliador, avaliado, estrelas, comentario) {
+    const dados = await post('avaliar', { avaliador, avaliado, estrelas, comentario });
+    return dados.reputacao || 0;
+  }
 
-    /**
-     * Envia uma mensagem no chat do grupo.
-     * Equivalente a: enviarMensagem() no Kotlin
-     */
-    async function enviarMensagem(codigo, telefone, nome, texto) {
-        const resposta = await fetch(`${BASE_URL}grupo/${codigo}/mensagem`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ telefone, nome, texto })
-        });
-        if (!resposta.ok) throw new Error("Erro ao enviar mensagem");
-    }
+  // ── UTILITÁRIOS ───────────────────────────────────────────
+  function reputacaoTexto(r) {
+    if (r >= 4.5) return 'Excelente';
+    if (r >= 3.5) return 'Confiável';
+    if (r >= 2.5) return 'Regular';
+    if (r >= 1.5) return 'Fraco';
+    if (r > 0)    return 'Novo';
+    return 'Sem avaliações';
+  }
 
-    /**
-     * Avalia um membro do grupo.
-     * Equivalente a: avaliar() no Kotlin
-     */
-    async function avaliar(avaliador, avaliado, estrelas, comentario) {
-        const resposta = await fetch(`${BASE_URL}avaliar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ avaliador, avaliado, estrelas, comentario })
-        });
-        if (!resposta.ok) throw new Error("Erro ao avaliar");
-        const dados = await resposta.json();
-        return dados.reputacao || 0.0;
-    }
+  function reputacaoEstrelas(r) {
+    const c = Math.floor(r);
+    return '★'.repeat(c) + '☆'.repeat(5 - c);
+  }
 
-    // ── UTILITÁRIOS ────────────────────────────────────────────
+  function formatarValor(v) {
+    return new Intl.NumberFormat('pt-AO').format(v);
+  }
 
-    function reputacaoTexto(reputacao) {
-        if (reputacao >= 4.5) return "Excelente";
-        if (reputacao >= 3.5) return "Confiável";
-        if (reputacao >= 2.5) return "Regular";
-        if (reputacao >= 1.5) return "Fraco";
-        if (reputacao > 0) return "Novo";
-        return "Sem avaliações";
-    }
-
-    function reputacaoEstrelas(reputacao) {
-        const cheias = Math.floor(reputacao);
-        return "★".repeat(cheias) + "☆".repeat(5 - cheias);
-    }
-
-    function formatarValor(valor) {
-        return new Intl.NumberFormat('pt-AO').format(valor);
-    }
-
-    // ── API PÚBLICA ────────────────────────────────────────────
-    return {
-        salvarGrupoLocal,
-        carregarGrupoLocal,
-        salvarMeusGrupos,
-        carregarMeusGrupos,
-        salvarPerfilLocal,
-        carregarPerfilLocal,
-        marcarPerfilComoVisto,
-        perfilJaVisto,
-        sincronizarPerfil,
-        carregarPerfil,
-        criarGrupo,
-        carregarGrupo,
-        entrarGrupo,
-        registarPagamento,
-        enviarMensagem,
-        avaliar,
-        reputacaoTexto,
-        reputacaoEstrelas,
-        formatarValor
-    };
+  return {
+    getSessao, setSessao, limparSessao,
+    registar, entrar,
+    atualizarPerfil, carregarPerfil, carregarMeusGrupos,
+    criarGrupo, carregarGrupo, entrarGrupo,
+    registarPagamento, enviarMensagem, avaliar,
+    reputacaoTexto, reputacaoEstrelas, formatarValor
+  };
 })();
