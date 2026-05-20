@@ -113,6 +113,20 @@
       </div>
     </div>
 
+    <!-- FEED / DESCOBRIR GRUPOS -->
+    <div class="card-secao" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h4 style="margin:0;">Descobrir Grupos</h4>
+        <button class="btn-outline" style="padding:6px 12px;font-size:.78rem;" onclick="carregarFeedDashboard()">
+          <i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> Atualizar
+        </button>
+      </div>
+      <div id="feedGrupos" style="display:flex;flex-direction:column;gap:8px;">
+        <p style="color:var(--muted);font-size:.85rem;text-align:center;padding:12px;">A carregar grupos abertos...</p>
+      </div>
+    </div>
+
+    <h4 style="font-size:.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--r);margin-bottom:8px;">Os Meus Grupos</h4>
     <div id="listaGrupos" class="lista-grupos"></div>
 
     <p id="dashVazio" class="vazio-msg" style="display:none">
@@ -179,6 +193,17 @@
       </div>
       <button class="btn-primary btn-block" onclick="guardarPerfil()">Guardar alterações</button>
     </div>
+
+    <!-- ZONA DE PERIGO — ELIMINAR CONTA -->
+    <div class="card-secao" style="margin:16px; border-color: var(--r2);">
+      <h4 style="color:var(--r2);">Zona de Perigo</h4>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">
+        Eliminar a tua conta remove-te de todos os grupos e apaga os teus dados permanentemente. Esta ação é irreversível.
+      </p>
+      <button class="btn-primary btn-block" style="background:var(--r2);" onclick="confirmarEliminarConta()">
+        Eliminar Conta
+      </button>
+    </div>
   </div>
 </div>
 
@@ -210,7 +235,6 @@
   </div>
 </div>
 
-
 <!-- CRIAR GRUPO -->
 <div id="paginaCriarGrupo" class="pagina" style="display:none">
   <nav class="topnav">
@@ -220,7 +244,6 @@
     <span class="topnav-titulo">Criar Grupo</span>
     <div></div>
   </nav>
-
   <div class="form-pagina">
     <div class="campo">
       <label>Nome do grupo</label>
@@ -262,7 +285,6 @@
     <span class="topnav-titulo">Entrar num Grupo</span>
     <div></div>
   </nav>
-
   <div class="form-pagina">
     <div class="campo">
       <label>Código do grupo</label>
@@ -283,7 +305,6 @@
       <i data-lucide="share-2"></i>
     </button>
   </nav>
-
   <div class="grupo-header">
     <div class="grupo-header-info">
       <p id="verGrupoValor" class="grupo-valor"></p>
@@ -295,7 +316,6 @@
       <span id="verGrupoCodigo"></span>
     </button>
   </div>
-
   <div class="grupo-acoes">
     <button class="btn-acao" onclick="registarPagamento()">
       <i data-lucide="check-circle"></i>
@@ -310,7 +330,6 @@
       <span>Chat</span>
     </button>
   </div>
-
   <div class="secao-label">
     <i data-lucide="users"></i> MEMBROS
   </div>
@@ -336,9 +355,7 @@
       </button>
     </div>
   </nav>
-
   <div id="chatMensagens" class="chat-mensagens"></div>
-
   <div class="chat-input-bar">
     <input type="text" id="etMensagem" placeholder="Mensagem para o grupo..." onkeydown="if(event.key==='Enter')enviarMensagem()">
     <button class="btn-enviar" onclick="enviarMensagem()">
