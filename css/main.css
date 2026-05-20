@@ -142,6 +142,41 @@ body {
 .btn-icon:hover { background: rgba(255,255,255,0.1); }
 .btn-icon svg { width: 20px; height: 20px; }
 
+/* DASHBOARD TABS */
+.dashboard-tabs {
+  display: flex;
+  background: var(--r);
+  padding: 0 16px 12px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.dash-tab {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  border-radius: 10px;
+  font-size: .82rem;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: .2s;
+}
+
+.dash-tab.activo {
+  background: white;
+  color: var(--r);
+  border-color: white;
+}
+
+.dash-tab svg { width: 16px; height: 16px; }
+
 /* CAMPOS */
 .campo { margin-bottom: 16px; }
 .campo label {
@@ -339,9 +374,16 @@ body {
   flex: 1;
 }
 
-/* SCROLL */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: rgba(139,0,0,0.2); border-radius: 4px; }
+/* SCROLL - OCULTADO COMPLETAMENTE */
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
 .perfil-membro-scroll {
   flex: 1;
   overflow-y: auto;
