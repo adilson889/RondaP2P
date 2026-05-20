@@ -3,9 +3,17 @@ const KixikilaManager = (() => {
 
   let _sessao = null;
 
-  function getSessao()       { return _sessao; }
-  function setSessao(perfil) { _sessao = { perfil }; }
-  function limparSessao()    { _sessao = null; }
+  function getSessao() { return _sessao; }
+
+  function setSessao(perfil) {
+    _sessao = { perfil };
+    try { sessionStorage.setItem('kx_sessao', JSON.stringify(perfil)); } catch (_) {}
+  }
+
+  function limparSessao() {
+    _sessao = null;
+    try { sessionStorage.removeItem('kx_sessao'); } catch (_) {}
+  }
 
   async function post(endpoint, corpo) {
     const r = await fetch(BASE_URL + endpoint, {
@@ -39,7 +47,7 @@ const KixikilaManager = (() => {
 
   async function atualizarPerfil({ telefone, nome, genero, cor, foto_perfil, senha }) {
     const dados = await post('perfil', { telefone, nome, genero, cor, foto_perfil, senha });
-    if (_sessao) _sessao.perfil = dados.perfil;
+    setSessao(dados.perfil);
     return dados.perfil;
   }
 
