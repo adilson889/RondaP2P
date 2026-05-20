@@ -105,33 +105,32 @@
     </div>
   </nav>
 
+  <!-- TABS -->
+  <div class="dashboard-tabs">
+    <button class="dash-tab activo" id="tabDescobrir" onclick="mostrarTabDashboard('descobrir')">
+      <i data-lucide="search"></i> Descobrir
+    </button>
+    <button class="dash-tab" id="tabMeusGrupos" onclick="mostrarTabDashboard('meus')">
+      <i data-lucide="users"></i> Os Meus Grupos
+    </button>
+  </div>
+
+  <!-- CONTEÚDO -->
   <div class="dashboard-content">
-    <div class="dashboard-header">
-      <div>
-        <h2 id="dashSaudacao">Olá!</h2>
-        <p id="dashReputacao" class="reputacao-badge"></p>
-      </div>
-    </div>
-
-    <!-- FEED / DESCOBRIR GRUPOS -->
-    <div class="card-secao" style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h4 style="margin:0;">Descobrir Grupos</h4>
-        <button class="btn-outline" style="padding:6px 12px;font-size:.78rem;" onclick="carregarFeedDashboard()">
-          <i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> Atualizar
-        </button>
-      </div>
+    <!-- FEED / DESCOBRIR -->
+    <div id="conteudoDescobrir">
       <div id="feedGrupos" style="display:flex;flex-direction:column;gap:8px;">
-        <p style="color:var(--muted);font-size:.85rem;text-align:center;padding:12px;">A carregar grupos abertos...</p>
+        <p style="color:var(--muted);font-size:.85rem;text-align:center;padding:20px;">A carregar grupos abertos...</p>
       </div>
     </div>
 
-    <h4 style="font-size:.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--r);margin-bottom:8px;">Os Meus Grupos</h4>
-    <div id="listaGrupos" class="lista-grupos"></div>
-
-    <p id="dashVazio" class="vazio-msg" style="display:none">
-      Ainda não fazes parte de nenhum grupo.<br>Cria ou entra num grupo abaixo.
-    </p>
+    <!-- OS MEUS GRUPOS -->
+    <div id="conteudoMeusGrupos" style="display:none;">
+      <div id="listaGrupos" class="lista-grupos"></div>
+      <p id="dashVazio" class="vazio-msg" style="display:none">
+        Ainda não fazes parte de nenhum grupo.<br>Cria ou entra num grupo abaixo.
+      </p>
+    </div>
   </div>
 
   <!-- FABS -->
@@ -195,8 +194,8 @@
     </div>
 
     <!-- ZONA DE PERIGO — ELIMINAR CONTA -->
-    <div class="card-secao" style="margin:16px; border-color: var(--r2);">
-      <h4 style="color:var(--r2);">Zona de Perigo</h4>
+    <div class="card-perigo">
+      <h4>Zona de Perigo</h4>
       <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">
         Eliminar a tua conta remove-te de todos os grupos e apaga os teus dados permanentemente. Esta ação é irreversível.
       </p>
