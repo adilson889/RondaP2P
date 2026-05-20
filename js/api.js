@@ -1,12 +1,11 @@
 const KixikilaManager = (() => {
   const BASE_URL = 'https://sire-kixikila-api.vercel.app/';
 
-  // Sessão em memória — limpa ao fechar o browser
-  let _sessao = null; // { perfil }
+  let _sessao = null;
 
-  function getSessao()          { return _sessao; }
-  function setSessao(perfil)    { _sessao = { perfil }; }
-  function limparSessao()       { _sessao = null; }
+  function getSessao()       { return _sessao; }
+  function setSessao(perfil) { _sessao = { perfil }; }
+  function limparSessao()    { _sessao = null; }
 
   async function post(endpoint, corpo) {
     const r = await fetch(BASE_URL + endpoint, {
@@ -26,7 +25,6 @@ const KixikilaManager = (() => {
     return dados;
   }
 
-  // ── AUTH ──────────────────────────────────────────────────
   async function registar({ telefone, nome, senha, foto_perfil }) {
     const dados = await post('auth/registar', { telefone, nome, senha, foto_perfil });
     setSessao(dados.perfil);
@@ -39,7 +37,6 @@ const KixikilaManager = (() => {
     return dados.perfil;
   }
 
-  // ── PERFIL ────────────────────────────────────────────────
   async function atualizarPerfil({ telefone, nome, genero, cor, foto_perfil, senha }) {
     const dados = await post('perfil', { telefone, nome, genero, cor, foto_perfil, senha });
     if (_sessao) _sessao.perfil = dados.perfil;
@@ -57,7 +54,6 @@ const KixikilaManager = (() => {
     return dados.grupos || [];
   }
 
-  // ── GRUPOS ────────────────────────────────────────────────
   async function criarGrupo(nome, telefone, nomeAdmin, valor, frequencia, maxMembros) {
     const dados = await post('grupo/criar', {
       nome, telefone, nomeAdmin, valor, periodicidade: frequencia, maxMembros
@@ -87,7 +83,6 @@ const KixikilaManager = (() => {
     return dados.reputacao || 0;
   }
 
-  // ── UTILITÁRIOS ───────────────────────────────────────────
   function reputacaoTexto(r) {
     if (r >= 4.5) return 'Excelente';
     if (r >= 3.5) return 'Confiável';
@@ -103,7 +98,7 @@ const KixikilaManager = (() => {
   }
 
   function formatarValor(v) {
-    return new Intl.NumberFormat('pt-AO').format(v);
+    return new Intl.NumberFormat('pt-AO').format(v || 0);
   }
 
   return {
