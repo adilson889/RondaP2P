@@ -68,6 +68,17 @@ const KixikilaManager = (() => {
     return get(`membro/${telefone.replace(/\+/g, '')}/reputacao`);
   }
 
+  // ── AVALIAÇÕES RECEBIDAS ─────────────────────────────────────
+  async function carregarAvaliacoesRecebidas(telefone) {
+    try {
+      const dados = await get(`perfil/${telefone.replace(/\+/g, '')}/avaliacoes`);
+      return dados.avaliacoes || [];
+    } catch (e) {
+      console.error('Erro ao carregar avaliações recebidas:', e);
+      return [];
+    }
+  }
+
   // ── GRUPOS DO MEMBRO ────────────────────────────────────────
   async function carregarMeusGrupos() {
     const telefone = _sessao?.perfil?.telefone;
@@ -148,6 +159,16 @@ const KixikilaManager = (() => {
     if (!telefone) return;
     return post(`notificacoes/${telefone.replace(/\+/g, '')}/marcar-lida`, { id });
   }
+    // ── AVALIAÇÕES RECEBIDAS ─────────────────────────────────────
+  async function carregarAvaliacoesRecebidas(telefone) {
+    try {
+      const dados = await get(`perfil/${telefone.replace(/\+/g, '')}/avaliacoes`);
+      return dados.avaliacoes || [];
+    } catch (e) {
+      console.error('Erro ao carregar avaliações recebidas:', e);
+      return [];
+    }
+  }
 
   // ── LEADERBOARD ─────────────────────────────────────────────
   async function carregarLeaderboard() {
@@ -178,10 +199,12 @@ const KixikilaManager = (() => {
     getSessao, setSessao, limparSessao,
     registar, entrar, eliminarConta,
     atualizarPerfil, carregarPerfil, carregarStats, carregarReputacao,
+    carregarAvaliacoesRecebidas,
     carregarMeusGrupos, carregarFeed,
     criarGrupo, carregarGrupo, entrarGrupo,
     sairGrupo, removerMembro, convidarMembro, encerrarGrupo,
-    carregarHistorico, registarPagamento, enviarMensagem,
+    carregarHistorico,
+    carregarAvaliacoesRecebidas, registarPagamento, enviarMensagem,
     avaliar,
     carregarNotificacoes, marcarNotificacaoLida,
     carregarLeaderboard,
