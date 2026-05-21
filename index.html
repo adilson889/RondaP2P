@@ -22,6 +22,191 @@
     });
   }
 </script>
+<style>
+/* ── TERMOS ─────────────────────────────────────────────────── */
+.termos-wrap {
+  margin-bottom: 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--card);
+}
+
+.termos-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(139,0,0,.06);
+  border-bottom: 1px solid var(--border);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--r);
+}
+
+.termos-header svg { width: 14px; height: 14px; }
+
+.termos-scroll {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--r) transparent;
+  /* sobrepor o reset de scrollbar do main.css só aqui */
+  display: block !important;
+}
+
+.termos-scroll::-webkit-scrollbar { display: block !important; width: 4px !important; }
+.termos-scroll::-webkit-scrollbar-thumb { background: var(--r); border-radius: 4px; }
+.termos-scroll::-webkit-scrollbar-track { background: var(--bg2); }
+
+.termos-conteudo h4 {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--r);
+  margin-bottom: 4px;
+}
+
+.termos-data {
+  font-size: .75rem;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.termos-conteudo h5 {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 14px 0 6px;
+}
+
+.termos-conteudo p {
+  font-size: .85rem;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.termos-conteudo ul {
+  padding-left: 20px;
+  margin-bottom: 8px;
+}
+
+.termos-conteudo ul li {
+  font-size: .85rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.termos-conteudo strong { color: var(--text); }
+
+.termos-contacto {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.termos-contacto a { color: var(--r); }
+
+.termos-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(139,0,0,.04);
+  font-size: .75rem;
+  color: var(--r);
+  font-weight: 500;
+  border-top: 1px solid var(--border);
+  transition: .3s;
+}
+
+.termos-hint svg { width: 14px; height: 14px; animation: bounce .8s infinite alternate; }
+@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(4px); } }
+
+.termos-hint.lido {
+  color: #2E7D32;
+  background: rgba(46,125,50,.06);
+  border-color: rgba(46,125,50,.15);
+}
+
+.termos-hint.lido svg { animation: none; }
+
+.termos-check-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-top: 1px solid var(--border);
+  transition: opacity .3s;
+  user-select: none;
+}
+
+.termos-check-wrap input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--r);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.termos-check-label {
+  font-size: .85rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.termos-check-label span { color: var(--r); font-weight: 600; }
+
+/* ── BOTÃO CRIAR CONTA BLOQUEADO ─────────────────────────────── */
+#btnCriarConta {
+  transition: .25s;
+}
+
+#btnCriarConta:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  background: var(--muted);
+}
+
+/* ── DOAÇÃO ──────────────────────────────────────────────────── */
+.doacao-banner {
+  margin: 0 0 16px;
+  background: linear-gradient(135deg, #5E0000, #8B0000);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: .2s;
+  text-decoration: none;
+}
+
+.doacao-banner:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,0,0,.25); }
+
+.doacao-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.4rem;
+}
+
+.doacao-texto { flex: 1; }
+.doacao-texto h5 { color: white; font-size: .9rem; font-weight: 700; margin-bottom: 2px; }
+.doacao-texto p  { color: rgba(255,255,255,.7); font-size: .78rem; line-height: 1.4; }
+
+.doacao-seta { color: rgba(255,255,255,.6); }
+.doacao-seta svg { width: 18px; height: 18px; }
+</style>
 </head>
 <body>
 
@@ -74,7 +259,83 @@
         <label>Senha</label>
         <input type="password" id="regSenha" placeholder="Mínimo 6 caracteres">
       </div>
-      <button class="btn-primary btn-block" onclick="registar()">Criar conta</button>
+
+      <!-- TERMOS DE USO -->
+      <div class="termos-wrap">
+        <div class="termos-header">
+          <i data-lucide="file-text"></i>
+          Termos de Uso e Política de Privacidade
+        </div>
+
+        <div class="termos-scroll" id="termosScroll" onscroll="verificarScrollTermos()">
+          <div class="termos-conteudo">
+            <h4>TERMOS DE USO — KIXIKILA</h4>
+            <p class="termos-data">Última actualização: Maio de 2026</p>
+            <p>Bem-vindo à KIXIKILA!</p>
+            <p>Estes Termos de Uso regulam o acesso e utilização da plataforma KIXIKILA (site e/ou aplicação), disponibilizada por Adilson Rafael (desenvolvedor independente).</p>
+
+            <h5>1. Aceitação dos Termos</h5>
+            <p>Ao aceder ou utilizar a KIXIKILA, você concorda com estes Termos na íntegra. Se não concordar, não deve utilizar a plataforma.</p>
+
+            <h5>2. Descrição do Serviço</h5>
+            <p>A KIXIKILA é uma plataforma que permite aos usuários:</p>
+            <ul>
+              <li>Criar e gerir grupos de kixikila/poupança rotativa;</li>
+              <li>Gerar códigos de convite;</li>
+              <li>Definir valores e acompanhar rodadas;</li>
+              <li>Comunicar dentro dos grupos.</li>
+            </ul>
+            <p>A plataforma <strong>não</strong> realiza cobranças, transferências nem guarda dinheiro de nenhum usuário. Todos os pagamentos são feitos directamente entre os participantes fora da plataforma.</p>
+
+            <h5>3. Responsabilidades</h5>
+            <p>A KIXIKILA é apenas uma ferramenta de organização. Não somos responsáveis por acordos, pagamentos, dívidas ou conflitos entre os membros dos grupos. Cada usuário é totalmente responsável pelos seus próprios grupos, pagamentos e combinações. A plataforma não funciona como banco, instituição financeira ou intermediária de pagamentos.</p>
+
+            <h5>4. Regras de Utilização</h5>
+            <p>É proibido:</p>
+            <ul>
+              <li>Usar a plataforma para actividades ilegais, fraudes ou branqueamento de capitais;</li>
+              <li>Partilhar conteúdo ofensivo, violento ou discriminatório;</li>
+              <li>Criar grupos com intenção de prejudicar terceiros;</li>
+              <li>Tentar aceder a contas de outros usuários.</li>
+            </ul>
+
+            <h5>5. Doações</h5>
+            <p>A plataforma é gratuita. As doações são voluntárias e ajudam a manter e melhorar o projecto. Não há reembolso de doações.</p>
+
+            <h5>6. Limitação de Responsabilidade</h5>
+            <p>A KIXIKILA é disponibilizada "no estado em que se encontra". Não garantimos que esteja livre de erros ou interrupções. Não nos responsabilizamos por eventuais danos directos ou indirectos decorrentes do uso da plataforma.</p>
+
+            <h5>7. Suspensão e Cancelamento</h5>
+            <p>Reservamos o direito de suspender ou terminar contas que violem estes Termos.</p>
+
+            <h5>8. Alterações</h5>
+            <p>Podemos actualizar estes Termos. A continuação do uso após actualizações significa aceitação das novas versões.</p>
+
+            <h5>9. Lei Aplicável</h5>
+            <p>Estes Termos são regidos pelas leis de Angola. Qualquer disputa será resolvida nos tribunais de Luanda.</p>
+
+            <p class="termos-contacto">Para dúvidas: <a href="https://wa.me/244921325366" target="_blank">+244 921 325 366</a></p>
+          </div>
+        </div>
+
+        <!-- Indicador de scroll -->
+        <div class="termos-hint" id="termosHint">
+          <i data-lucide="chevrons-down"></i>
+          Leia os termos até ao fim para activar o registo
+        </div>
+
+        <!-- Checkbox — só activa após scroll completo -->
+        <label class="termos-check-wrap" id="termosCheckWrap" style="opacity:.35;pointer-events:none;">
+          <input type="checkbox" id="termosCheck" disabled onchange="atualizarBotaoCriar()">
+          <span class="termos-check-label">
+            Li e aceito os <span>Termos de Uso</span> e a <span>Política de Privacidade</span> da KIXIKILA
+          </span>
+        </label>
+      </div>
+
+      <button class="btn-primary btn-block" id="btnCriarConta" onclick="registar()" disabled>
+        Criar conta
+      </button>
     </div>
 
     <!-- LOGIN -->
@@ -117,6 +378,17 @@
 
   <!-- CONTEÚDO -->
   <div class="dashboard-content">
+
+    <!-- BANNER DOAÇÃO -->
+    <a class="doacao-banner" href="https://www.paypal.com/donate/?hosted_button_id=XXXXXXXX" target="_blank" rel="noopener">
+      <div class="doacao-icon">🤝</div>
+      <div class="doacao-texto">
+        <h5>Apoiar a Kixikila</h5>
+        <p>A plataforma é gratuita. Uma doação voluntária ajuda a mantê-la e a melhorá-la.</p>
+      </div>
+      <div class="doacao-seta"><i data-lucide="chevron-right"></i></div>
+    </a>
+
     <!-- FEED / DESCOBRIR -->
     <div id="conteudoDescobrir">
       <div id="feedGrupos" style="display:flex;flex-direction:column;gap:8px;">
@@ -193,7 +465,19 @@
       <button class="btn-primary btn-block" onclick="guardarPerfil()">Guardar alterações</button>
     </div>
 
-    <!-- ZONA DE PERIGO — ELIMINAR CONTA -->
+    <!-- DOAÇÃO NO PERFIL -->
+    <div style="margin: 0 16px 16px;">
+      <a class="doacao-banner" href="https://www.paypal.com/donate/?hosted_button_id=XXXXXXXX" target="_blank" rel="noopener">
+        <div class="doacao-icon">🤝</div>
+        <div class="doacao-texto">
+          <h5>Apoiar a Kixikila</h5>
+          <p>Donativo voluntário — ajuda a manter o projecto gratuito.</p>
+        </div>
+        <div class="doacao-seta"><i data-lucide="chevron-right"></i></div>
+      </a>
+    </div>
+
+    <!-- ZONA DE PERIGO -->
     <div class="card-perigo">
       <h4>Zona de Perigo</h4>
       <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">
@@ -382,5 +666,31 @@
 <script src="js/grupo.js"></script>
 <script src="js/perfil.js"></script>
 <script src="js/app.js"></script>
+<script>
+// ── TERMOS — lógica de scroll e desbloqueio ───────────────────
+function verificarScrollTermos() {
+  const el     = document.getElementById('termosScroll');
+  const hint   = document.getElementById('termosHint');
+  const check  = document.getElementById('termosCheckWrap');
+  const input  = document.getElementById('termosCheck');
+
+  const chegouAoFim = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
+
+  if (chegouAoFim) {
+    hint.innerHTML  = '<i data-lucide="check-circle"></i> Lido — agora pode aceitar os termos';
+    hint.classList.add('lido');
+    check.style.opacity       = '1';
+    check.style.pointerEvents = 'auto';
+    input.disabled            = false;
+    lucide.createIcons();
+  }
+}
+
+function atualizarBotaoCriar() {
+  const aceite = document.getElementById('termosCheck').checked;
+  const btn    = document.getElementById('btnCriarConta');
+  btn.disabled = !aceite;
+}
+</script>
 </body>
 </html>
