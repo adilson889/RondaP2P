@@ -71,10 +71,11 @@ const KixikilaManager = (() => {
   // ── AVALIAÇÕES RECEBIDAS ─────────────────────────────────────
   async function carregarAvaliacoesRecebidas(telefone) {
     try {
-      const dados = await get(`perfil/${telefone.replace(/\+/g, '')}/avaliacoes`);
-      return dados.avaliacoes || [];
+      // O servidor não tem endpoint /avaliacoes separado
+      // As avaliações estão dentro do perfil mas são removidas no GET público
+      // Usamos os stats como fallback
+      return [];
     } catch (e) {
-      console.error('Erro ao carregar avaliações recebidas:', e);
       return [];
     }
   }
@@ -89,10 +90,11 @@ const KixikilaManager = (() => {
 
   // ── FEED ────────────────────────────────────────────────────
   async function carregarFeed({ estado, periodicidade, limite } = {}) {
-    let query = 'grupos?';
-    if (estado)        query += `estado=${estado}&`;
-    if (periodicidade) query += `periodicidade=${periodicidade}&`;
-    if (limite)        query += `limite=${limite}`;
+    const params = new URLSearchParams();
+    if (estado)        params.set('estado', estado);
+    if (periodicidade) params.set('periodicidade', periodicidade);
+    if (limite)        params.set('limite', limite);
+    const query = 'grupos?' + params.toString();
     const dados = await get(query);
     return dados.grupos || [];
   }
@@ -159,17 +161,6 @@ const KixikilaManager = (() => {
     if (!telefone) return;
     return post(`notificacoes/${telefone.replace(/\+/g, '')}/marcar-lida`, { id });
   }
-    // ── AVALIAÇÕES RECEBIDAS ─────────────────────────────────────
-  async function carregarAvaliacoesRecebidas(telefone) {
-    try {
-      const dados = await get(`perfil/${telefone.replace(/\+/g, '')}/avaliacoes`);
-      return dados.avaliacoes || [];
-    } catch (e) {
-      console.error('Erro ao carregar avaliações recebidas:', e);
-      return [];
-    }
-  }
-
   // ── LEADERBOARD ─────────────────────────────────────────────
   async function carregarLeaderboard() {
     const dados = await get('leaderboard');
@@ -203,8 +194,7 @@ const KixikilaManager = (() => {
     carregarMeusGrupos, carregarFeed,
     criarGrupo, carregarGrupo, entrarGrupo,
     sairGrupo, removerMembro, convidarMembro, encerrarGrupo,
-    carregarHistorico,
-    carregarAvaliacoesRecebidas, registarPagamento, enviarMensagem,
+    carregarHistorico, registarPagamento, enviarMensagem,
     avaliar,
     carregarNotificacoes, marcarNotificacaoLida,
     carregarLeaderboard,
