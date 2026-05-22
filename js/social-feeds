@@ -147,11 +147,11 @@ function abrirGrupoPorCodigo(codigo) {
 // ============================================
 
 function melhorarCardsGrupos() {
-    const cards = document.querySelectorAll('.feed-grupo-card, .card-grupo');
+    const cards = document.querySelectorAll('.card-grupo');
     
     for (const card of cards) {
         // Evitar duplicar métricas
-        if (card.querySelector('.card-metrics')) continue;
+        if (card.querySelector('.card-metrics') || card.querySelector('.feed-card-actions')) continue;
         
         // Extrair código do grupo
         let codigoGrupo = card.getAttribute('data-codigo');
@@ -386,7 +386,7 @@ function fecharModalReacao() {
 // ============================================
 
 function configurarDoubleTapLike() {
-    const cards = document.querySelectorAll('.feed-grupo-card, .card-grupo');
+    const cards = document.querySelectorAll('.card-grupo');
     
     for (const card of cards) {
         // Remover listener antigo se existir
