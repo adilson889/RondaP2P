@@ -3,587 +3,32 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Kixikila — Poupança Colectiva</title>
+<title>Kixikila</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/components.css">
-<meta name="theme-color" content="#8B0000">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Kixikila">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.jpg">
 <link rel="manifest" href="/manifest.json">
-<style>
-/* ── TERMOS ─────────────────────────────────────────────────── */
-.termos-wrap {
-  margin-bottom: 20px;
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--card);
-}
-
-.termos-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: rgba(139,0,0,.06);
-  border-bottom: 1px solid var(--border);
-  font-size: .78rem;
-  font-weight: 700;
-  letter-spacing: .8px;
-  text-transform: uppercase;
-  color: var(--r);
-}
-
-.termos-header svg { width: 14px; height: 14px; }
-
-.termos-scroll {
-  max-height: 220px;
-  overflow-y: auto;
-  padding: 16px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--r) transparent;
-  display: block !important;
-}
-
-.termos-scroll::-webkit-scrollbar { display: block !important; width: 4px !important; }
-.termos-scroll::-webkit-scrollbar-thumb { background: var(--r); border-radius: 4px; }
-.termos-scroll::-webkit-scrollbar-track { background: var(--bg2); }
-
-.termos-conteudo h4 {
-  font-family: var(--serif);
-  font-size: 1.1rem;
-  color: var(--r);
-  margin-bottom: 4px;
-}
-
-.termos-data {
-  font-size: .75rem;
-  color: var(--muted);
-  margin-bottom: 14px;
-}
-
-.termos-conteudo h5 {
-  font-size: .85rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 14px 0 6px;
-}
-
-.termos-conteudo p {
-  font-size: .85rem;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 8px;
-}
-
-.termos-conteudo ul {
-  padding-left: 20px;
-  margin-bottom: 8px;
-}
-
-.termos-conteudo ul li {
-  font-size: .85rem;
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.termos-conteudo strong { color: var(--text); }
-
-.termos-contacto {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-
-.termos-contacto a { color: var(--r); }
-
-.termos-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: rgba(139,0,0,.04);
-  font-size: .75rem;
-  color: var(--r);
-  font-weight: 500;
-  border-top: 1px solid var(--border);
-  transition: .3s;
-}
-
-.termos-hint svg { width: 14px; height: 14px; animation: bounce .8s infinite alternate; }
-@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(4px); } }
-
-.termos-hint.lido {
-  color: #2E7D32;
-  background: rgba(46,125,50,.06);
-  border-color: rgba(46,125,50,.15);
-}
-
-.termos-hint.lido svg { animation: none; }
-
-.termos-check-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  cursor: pointer;
-  border-top: 1px solid var(--border);
-  transition: opacity .3s;
-  user-select: none;
-}
-
-.termos-check-wrap input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--r);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.termos-check-label {
-  font-size: .85rem;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-.termos-check-label span { color: var(--r); font-weight: 600; }
-
-#btnCriarConta {
-  transition: .25s;
-}
-
-#btnCriarConta:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-  background: var(--muted);
-}
-
-.doacao-banner {
-  margin: 0 0 16px;
-  background: linear-gradient(135deg, #ffa995, #8B0000);
-  border-radius: 16px;
-  padding: 18px 20px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  transition: .2s;
-  text-decoration: none;
-}
-
-.doacao-banner:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,0,0,.25); }
-
-.doacao-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 1.4rem;
-}
-
-.doacao-texto { flex: 1; }
-.doacao-texto h5 { color: white; font-size: .9rem; font-weight: 700; margin-bottom: 2px; }
-.doacao-texto p  { color: rgba(255,255,255,.7); font-size: .78rem; line-height: 1.4; }
-
-.doacao-seta { color: rgba(255,255,255,.6); }
-.doacao-seta svg { width: 18px; height: 18px; }
-
-/* ── SOCIAL FEATURES (Stories, Trending, Likes) ───────────────── */
-.card-metrics {
-  display: flex;
-  gap: 16px;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-  font-size: 0.7rem;
-  color: var(--muted);
-}
-
-.metric-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.metric-item:hover {
-  color: var(--r);
-}
-
-.like-metric {
-  cursor: pointer;
-}
-
-.like-metric[data-liked="true"] {
-  color: #ed4956;
-}
-
-.like-metric[data-liked="true"] svg {
-  fill: #ed4956;
-  stroke: #ed4956;
-}
-
-.like-ripple {
-  position: fixed;
-  pointer-events: none;
-  animation: ripple 0.5s ease-out forwards;
-  font-size: 2.5rem;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-}
-
-@keyframes ripple {
-  0% { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
-}
-
-.stories-container {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  padding: 16px 0 20px;
-  margin-bottom: 8px;
-  scrollbar-width: none;
-}
-
-.stories-container::-webkit-scrollbar {
-  display: none;
-}
-
-.story-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.story-item:hover {
-  transform: translateY(-2px);
-}
-
-.story-ring {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  padding: 2px;
-  background: linear-gradient(45deg, #f09433, #d62976, #962fbf, #3b5998);
-}
-
-.story-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--card);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.story-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.story-avatar .story-letra {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--r);
-  background: var(--bg2);
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.story-name {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--muted);
-  max-width: 68px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.trending-card {
-  background: var(--card);
-  border-radius: 16px;
-  border: 1.5px solid var(--border);
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.trending-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  font-weight: 700;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--r);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.trending-item {
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: background 0.15s;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.trending-item:last-child {
-  border-bottom: none;
-}
-
-.trending-item:hover {
-  background: rgba(139, 0, 0, 0.04);
-}
-
-.trending-rank {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--muted);
-  width: 28px;
-}
-
-.trending-info {
-  flex: 1;
-}
-
-.trending-info h4 {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.trending-info p {
-  font-size: 0.65rem;
-  color: var(--muted);
-}
-
-.trending-stats {
-  font-size: 0.65rem;
-  color: var(--muted);
-  background: var(--bg2);
-  padding: 3px 8px;
-  border-radius: 16px;
-}
-
-.reaction-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 2000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.reaction-modal.open {
-  display: flex;
-}
-
-.reaction-modal-content {
-  background: var(--card);
-  border-radius: 28px;
-  padding: 20px;
-  width: 90%;
-  max-width: 300px;
-  text-align: center;
-}
-
-.reaction-modal-content h3 {
-  font-size: 1.1rem;
-  margin-bottom: 16px;
-}
-
-.reaction-options {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 16px;
-}
-
-.reaction-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px;
-  border-radius: 40px;
-  cursor: pointer;
-  transition: all 0.15s;
-  background: none;
-  border: none;
-}
-
-.reaction-option:hover {
-  transform: scale(1.1);
-  background: rgba(139, 0, 0, 0.08);
-}
-
-.reaction-emoji {
-  font-size: 1.8rem;
-}
-
-.reaction-label {
-  font-size: 0.65rem;
-  color: var(--muted);
-}
-
-.scroll-top-btn {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  background: var(--r);
-  color: white;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
-  transition: all 0.2s;
-  opacity: 0;
-  transform: scale(0.8);
-  pointer-events: none;
-  z-index: 100;
-  border: none;
-}
-
-.scroll-top-btn.show {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
-}
-
-.scroll-top-btn:hover {
-  transform: translateY(-2px) scale(1.05);
-}
-
-/* Notificacoes */
-.notificacao-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.notificacao-item:hover {
-  background: rgba(139, 0, 0, 0.04);
-}
-
-.notificacao-item.nao-lida {
-  background: rgba(139, 0, 0, 0.04);
-}
-
-.notificacao-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--bg2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.notificacao-icon svg {
-  width: 20px;
-  height: 20px;
-  color: var(--r);
-}
-
-.notificacao-conteudo {
-  flex: 1;
-}
-
-.notificacao-mensagem {
-  font-size: 0.85rem;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-.notificacao-data {
-  font-size: 0.65rem;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.notificacao-badge {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ed4956;
-  flex-shrink: 0;
-}
-
-/* Resumo avaliacoes */
-.resumo-avaliacoes {
-  text-align: center;
-  padding: 16px;
-}
-
-.resumo-nota {
-  margin-bottom: 8px;
-}
-
-.resumo-valor {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--r);
-}
-
-.resumo-estrelas {
-  font-size: 1rem;
-  letter-spacing: 2px;
-  color: #FFB300;
-  margin-left: 8px;
-}
-
-.resumo-texto {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-left: 8px;
-}
-
-.resumo-total {
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-</style>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
 </head>
 <body>
 
-<!-- MODAL GLOBAL -->
-<div id="modal" class="modal-overlay" style="display:none">
+<!-- ════════════════════════════
+     MODAL GLOBAL (bottom sheet)
+════════════════════════════ -->
+<div id="modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)fecharModal()">
   <div class="modal-box">
     <h3 id="modalTitulo"></h3>
     <p id="modalMensagem"></p>
@@ -594,9 +39,12 @@
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-<!-- AUTH -->
+<!-- ════════════════════════════
+     AUTH
+════════════════════════════ -->
 <div id="paginaAuth" class="pagina">
   <div class="auth-container">
+
     <div class="auth-logo">
       <div class="auth-logo-circle">K</div>
       <h1>Kixikila</h1>
@@ -608,12 +56,13 @@
       <button class="auth-tab" onclick="mostrarTab('login')">Entrar</button>
     </div>
 
+    <!-- REGISTO -->
     <div id="tabRegisto" class="auth-form">
       <div class="foto-upload" onclick="document.getElementById('inputFotoRegisto').click()">
         <img id="previewFotoRegisto" src="" style="display:none">
         <div id="fotoPlaceholderRegisto" class="foto-placeholder">
           <i data-lucide="camera"></i>
-          <span>Foto de perfil</span>
+          <span>Foto</span>
         </div>
         <input type="file" id="inputFotoRegisto" accept="image/*" capture="user" style="display:none" onchange="previewFoto('Registo',event)">
       </div>
@@ -639,42 +88,42 @@
           <div class="termos-conteudo">
             <h4>TERMOS DE USO — KIXIKILA</h4>
             <p class="termos-data">Última actualização: Maio de 2026</p>
-            <p>Bem-vindo à KIXIKILA!</p>
-            <p>Estes Termos de Uso regulam o acesso e utilização da plataforma KIXIKILA (site e/ou aplicação), disponibilizada por Adilson Rafael (desenvolvedor independente).</p>
+            <p>Bem-vindo à KIXIKILA! Estes Termos de Uso regulam o acesso e utilização da plataforma KIXIKILA, disponibilizada por Adilson Rafael (desenvolvedor independente).</p>
             <h5>1. Aceitação dos Termos</h5>
-            <p>Ao aceder ou utilizar a KIXIKILA, você concorda com estes Termos na íntegra. Se não concordar, não deve utilizar a plataforma.</p>
+            <p>Ao aceder ou utilizar a KIXIKILA, você concorda com estes Termos na íntegra.</p>
             <h5>2. Descrição do Serviço</h5>
-            <p>A KIXIKILA é uma plataforma que permite aos usuários criar e gerir grupos de poupança rotativa, gerar códigos de convite, definir valores e acompanhar rodadas, e comunicar dentro dos grupos.</p>
-            <p>A plataforma <strong>não</strong> realiza cobranças, transferências nem guarda dinheiro de nenhum usuário. Todos os pagamentos são feitos directamente entre os participantes fora da plataforma.</p>
+            <p>A KIXIKILA permite criar e gerir grupos de poupança rotativa, gerar códigos de convite, definir valores e comunicar dentro dos grupos. Não realiza cobranças nem guarda dinheiro — os pagamentos são feitos directamente entre participantes.</p>
             <h5>3. Responsabilidades</h5>
-            <p>A KIXIKILA é apenas uma ferramenta de organização. Não somos responsáveis por acordos, pagamentos, dívidas ou conflitos entre os membros dos grupos.</p>
+            <p>A KIXIKILA é apenas uma ferramenta de organização. Não somos responsáveis por acordos, pagamentos, dívidas ou conflitos entre membros.</p>
             <h5>4. Regras de Utilização</h5>
-            <p>É proibido usar a plataforma para actividades ilegais, fraudes, partilhar conteúdo ofensivo, ou tentar aceder a contas de outros usuários.</p>
+            <p>É proibido usar a plataforma para actividades ilegais, fraudes, branqueamento de capitais, conteúdo ofensivo, ou tentativas de acesso a contas alheias.</p>
             <h5>5. Doações</h5>
-            <p>A plataforma é gratuita. As doações são voluntárias e ajudam a manter e melhorar o projecto.</p>
+            <p>A plataforma é gratuita. Doações são voluntárias e não reembolsáveis.</p>
             <h5>6. Limitação de Responsabilidade</h5>
-            <p>A KIXIKILA é disponibilizada "no estado em que se encontra". Não garantimos que esteja livre de erros ou interrupções.</p>
-            <h5>7. Suspensão e Cancelamento</h5>
-            <p>Reservamos o direito de suspender ou terminar contas que violem estes Termos.</p>
-            <h5>8. Alterações</h5>
-            <p>Podemos actualizar estes Termos. A continuação do uso após actualizações significa aceitação das novas versões.</p>
-            <h5>9. Lei Aplicável</h5>
-            <p>Estes Termos são regidos pelas leis de Angola. Qualquer disputa será resolvida nos tribunais de Luanda.</p>
-            <p class="termos-contacto">Para dúvidas: <a href="https://wa.me/244921325366" target="_blank">+244 921 325 366</a></p>
+            <p>A KIXIKILA é disponibilizada "no estado em que se encontra". Não garantimos ausência de erros ou interrupções.</p>
+            <h5>7. Lei Aplicável</h5>
+            <p>Estes Termos são regidos pelas leis de Angola. Disputas resolvidas nos tribunais de Luanda.</p>
+            <p class="termos-contacto">Dúvidas: <a href="https://wa.me/244921325366" target="_blank">+244 921 325 366</a></p>
           </div>
         </div>
         <div class="termos-hint" id="termosHint">
           <i data-lucide="chevrons-down"></i>
           Leia os termos até ao fim para activar o registo
         </div>
-        <label class="termos-check-wrap" id="termosCheckWrap" style="opacity:.35;pointer-events:none;">
+        <label class="termos-check-wrap" id="termosCheckWrap" style="opacity:.3;pointer-events:none;">
           <input type="checkbox" id="termosCheck" disabled onchange="atualizarBotaoCriar()">
-          <span class="termos-check-label">Li e aceito os <span>Termos de Uso</span> e a <span>Política de Privacidade</span> da KIXIKILA</span>
+          <span class="termos-check-label">
+            Li e aceito os <span>Termos de Uso</span> e a <span>Política de Privacidade</span>
+          </span>
         </label>
       </div>
-      <button class="btn-primary btn-block" id="btnCriarConta" onclick="registar()" disabled>Criar conta</button>
+
+      <button class="btn-primary btn-block" id="btnCriarConta" onclick="registar()" disabled>
+        Criar conta
+      </button>
     </div>
 
+    <!-- LOGIN -->
     <div id="tabLogin" class="auth-form" style="display:none">
       <div class="campo">
         <label>Telefone</label>
@@ -686,236 +135,469 @@
       </div>
       <button class="btn-primary btn-block" onclick="entrar()">Entrar</button>
     </div>
+
   </div>
 </div>
 
-<!-- DASHBOARD -->
+<!-- ════════════════════════════
+     DASHBOARD
+════════════════════════════ -->
 <div id="paginaDashboard" class="pagina" style="display:none">
+
+  <!-- Topnav estilo X -->
   <nav class="topnav">
     <div class="topnav-logo">
       <div class="logo-dot">K</div>
       <span>Kixikila</span>
     </div>
-    <div class="topnav-avatar" onclick="abrirPerfil()">
-      <img id="navAvatar" src="" style="display:none">
-      <div id="navAvatarLetra" class="avatar-letra"></div>
+    <div style="display:flex;gap:4px;align-items:center;">
+      <!-- Notificações -->
+      <button class="btn-icon" title="Notificações" style="position:relative">
+        <i data-lucide="bell"></i>
+        <span class="notif-dot"></span>
+      </button>
+      <!-- Mensagens -->
+      <button class="btn-icon" title="Mensagens">
+        <i data-lucide="mail"></i>
+      </button>
     </div>
   </nav>
 
-  <div class="dashboard-tabs">
-    <button class="dash-tab activo" id="tabDescobrir" onclick="mostrarTabDashboard('descobrir')">
-      <i data-lucide="search"></i> Descobrir
-    </button>
-    <button class="dash-tab" id="tabMeusGrupos" onclick="mostrarTabDashboard('meus')">
-      <i data-lucide="users"></i> Os Meus Grupos
-    </button>
-  </div>
-
+  <!-- Conteúdo scrollável -->
   <div class="dashboard-content">
-    <div id="storiesContainer" class="stories-container"></div>
-    
-    <div class="trending-card">
-      <div class="trending-header">
-        <i data-lucide="trending-up"></i>
-        Tendências em Angola
-      </div>
-      <div id="trendingContainer"></div>
+
+    <!-- Tabs: Descobrir | Os Meus -->
+    <div class="dashboard-tabs">
+      <button class="dash-tab activo" id="tabDescobrir" onclick="mostrarTabDashboard('descobrir')">
+        <i data-lucide="compass"></i> Descobrir
+      </button>
+      <button class="dash-tab" id="tabMeusGrupos" onclick="mostrarTabDashboard('meus')">
+        <i data-lucide="layers"></i> Os Meus
+      </button>
     </div>
 
-    <a class="doacao-banner" href="#" target="_blank" rel="noopener">
-      <div class="doacao-icon"><i data-lucide="heart-handshake"></i></div>
-      <div class="doacao-texto">
-        <h5>Apoiar a Kixikila</h5>
-        <p>A plataforma é gratuita. Uma doação voluntária ajuda a mantê-la e a melhorá-la.</p>
-      </div>
-      <div class="doacao-seta"><i data-lucide="chevron-right"></i></div>
-    </a>
-
+    <!-- ── DESCOBRIR ── -->
     <div id="conteudoDescobrir">
-      <div id="feedGrupos" style="display:flex;flex-direction:column;gap:12px;">
-        <p style="color:var(--muted);font-size:.85rem;text-align:center;padding:20px;">A carregar grupos abertos...</p>
-      </div>
-    </div>
 
-    <div id="conteudoMeusGrupos" style="display:none;">
-      <div id="listaGrupos" class="lista-grupos"></div>
-      <p id="dashVazio" class="vazio-msg" style="display:none">
-        Ainda não fazes parte de nenhum grupo.<br>Cria ou entra num grupo abaixo.
-      </p>
-    </div>
-  </div>
-
-  <div class="fabs">
-    <button class="fab fab-mini" onclick="abrirEntrarGrupo()" title="Entrar num grupo">
-      <i data-lucide="log-in"></i>
-    </button>
-    <button class="fab fab-principal" onclick="abrirCriarGrupo()" title="Criar grupo">
-      <i data-lucide="plus"></i>
-    </button>
-  </div>
-</div>
-
-<!-- PERFIL -->
-<div id="paginaPerfil" class="pagina" style="display:none">
-  <nav class="topnav">
-    <button class="btn-icon" onclick="voltarDashboard()"><i data-lucide="arrow-left"></i></button>
-    <span class="topnav-titulo">O Meu Perfil</span>
-    <button class="btn-icon" onclick="logout()"><i data-lucide="log-out"></i></button>
-  </nav>
-  <div class="perfil-content">
-    <div class="perfil-foto-wrap">
-      <div class="perfil-foto-circle" onclick="document.getElementById('inputFotoPerfil').click()">
-        <img id="perfilFotoImg" src="" style="display:none">
-        <div id="perfilFotoLetra" class="avatar-letra grande"></div>
-        <div class="perfil-foto-edit"><i data-lucide="camera"></i></div>
+      <!-- Caixa de publicação / entrada rápida (estilo X) -->
+      <div class="compose-box" onclick="abrirEntrarGrupo()">
+        <div class="compose-avatar" id="composeAvatar">
+          <img id="composeAvatarImg" src="" style="display:none">
+          <span id="composeAvatarLetra"></span>
+        </div>
+        <div class="compose-right">
+          <span class="compose-placeholder">Tens um código de grupo? Entra aqui...</span>
+          <div class="compose-actions">
+            <div class="compose-icons">
+              <button class="compose-icon-btn" onclick="event.stopPropagation();abrirCriarGrupo()">
+                <i data-lucide="plus-circle"></i>
+              </button>
+              <button class="compose-icon-btn" onclick="event.stopPropagation();carregarFeedDashboard()">
+                <i data-lucide="refresh-cw"></i>
+              </button>
+            </div>
+            <button class="btn-publicar" onclick="event.stopPropagation();abrirEntrarGrupo()">Entrar</button>
+          </div>
+        </div>
       </div>
-      <input type="file" id="inputFotoPerfil" accept="image/*" capture="user" style="display:none" onchange="previewFoto('Perfil',event)">
-      <h2 id="perfilNome"></h2>
-      <p id="perfilTelefone" class="perfil-tel"></p>
-      <div id="perfilReputacao" class="reputacao-grande"></div>
-    </div>
-    <div class="perfil-stats">
-      <div class="stat-box"><span id="statGrupos">0</span><label>Grupos</label></div>
-      <div class="stat-box"><span id="statAvaliacoes">0</span><label>Avaliações</label></div>
-    </div>
-    
-    <!-- Resumo de Avaliacoes -->
-    <div class="card-secao">
-      <h4>Minha Reputação</h4>
-      <div id="minhasAvaliacoesLista" class="resumo-container">
-        <p style="color:var(--muted);text-align:center;padding:16px;">A carregar...</p>
-      </div>
-    </div>
-    
-    <div class="card-secao">
-      <h4>Editar dados</h4>
-      <div class="campo"><label>Nome</label><input type="text" id="editNome"></div>
-      <div class="campo"><label>Senha</label><input type="password" id="editSenha" placeholder="Nova senha (opcional)"></div>
-      <button class="btn-primary btn-block" onclick="guardarPerfil()">Guardar alterações</button>
-    </div>
-    
-    <div style="margin: 0 16px 16px;">
-      <a class="doacao-banner" href="#" target="_blank" rel="noopener">
-        <div class="doacao-icon"><i data-lucide="heart-handshake"></i></div>
-        <div class="doacao-texto"><h5>Apoiar a Kixikila</h5><p>Donativo voluntário — ajuda a manter o projecto gratuito.</p></div>
+
+      <!-- Doação integrada como post -->
+      <a class="doacao-banner" href="https://www.paypal.com/donate/?hosted_button_id=XXXXXXXX" target="_blank" rel="noopener">
+        <div class="doacao-icon">🤝</div>
+        <div class="doacao-texto">
+          <h5>Apoiar a Kixikila</h5>
+          <p>A plataforma é gratuita — uma doação ajuda a mantê-la.</p>
+        </div>
         <div class="doacao-seta"><i data-lucide="chevron-right"></i></div>
       </a>
+
+      <!-- Stories — grupos abertos -->
+      <div class="secao-header">
+        <h3>Grupos abertos</h3>
+        <button onclick="carregarFeedDashboard()">Actualizar</button>
+      </div>
+      <div class="stories-row" id="storiesRow">
+        <p style="color:var(--muted);font-size:.8rem;padding:8px 0">A carregar...</p>
+      </div>
+
+      <!-- Feed de grupos -->
+      <div class="secao-header" style="padding-top:8px;">
+        <h3>Todos os grupos</h3>
+      </div>
+      <div class="feed-lista" id="feedGrupos">
+        <div style="padding:30px 16px;text-align:center;color:var(--muted);font-size:.88rem">
+          A carregar grupos abertos...
+        </div>
+      </div>
+
+    </div><!-- /conteudoDescobrir -->
+
+    <!-- ── OS MEUS GRUPOS ── -->
+    <div id="conteudoMeusGrupos" style="display:none;padding-top:4px;">
+      <div class="lista-grupos" id="listaGrupos"></div>
+      <p id="dashVazio" class="vazio-msg" style="display:none">
+        Ainda não fazes parte de nenhum grupo.<br>
+        <span style="color:var(--r);font-weight:700;cursor:pointer" onclick="abrirCriarGrupo()">Cria o teu primeiro grupo →</span>
+      </p>
     </div>
-    
-    <div class="card-perigo">
-      <h4>Zona de Perigo</h4>
-      <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">Eliminar a tua conta remove-te de todos os grupos e apaga os teus dados permanentemente. Esta ação é irreversível.</p>
-      <button class="btn-primary btn-block" style="background:var(--r2);" onclick="confirmarEliminarConta()">Eliminar Conta</button>
+
+  </div><!-- /dashboard-content -->
+
+  <!-- ── BOTTOM NAV ── -->
+  <nav class="bottom-nav">
+    <button class="nav-item activo" id="navHome" onclick="mostrarTabDashboard('descobrir');setNavActivo('navHome')">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" id="navExplorar" onclick="mostrarTabDashboard('descobrir');setNavActivo('navExplorar')">
+      <i data-lucide="search"></i>
+      <span>Explorar</span>
+    </button>
+    <!-- FAB criar -->
+    <div class="nav-fab">
+      <button class="nav-fab-btn" onclick="abrirCriarGrupo()" title="Criar grupo">
+        <i data-lucide="plus"></i>
+      </button>
+    </div>
+    <button class="nav-item" id="navGrupos" onclick="mostrarTabDashboard('meus');setNavActivo('navGrupos')">
+      <i data-lucide="users"></i>
+      <span>Grupos</span>
+    </button>
+    <button class="nav-item" id="navPerfil" onclick="abrirPerfil();setNavActivo('navPerfil')">
+      <i data-lucide="user"></i>
+      <span>Perfil</span>
+    </button>
+  </nav>
+
+</div><!-- /paginaDashboard -->
+
+<!-- ════════════════════════════
+     PERFIL — O MEU
+════════════════════════════ -->
+<div id="paginaPerfil" class="pagina" style="display:none">
+  <nav class="topnav">
+    <button class="btn-icon" onclick="voltarDashboard()">
+      <i data-lucide="arrow-left"></i>
+    </button>
+    <span class="topnav-titulo" id="perfilTopTitulo">Perfil</span>
+    <button class="btn-icon" onclick="logout()">
+      <i data-lucide="log-out"></i>
+    </button>
+  </nav>
+
+  <div class="perfil-content">
+
+    <!-- Capa -->
+    <div class="perfil-capa"></div>
+
+    <div class="perfil-foto-wrap">
+      <!-- Foto + botão editar alinhados -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+        <div class="perfil-foto-circle" onclick="document.getElementById('inputFotoPerfil').click()">
+          <img id="perfilFotoImg" src="" style="display:none">
+          <div id="perfilFotoLetra" class="avatar-letra grande"></div>
+          <div class="perfil-foto-edit"><i data-lucide="camera"></i></div>
+        </div>
+        <button class="btn-editar-perfil" onclick="toggleEditarPerfil()">Editar perfil</button>
+      </div>
+      <input type="file" id="inputFotoPerfil" accept="image/*" capture="user" style="display:none" onchange="previewFoto('Perfil',event)">
+
+      <!-- Nome + verificado -->
+      <div class="perfil-nome-linha" style="margin-top:12px;">
+        <div>
+          <h2 id="perfilNome">
+            <span id="perfilNomeTexto"></span>
+            <span class="verificado-badge"><i data-lucide="badge-check"></i></span>
+          </h2>
+          <p class="perfil-handle" id="perfilHandle"></p>
+        </div>
+      </div>
+
+      <!-- Bio / reputação -->
+      <div id="perfilReputacao" class="reputacao-grande" style="margin-bottom:8px;"></div>
+
+      <!-- Meta: localização + data -->
+      <div class="perfil-meta">
+        <div class="perfil-meta-item">
+          <i data-lucide="map-pin"></i>
+          <span>Angola</span>
+        </div>
+        <div class="perfil-meta-item">
+          <i data-lucide="calendar"></i>
+          <span id="perfilDataEntrada">Entrou em 2026</span>
+        </div>
+      </div>
+
+      <!-- Seguindo / seguidores (grupos e avaliações) -->
+      <div class="perfil-social">
+        <div class="perfil-social-item">
+          <strong id="statGrupos">0</strong>
+          <span>Grupos</span>
+        </div>
+        <div class="perfil-social-item">
+          <strong id="statAvaliacoes">0</strong>
+          <span>Avaliações</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs: Publicações | Grupos | Avaliações -->
+    <div class="perfil-tabs">
+      <button class="perfil-tab activo" id="ptabPub" onclick="setPerfTab('pub')">Publicações</button>
+      <button class="perfil-tab" id="ptabGrupos" onclick="setPerfTab('grupos')">Grupos</button>
+      <button class="perfil-tab" id="ptabAval" onclick="setPerfTab('aval')">Avaliações</button>
+    </div>
+
+    <!-- Conteúdo das tabs -->
+    <div id="ptabConteudo">
+
+      <!-- Editar dados (tab pub por defeito, mas colocamos card aqui) -->
+      <div id="perfEditarCard" class="card-secao" style="display:none">
+        <h4>Editar dados</h4>
+        <div class="campo">
+          <label>Nome</label>
+          <input type="text" id="editNome">
+        </div>
+        <div class="campo">
+          <label>Nova senha (opcional)</label>
+          <input type="password" id="editSenha" placeholder="Deixa vazio para manter">
+        </div>
+        <button class="btn-primary btn-block" onclick="guardarPerfil()">Guardar alterações</button>
+      </div>
+
+      <p id="perfilTelefone" class="perfil-tel" style="padding:12px 16px;display:none"></p>
+
+      <!-- Doação -->
+      <a class="doacao-banner" href="https://www.paypal.com/donate/?hosted_button_id=XXXXXXXX" target="_blank" rel="noopener">
+        <div class="doacao-icon">🤝</div>
+        <div class="doacao-texto">
+          <h5>Apoiar a Kixikila</h5>
+          <p>Donativo voluntário — mantém o projecto gratuito.</p>
+        </div>
+        <div class="doacao-seta"><i data-lucide="chevron-right"></i></div>
+      </a>
+
+      <!-- Zona de perigo -->
+      <div class="card-perigo">
+        <h4>Zona de Perigo</h4>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px;">
+          Eliminar a conta remove-te de todos os grupos e apaga os teus dados permanentemente.
+        </p>
+        <button class="btn-primary btn-block" style="background:var(--r2);" onclick="confirmarEliminarConta()">
+          Eliminar Conta
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- PAGINA NOTIFICACOES -->
-<div id="paginaNotificacoes" class="pagina" style="display:none">
-  <nav class="topnav">
-    <button class="btn-icon" onclick="voltarDashboard()"><i data-lucide="arrow-left"></i></button>
-    <span class="topnav-titulo">Notificações</span>
-    <div></div>
-  </nav>
-  <div id="notificacoesLista" class="perfil-membro-scroll"></div>
-</div>
-
-<!-- PERFIL DE MEMBRO -->
+<!-- ════════════════════════════
+     PERFIL DE MEMBRO
+════════════════════════════ -->
 <div id="paginaPerfilMembro" class="pagina" style="display:none">
   <nav class="topnav">
-    <button class="btn-icon" onclick="history.back()"><i data-lucide="arrow-left"></i></button>
+    <button class="btn-icon" onclick="history.back()">
+      <i data-lucide="arrow-left"></i>
+    </button>
     <span class="topnav-titulo">Perfil</span>
     <div></div>
   </nav>
   <div id="perfilMembroConteudo" class="perfil-membro-scroll"></div>
 </div>
 
-<!-- REACTION MODAL -->
-<div id="reactionModal" class="reaction-modal">
-  <div class="reaction-modal-content">
-    <h3>Reagir a <span id="reactionGrupoNome"></span>?</h3>
-    <div class="reaction-options">
-      <button class="reaction-option" data-reaction="like"><span class="reaction-emoji">👍</span><span class="reaction-label">Curtir</span></button>
-      <button class="reaction-option" data-reaction="love"><span class="reaction-emoji">❤️</span><span class="reaction-label">Amei</span></button>
-      <button class="reaction-option" data-reaction="care"><span class="reaction-emoji">🤝</span><span class="reaction-label">Apoiar</span></button>
-      <button class="reaction-option" data-reaction="haha"><span class="reaction-emoji">😄</span><span class="reaction-label">Divertido</span></button>
-      <button class="reaction-option" data-reaction="wow"><span class="reaction-emoji">😲</span><span class="reaction-label">Surpreende</span></button>
-    </div>
-    <button class="btn-outline" style="width:100%;" onclick="fecharModalReacao()">Cancelar</button>
-  </div>
-</div>
-
-<!-- SCROLL TOP BUTTON -->
-<button id="scrollTopBtn" class="scroll-top-btn"><i data-lucide="arrow-up"></i></button>
-
-<!-- OVERLAY AVALIAÇÃO DIRECTA -->
-<div id="overlayAvaliacaoDireta" class="modal-overlay" style="display:none">
+<!-- Overlay avaliação directa -->
+<div id="overlayAvaliacaoDireta" class="modal-overlay" style="display:none" onclick="if(event.target===this)fecharAvaliacaoDireta()">
   <div class="modal-box">
     <h3>Avaliar <span id="avalDiretaNome"></span></h3>
     <div id="estrelasWrapDireta" class="estrelas-wrap"></div>
-    <div class="campo" style="margin-top:12px"><label>Comentário (opcional)</label><input type="text" id="comentarioAvaliacao" placeholder="Ex: Muito pontual e confiável"></div>
-    <div class="modal-btns" style="margin-top:16px"><button class="btn-outline" onclick="fecharAvaliacaoDireta()">Cancelar</button><button class="btn-primary" onclick="confirmarAvaliacaoDireta()">Confirmar</button></div>
+    <div class="campo" style="margin-top:12px">
+      <label>Comentário (opcional)</label>
+      <input type="text" id="comentarioAvaliacao" placeholder="Ex: Muito pontual e confiável">
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn-outline" onclick="fecharAvaliacaoDireta()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarAvaliacaoDireta()">Confirmar</button>
+    </div>
   </div>
 </div>
 
-<!-- CRIAR GRUPO -->
+<!-- ════════════════════════════
+     CRIAR GRUPO
+════════════════════════════ -->
 <div id="paginaCriarGrupo" class="pagina" style="display:none">
-  <nav class="topnav"><button class="btn-icon" onclick="voltarDashboard()"><i data-lucide="arrow-left"></i></button><span class="topnav-titulo">Criar Grupo</span><div></div></nav>
+  <nav class="topnav">
+    <button class="btn-icon" onclick="voltarDashboard()">
+      <i data-lucide="arrow-left"></i>
+    </button>
+    <span class="topnav-titulo">Criar Grupo</span>
+    <div></div>
+  </nav>
   <div class="form-pagina">
-    <div class="campo"><label>Nome do grupo</label><input type="text" id="criarNome" placeholder="Ex: Poupança Namibe 2026"></div>
-    <div class="campo"><label>Valor por membro (mín. 500 KZ)</label><input type="number" id="criarValor" placeholder="5000" min="500"></div>
-    <div class="campo"><label>Periodicidade</label><select id="criarFrequencia"><option value="semanal">Semanal</option><option value="quinzenal">Quinzenal</option><option value="mensal" selected>Mensal</option></select></div>
-    <div class="campo"><label>Máximo de membros</label><select id="criarMax"><option value="3">3 membros</option><option value="4">4 membros</option><option value="5">5 membros</option><option value="6" selected>6 membros</option><option value="8">8 membros</option><option value="10">10 membros</option></select></div>
+    <div class="campo">
+      <label>Nome do grupo</label>
+      <input type="text" id="criarNome" placeholder="Ex: Poupança Namibe 2026">
+    </div>
+    <div class="campo">
+      <label>Valor por membro (mín. 500 KZ)</label>
+      <input type="number" id="criarValor" placeholder="5000" min="500">
+    </div>
+    <div class="campo">
+      <label>Periodicidade</label>
+      <select id="criarFrequencia">
+        <option value="semanal">Semanal</option>
+        <option value="quinzenal">Quinzenal</option>
+        <option value="mensal" selected>Mensal</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label>Máximo de membros</label>
+      <select id="criarMax">
+        <option value="3">3 membros</option>
+        <option value="4">4 membros</option>
+        <option value="5">5 membros</option>
+        <option value="6" selected>6 membros</option>
+        <option value="8">8 membros</option>
+        <option value="10">10 membros</option>
+      </select>
+    </div>
     <button class="btn-primary btn-block" onclick="criarGrupo()">Criar grupo</button>
   </div>
 </div>
 
-<!-- ENTRAR GRUPO -->
+<!-- ════════════════════════════
+     ENTRAR GRUPO
+════════════════════════════ -->
 <div id="paginaEntrarGrupo" class="pagina" style="display:none">
-  <nav class="topnav"><button class="btn-icon" onclick="voltarDashboard()"><i data-lucide="arrow-left"></i></button><span class="topnav-titulo">Entrar num Grupo</span><div></div></nav>
-  <div class="form-pagina">
-    <div class="campo"><label>Código do grupo</label><input type="text" id="entrarCodigo" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.4rem;text-align:center"></div>
-    <button class="btn-primary btn-block" onclick="entrarGrupo()">Entrar no grupo</button>
+  <nav class="topnav">
+    <button class="btn-icon" onclick="voltarDashboard()">
+      <i data-lucide="arrow-left"></i>
+    </button>
+    <span class="topnav-titulo">Entrar num Grupo</span>
+    <div></div>
+  </nav>
+  <div class="form-pagina" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;height:100%;padding-bottom:60px;">
+    <div style="text-align:center;">
+      <div style="width:68px;height:68px;border-radius:50%;background:var(--r-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i data-lucide="scan-line" style="width:30px;height:30px;color:var(--r)"></i>
+      </div>
+      <h2 style="font-family:var(--serif);font-weight:800;font-size:1.35rem;color:var(--text);margin-bottom:8px">Código de convite</h2>
+      <p style="color:var(--muted);font-size:.88rem;line-height:1.5">Pede ao administrador do grupo<br>o código de 6 letras</p>
+    </div>
+    <div class="campo" style="width:100%;max-width:280px;">
+      <input type="text" id="entrarCodigo" placeholder="ABC123" maxlength="6"
+        style="text-transform:uppercase;letter-spacing:8px;font-size:1.7rem;text-align:center;font-weight:800;border-radius:16px;padding:18px;background:var(--bg3);color:var(--text);">
+    </div>
+    <button class="btn-primary btn-block" onclick="entrarGrupo()" style="max-width:280px;">Entrar no grupo</button>
   </div>
 </div>
 
-<!-- VER GRUPO -->
+<!-- ════════════════════════════
+     VER GRUPO
+════════════════════════════ -->
 <div id="paginaVerGrupo" class="pagina" style="display:none">
-  <nav class="topnav"><button class="btn-icon" onclick="voltarDashboard()"><i data-lucide="arrow-left"></i></button><span class="topnav-titulo" id="verGrupoTitulo"></span><button class="btn-icon" onclick="partilharGrupo()"><i data-lucide="share-2"></i></button></nav>
-  <div class="grupo-header"><div class="grupo-header-info"><p id="verGrupoValor" class="grupo-valor"></p><p id="verGrupoEstado" class="grupo-estado"></p><p id="verGrupoOrdem" class="grupo-ordem"></p></div><button class="btn-codigo" onclick="copiarCodigo()"><i data-lucide="copy"></i><span id="verGrupoCodigo"></span></button></div>
-  <div class="grupo-acoes"><button class="btn-acao" onclick="registarPagamento()"><i data-lucide="check-circle"></i><span>Paguei</span></button><button class="btn-acao btn-acao-outline" onclick="abrirAvaliacao()"><i data-lucide="star"></i><span>Avaliar</span></button><button class="btn-acao btn-acao-outline" onclick="abrirChat()"><i data-lucide="message-circle"></i><span>Chat</span></button></div>
-  <div class="secao-label"><i data-lucide="users"></i> MEMBROS</div>
+  <nav class="topnav">
+    <button class="btn-icon" onclick="voltarDashboard()">
+      <i data-lucide="arrow-left"></i>
+    </button>
+    <span class="topnav-titulo" id="verGrupoTitulo"></span>
+    <button class="btn-icon" onclick="partilharGrupo()">
+      <i data-lucide="share-2"></i>
+    </button>
+  </nav>
+
+  <div class="grupo-header">
+    <div>
+      <p id="verGrupoValor" class="grupo-valor"></p>
+      <p id="verGrupoEstado" class="grupo-estado"></p>
+      <p id="verGrupoOrdem" class="grupo-ordem"></p>
+    </div>
+    <button class="btn-codigo" onclick="copiarCodigo()">
+      <i data-lucide="copy"></i>
+      <span id="verGrupoCodigo"></span>
+    </button>
+  </div>
+
+  <div class="grupo-acoes">
+    <button class="btn-acao" onclick="registarPagamento()">
+      <i data-lucide="check-circle"></i>
+      <span>Paguei</span>
+    </button>
+    <button class="btn-acao btn-acao-outline" onclick="abrirAvaliacao()">
+      <i data-lucide="star"></i>
+      <span>Avaliar</span>
+    </button>
+    <button class="btn-acao btn-acao-outline" onclick="abrirChat()">
+      <i data-lucide="message-circle"></i>
+      <span>Chat</span>
+    </button>
+  </div>
+
+  <div class="secao-label">
+    <i data-lucide="users"></i> MEMBROS
+  </div>
   <div id="listaMembros" class="lista-membros"></div>
 </div>
 
-<!-- CHAT -->
+<!-- ════════════════════════════
+     CHAT
+════════════════════════════ -->
 <div id="paginaChat" class="pagina pagina-chat" style="display:none">
-  <nav class="topnav topnav-chat"><button class="btn-icon" onclick="voltarGrupo()"><i data-lucide="arrow-left"></i></button><div class="chat-topnav-info"><span id="chatNomeGrupo"></span><small id="chatMembrosCount"></small></div><div class="topnav-icons"><button class="btn-icon" onclick="abrirMembrosChat()"><i data-lucide="users"></i></button><button class="btn-icon" onclick="carregarChatGrupo()"><i data-lucide="refresh-cw"></i></button></div></nav>
+  <nav class="topnav topnav-chat">
+    <button class="btn-icon" onclick="voltarGrupo()">
+      <i data-lucide="arrow-left"></i>
+    </button>
+    <div class="chat-topnav-info">
+      <span id="chatNomeGrupo"></span>
+      <small id="chatMembrosCount"></small>
+    </div>
+    <div class="topnav-icons">
+      <button class="btn-icon" onclick="abrirMembrosChat()">
+        <i data-lucide="users"></i>
+      </button>
+      <button class="btn-icon" onclick="carregarChatGrupo()">
+        <i data-lucide="refresh-cw"></i>
+      </button>
+    </div>
+  </nav>
   <div id="chatMensagens" class="chat-mensagens"></div>
-  <div class="chat-input-bar"><input type="text" id="etMensagem" placeholder="Mensagem para o grupo..." onkeydown="if(event.key==='Enter')enviarMensagem()"><button class="btn-enviar" onclick="enviarMensagem()"><i data-lucide="send"></i></button></div>
+  <div class="chat-input-bar">
+    <input type="text" id="etMensagem" placeholder="Mensagem..." onkeydown="if(event.key==='Enter')enviarMensagem()">
+    <button class="btn-enviar" onclick="enviarMensagem()">
+      <i data-lucide="send"></i>
+    </button>
+  </div>
 </div>
 
-<!-- MODAL AVALIAÇÃO -->
-<div id="modalAvaliacao" class="modal-overlay" style="display:none">
-  <div class="modal-box"><h3>Avaliar membro</h3><select id="selMembro" class="select-avaliacao"></select><div class="estrelas-wrap" id="estrelasWrap"></div><div class="modal-btns"><button class="btn-outline" onclick="fecharModalAvaliacao()">Cancelar</button><button class="btn-primary" onclick="confirmarAvaliacao()">Avaliar</button></div></div>
+<!-- Modal avaliação -->
+<div id="modalAvaliacao" class="modal-overlay" style="display:none" onclick="if(event.target===this)fecharModalAvaliacao()">
+  <div class="modal-box">
+    <h3>Avaliar membro</h3>
+    <select id="selMembro" class="select-avaliacao"></select>
+    <div class="estrelas-wrap" id="estrelasWrap"></div>
+    <div class="modal-btns">
+      <button class="btn-outline" onclick="fecharModalAvaliacao()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarAvaliacao()">Avaliar</button>
+    </div>
+  </div>
 </div>
 
+<!-- ════════════════════════
+     JS
+════════════════════════ -->
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/dashboard.js"></script>
-<script src="js/grupo.js"></script>
-<script src="js/perfil.js"></script>
 <script src="js/app.js"></script>
 
 <script>
+/* ── TERMOS ─────────────────────────── */
 function verificarScrollTermos() {
-  const el = document.getElementById('termosScroll');
-  const hint = document.getElementById('termosHint');
+  const el    = document.getElementById('termosScroll');
+  const hint  = document.getElementById('termosHint');
   const check = document.getElementById('termosCheckWrap');
   const input = document.getElementById('termosCheck');
-  const chegouAoFim = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
-  if (chegouAoFim) {
-    hint.innerHTML = '<i data-lucide="check-circle"></i> Lido — agora pode aceitar os termos';
+  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+    hint.innerHTML = '<i data-lucide="check-circle"></i> Lido — pode aceitar os termos';
     hint.classList.add('lido');
     check.style.opacity = '1';
     check.style.pointerEvents = 'auto';
@@ -923,12 +605,225 @@ function verificarScrollTermos() {
     lucide.createIcons();
   }
 }
-
 function atualizarBotaoCriar() {
-  const aceite = document.getElementById('termosCheck').checked;
-  const btn = document.getElementById('btnCriarConta');
-  btn.disabled = !aceite;
+  document.getElementById('btnCriarConta').disabled =
+    !document.getElementById('termosCheck').checked;
+}
+
+/* ── BOTTOM NAV ─────────────────────── */
+function setNavActivo(id) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('activo'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('activo');
+}
+
+/* ── PERFIL TABS ────────────────────── */
+function toggleEditarPerfil() {
+  const card = document.getElementById('perfEditarCard');
+  const show = card.style.display === 'none';
+  card.style.display = show ? 'block' : 'none';
+}
+function setPerfTab(tab) {
+  ['pub','grupos','aval'].forEach(t => {
+    document.getElementById('ptab' + t.charAt(0).toUpperCase() + t.slice(1))
+      ?.classList.remove('activo');
+  });
+  document.getElementById('ptab' + tab.charAt(0).toUpperCase() + tab.slice(1))
+    ?.classList.add('activo');
+}
+
+/* ── DASHBOARD NOME / REP ───────────── */
+function carregarDashboard() {
+  const sessao = KixikilaManager.getSessao();
+  if (!sessao) return;
+  const p = sessao.perfil;
+
+  /* Compose avatar */
+  const cImg   = document.getElementById('composeAvatarImg');
+  const cLetra = document.getElementById('composeAvatarLetra');
+  if (p.foto_perfil) {
+    cImg.src = p.foto_perfil; cImg.style.display = 'block';
+    cLetra.style.display = 'none';
+  } else {
+    cImg.style.display = 'none';
+    cLetra.textContent = (p.nome?.[0] || 'K').toUpperCase();
+    cLetra.style.display = 'flex';
+  }
+
+  /* Nav avatar (topnav do dashboard não tem avatar próprio — só ícones) */
+}
+
+/* ── FEED (grupos abertos) ──────────── */
+async function carregarFeedDashboard() {
+  const container = document.getElementById('feedGrupos');
+  const stories   = document.getElementById('storiesRow');
+  if (!container) return;
+
+  try {
+    const grupos = await KixikilaManager.carregarFeed({ estado: 'aberto', limite: 20 });
+
+    /* Stories */
+    if (stories) {
+      stories.innerHTML = '';
+      if (!grupos.length) {
+        stories.innerHTML = '<p style="color:var(--muted);font-size:.8rem;padding:8px 0">Nenhum grupo aberto</p>';
+      } else {
+        grupos.slice(0, 8).forEach(g => {
+          const vagas = g.max_membros - g.membros.length;
+          const item  = document.createElement('div');
+          item.className = 'story-item';
+          item.onclick = () => {
+            _codigoGrupoAtual = g.codigo;
+            mostrarPagina('VerGrupo');
+            carregarVerGrupo(g.codigo);
+          };
+          item.innerHTML = `
+            <div class="story-ring">
+              <div class="story-inner">
+                <span class="story-inner-text">${(g.nome||'G')[0].toUpperCase()}</span>
+              </div>
+            </div>
+            <span class="story-label">${g.nome}</span>
+            <span class="story-valor">${vagas} vaga${vagas!==1?'s':''}</span>
+          `;
+          stories.appendChild(item);
+        });
+      }
+    }
+
+    /* Feed lista */
+    container.innerHTML = '';
+    if (!grupos.length) {
+      container.innerHTML = '<div style="padding:30px 16px;text-align:center;color:var(--muted);font-size:.88rem">Nenhum grupo aberto no momento.</div>';
+      return;
+    }
+    grupos.forEach(g => {
+      const vagas    = g.max_membros - g.membros.length;
+      const pct      = Math.round((g.membros.length / g.max_membros) * 100);
+      const views    = Math.floor(Math.random() * 300) + 50;
+      const likes    = Math.floor(Math.random() * 50) + 10;
+      const card     = document.createElement('div');
+      card.className = 'feed-grupo-card';
+      card.setAttribute('data-codigo', g.codigo);
+      card.onclick   = () => {
+        _codigoGrupoAtual = g.codigo;
+        mostrarPagina('VerGrupo');
+        carregarVerGrupo(g.codigo);
+      };
+      card.innerHTML = `
+        <div class="feed-card-top">
+          <div class="feed-grupo-icon">${(g.nome||'G')[0].toUpperCase()}</div>
+          <div class="feed-info">
+            <h4>${g.nome}</h4>
+            <div class="feed-valor">${KixikilaManager.formatarValor(g.valor)} KZ · ${g.periodicidade}</div>
+            <div class="feed-criador">por <span onclick="event.stopPropagation();abrirPerfilMembro('${g.criador.telefone}')">${g.criador.nome}</span></div>
+            <div class="feed-progress"><div class="feed-progress-bar" style="width:${pct}%"></div></div>
+          </div>
+          <div class="feed-meta">
+            <span class="feed-vagas">${vagas} vaga${vagas!==1?'s':''}</span>
+            <small>${g.membros.length}/${g.max_membros}</small>
+          </div>
+        </div>
+        <div class="feed-card-actions">
+          <div class="feed-action-btn">
+            <i data-lucide="eye" style="width:14px;height:14px"></i>
+            <span>${views}</span>
+          </div>
+          <div class="feed-action-btn like-metric" data-codigo="${g.codigo}" data-liked="false"
+               onclick="event.stopPropagation();handleGrupoLikeInline(this,'${g.codigo}',${likes})">
+            <i data-lucide="heart" style="width:14px;height:14px"></i>
+            <span class="like-count">${likes}</span>
+          </div>
+          <div class="feed-action-btn"
+               onclick="event.stopPropagation();abrirChatGrupo('${g.codigo}')">
+            <i data-lucide="message-circle" style="width:14px;height:14px"></i>
+            <span>Comentar</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch {
+    container.innerHTML = '<div style="padding:30px 16px;text-align:center;color:var(--muted);font-size:.88rem">Erro ao carregar grupos.</div>';
+  }
+}
+
+/* ── MEUS GRUPOS ────────────────────── */
+async function carregarMeusGruposDashboard() {
+  const container = document.getElementById('listaGrupos');
+  const vazio     = document.getElementById('dashVazio');
+  if (!container) return;
+
+  try {
+    const grupos = await KixikilaManager.carregarMeusGrupos();
+    if (!grupos.length) {
+      container.innerHTML = '';
+      if (vazio) vazio.style.display = 'block';
+      return;
+    }
+    if (vazio) vazio.style.display = 'none';
+    container.innerHTML = '';
+
+    grupos.forEach(g => {
+      const pagos  = g.membros.filter(m => m.pago).length;
+      const cheio  = g.membros.length >= g.max_membros;
+      const card   = document.createElement('div');
+      card.className = 'card-grupo';
+      card.onclick = () => {
+        _codigoGrupoAtual = g.codigo;
+        mostrarPagina('VerGrupo');
+        carregarVerGrupo(g.codigo);
+      };
+      card.innerHTML = `
+        <div class="card-grupo-icon">${(g.nome||'G')[0].toUpperCase()}</div>
+        <div class="card-grupo-info">
+          <h3>${g.nome}</h3>
+          <div class="valor">${KixikilaManager.formatarValor(g.valor)} KZ · ${g.periodicidade}</div>
+          <div class="info">${g.membros.length} membros · ${pagos} pagaram</div>
+          <span class="pill ${cheio?'pill-cheio':'pill-aberto'}">${cheio?'Cheio':'Aberto'}</span>
+        </div>
+        <div class="card-grupo-seta"><i data-lucide="chevron-right"></i></div>
+      `;
+      container.appendChild(card);
+    });
+    lucide.createIcons();
+  } catch {
+    container.innerHTML = '<div style="padding:30px 16px;text-align:center;color:var(--muted);font-size:.88rem">Erro ao carregar os teus grupos.</div>';
+  }
+}
+
+/* ── PERFIL (O meu) — override ──────── */
+function carregarMeuPerfil() {
+  const perfil = KixikilaManager.getSessao()?.perfil;
+  if (!perfil) return;
+
+  document.getElementById('perfilNomeTexto').textContent = perfil.nome || 'Utilizador';
+  document.getElementById('perfilTopTitulo').textContent = perfil.nome || 'Perfil';
+  document.getElementById('perfilHandle').textContent    = '@' + (perfil.nome || 'utilizador').toLowerCase().replace(/\s+/g,'');
+  document.getElementById('perfilTelefone').textContent  = perfil.telefone || '';
+  document.getElementById('perfilReputacao').textContent =
+    KixikilaManager.reputacaoEstrelas(perfil.reputacao || 0) + '  ' +
+    KixikilaManager.reputacaoTexto(perfil.reputacao || 0);
+  document.getElementById('editNome').value = perfil.nome || '';
+
+  if (perfil.foto_perfil) {
+    document.getElementById('perfilFotoImg').src            = perfil.foto_perfil;
+    document.getElementById('perfilFotoImg').style.display  = 'block';
+    document.getElementById('perfilFotoLetra').style.display= 'none';
+  } else {
+    document.getElementById('perfilFotoLetra').textContent  = (perfil.nome?.[0]||'K').toUpperCase();
+  }
+
+  KixikilaManager.carregarStats(perfil.telefone).then(s => {
+    document.getElementById('statGrupos').textContent    = s.grupos_activos || 0;
+    document.getElementById('statAvaliacoes').textContent= s.total_avaliacoes || 0;
+  }).catch(() => {});
+
+  lucide.createIcons();
 }
 </script>
+
 </body>
 </html>
+ 
+ 
