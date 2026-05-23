@@ -793,3 +793,25 @@ html, body {
 
 .star-btn.on         { color: #FBBF24; }
 .star-btn:active     { transform: scale(1.2); }
+
+/* Esconde todos os inputs de upload dentro do perfil */
+#modalPerfil input[type="file"],
+#modalPerfil .perfil-avatar-wrap + input {
+  display: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+}
+
+/* Alinha o nome e telefone */
+.perfil-topo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.perfil-nome, .perfil-tel {
+  margin: 0;
+  line-height: 1.4;
+}
