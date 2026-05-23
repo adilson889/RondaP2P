@@ -85,7 +85,7 @@ function mostrarPagina(nome) {
     carregarDashboard();
     carregarFeedDashboard();
     iniciarSync();
-    setTimeout(() => { configurarScrollToTop(); configurarPullToRefresh(); }, 300);
+    setTimeout(() => { configurarScrollToTop(); configurarPullToRefresh(); lucide.createIcons(); }, 400);
   } else {
     pararSync();
   }
@@ -104,6 +104,7 @@ window.addEventListener('popstate', (e) => {
     const el = document.getElementById('pagina' + pagina);
     if (el) el.style.display = 'flex';
     lucide.createIcons();
+    if (pagina === 'Dashboard') { carregarDashboard(); carregarFeedDashboard(); setTimeout(lucide.createIcons, 400); }
   }
 });
 
@@ -240,9 +241,7 @@ async function carregarFeedDashboard(silencioso = false) {
       card.setAttribute('data-codigo', g.codigo);
       card.onclick = () => abrirPreviewGrupo(g);
       card.innerHTML = `
-        ${g.foto_grupo
-          ? `<div class="feed-avatar-x" style="padding:0;overflow:hidden"><img src="${escapeHtml(g.foto_grupo)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
-          : `<div class="feed-avatar-x">${(g.nome||'G')[0].toUpperCase()}</div>`}
+        <div class="feed-avatar-x">${(g.nome||'G')[0].toUpperCase()}</div>
         <div class="feed-body-x">
           <div class="feed-header-x">
             <span class="feed-nome-x">${escapeHtml(g.nome)}</span>
@@ -353,24 +352,12 @@ function toggleLike(el, codigo) {
 // COMENTARIOS
 // ════════════════════════════════════════════════════════════
 
-async function abrirComentarios(codigo, nomeGrupo) {
+function abrirComentarios(codigo, nomeGrupo) {
   _comentarioGrupoAtual = codigo;
   const titulo = document.getElementById('comentariosTitulo');
   if (titulo) titulo.textContent = 'Comentários · ' + nomeGrupo;
-  const lista = document.getElementById('comentariosLista');
-  if (lista) lista.innerHTML = '<p style="text-align:center;color:var(--muted);padding:24px;font-size:.85rem">A carregar...</p>';
-  document.getElementById('modalComentarios').style.display = 'flex';
-  lucide.createIcons();
-  try {
-    const grupo = await KixikilaManager.carregarGrupo(codigo);
-    const msgs  = (grupo.mensagens || []).slice(-50).reverse();
-    _comentariosCache[codigo] = msgs.map(m => ({
-      nome:  m.nome  || 'Utilizador',
-      texto: m.texto || '',
-      tempo: (m.data || '').replace('T', ' ').slice(0, 16)
-    }));
-  } catch { _comentariosCache[codigo] = []; }
   renderizarComentarios(codigo);
+  document.getElementById('modalComentarios').style.display = 'flex';
 }
 
 function fecharComentarios() {
@@ -400,18 +387,15 @@ function renderizarComentarios(codigo) {
     </div>`).join('');
 }
 
-async function enviarComentario() {
+function enviarComentario() {
   const input  = document.getElementById('comentarioInput');
   const texto  = input?.value.trim() || '';
   const perfil = KixikilaManager.getSessao()?.perfil;
-  if (!texto || !perfil || !_comentarioGrupoAtual) return;
-  if (input) input.value = '';
+  if (!texto || !perfil) return;
   if (!_comentariosCache[_comentarioGrupoAtual]) _comentariosCache[_comentarioGrupoAtual] = [];
-  _comentariosCache[_comentarioGrupoAtual].unshift({ nome: perfil.nome || 'Eu', texto, tempo: 'Agora' });
+  _comentariosCache[_comentarioGrupoAtual].push({ nome: perfil.nome || 'Eu', texto, tempo: 'Agora' });
+  if (input) input.value = '';
   renderizarComentarios(_comentarioGrupoAtual);
-  try {
-    await KixikilaManager.enviarMensagem(_comentarioGrupoAtual, perfil.telefone, perfil.nome, texto);
-  } catch { mostrarToast('Erro ao guardar comentário'); }
 }
 
 // ════════════════════════════════════════════════════════════
