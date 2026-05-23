@@ -303,13 +303,18 @@
 <div id="modalMembroPerfil" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
   <div class="modal modal-membro">
     <button class="modal-fechar" onclick="fecharModal('modalMembroPerfil')">&#10005;</button>
-    <div class="membro-foto-grande" id="membroFotoGrande"></div>
-    <div class="membro-perfil-info">
-      <div class="membro-perfil-nome" id="membroPerfilNome"></div>
-      <div class="membro-perfil-tel" id="membroPerfilTel"></div>
+    <div style="display:flex;align-items:center;gap:14px;padding:0 0 16px;border-bottom:1px solid var(--border-color, #eee);margin-bottom:14px">
+      <div class="membro-foto-grande" id="membroFotoGrande"></div>
+      <div>
+        <div class="membro-perfil-nome" id="membroPerfilNome"></div>
+        <div class="membro-perfil-tel" id="membroPerfilTel"></div>
+      </div>
+    </div>
+    <div class="membro-perfil-info" style="padding-top:0">
       <div id="membroInfoExtra" style="margin-top:8px; font-size:.85rem"></div>
       <div class="membro-stars-wrap" style="margin-top:12px"><div class="membro-stars" id="membroStars"></div><span class="membro-stars-count" id="membroStarsCount"></span></div>
       <button class="btn-primary w100" style="margin-top:16px" onclick="abrirAvaliarMembro()">Avaliar membro</button>
+    </div>
     </div>
   </div>
 </div>
