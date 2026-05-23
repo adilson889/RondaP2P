@@ -502,13 +502,20 @@ function abrirPerfilMembro(m) {
   }
   document.getElementById('membroPerfilNome').textContent = m.nome || '';
   document.getElementById('membroPerfilTel').textContent = m.telefone || '';
-  let infoExtra = '';
-  if (m.provincia) infoExtra += `<div><span style="color:var(--muted)">Provincia:</span> ${esc(m.provincia)}</div>`;
-  if (m.municipio) infoExtra += `<div><span style="color:var(--muted)">Municipio:</span> ${esc(m.municipio)}</div>`;
-  if (m.data_nasc) infoExtra += `<div><span style="color:var(--muted)">Data de nascimento:</span> ${esc(m.data_nasc)}</div>`;
-  document.getElementById('membroInfoExtra').innerHTML = infoExtra;
-  document.getElementById('membroStars').innerHTML = renderEstrelas(m.reputacao || 0, m.total_avaliacoes);
-  document.getElementById('membroStarsCount').textContent = m.total_avaliacoes ? m.total_avaliacoes + ' avaliacoes' : 'Sem avaliacoes';
+  const campo = (label, val) => val ? `
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">${label}</span>
+      <span style="color:var(--text);font-weight:500">${esc(val)}</span>
+    </div>` : '';
+  document.getElementById('membroInfoExtra').innerHTML = [
+    campo('Email',             m.email),
+    campo('Telefone',          m.telefone),
+    campo('Província',         m.provincia),
+    campo('Município',         m.municipio),
+    campo('Data de nascimento',m.data_nasc),
+  ].join('');
+  document.getElementById('membroStars').innerHTML = renderEstrelas(m.reputacao || 0, m.total_avaliacoes)
+    + `<div style="font-size:.72rem;color:var(--muted);margin-top:2px">${m.total_avaliacoes ? m.total_avaliacoes + ' aval.' : 'Sem aval.'}</div>`;
   const perfil = KixikilaManager.getSessao()?.perfil;
   const eProprio = m.telefone === perfil?.telefone;
   const btnAvaliar = document.querySelector('#modalMembroPerfil .btn-primary');
@@ -649,7 +656,7 @@ function renderChat(grupo, perfil) {
     return;
   }
   msgs.forEach(msg => {
-    const meu = msg.telefone?.replace(/\D/g,'') === perfil?.telefone?.replace(/\D/g,'');
+    const meu = msg.telefone === perfil?.telefone;
     const wrap = document.createElement('div');
     wrap.className = 'chat-balao-wrap ' + (meu ? 'meu' : 'outro');
     wrap.innerHTML = `${!meu ? `<span class="chat-autor">${esc(msg.nome)}</span>` : ''}<div class="chat-balao ${meu?'meu':'outro'}">${esc(msg.texto)}</div><span class="chat-data">${(msg.data||'').replace('T',' ').slice(0,16)}</span>`;
