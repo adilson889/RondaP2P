@@ -5,13 +5,9 @@ const CACHE_URLS = [
   '/css/main.css',
   '/css/components.css',
   '/js/api.js',
-  '/js/auth.js',
-  '/js/dashboard.js',
-  '/js/grupo.js',
-  '/js/perfil.js',
   '/js/app.js',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  '/assets/icons/icon-192.png',
+  '/assets/icons/icon-512.png',
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap',
   'https://unpkg.com/lucide@latest'
 ];
