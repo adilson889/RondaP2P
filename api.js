@@ -37,17 +37,14 @@ const KixikilaManager = (() => {
 
   // ── AUTH ─────────────────────────────────────────────────────
   async function registar({ telefone, nome, senha, foto_perfil, data_nasc, email, provincia, municipio }) {
-    const d = await http('auth/registar', { 
-      telefone, nome, senha, foto_perfil,
-      data_nasc, email, provincia, municipio
-    });
-    setSessao(d.perfil); 
+    const d = await http('auth/registar', { telefone, nome, senha, foto_perfil, data_nasc, email, provincia, municipio });
+    setSessao(d.perfil);
     return d.perfil;
   }
 
   async function entrar({ telefone, senha }) {
     const d = await http('auth/entrar', { telefone, senha });
-    setSessao(d.perfil); 
+    setSessao(d.perfil);
     return d.perfil;
   }
 
@@ -58,7 +55,7 @@ const KixikilaManager = (() => {
   // ── PERFIL ───────────────────────────────────────────────────
   async function atualizarPerfil({ telefone, nome, foto_perfil, senha }) {
     const d = await http('perfil', { telefone, nome, foto_perfil, senha });
-    setSessao(d.perfil); 
+    setSessao(d.perfil);
     return d.perfil;
   }
 
@@ -79,12 +76,7 @@ const KixikilaManager = (() => {
   }
 
   async function criarGrupo({ nome, telefone, nomeAdmin, valor, periodicidade, maxMembros, descricao, regras, localizacao, foto_grupo }) {
-    const d = await http('grupo/criar', { 
-      nome, telefone, nomeAdmin, valor, 
-      periodicidade, maxMembros,
-      descricao, regras, localizacao,
-      foto_grupo
-    });
+    const d = await http('grupo/criar', { nome, telefone, nomeAdmin, valor, periodicidade, maxMembros, descricao, regras, localizacao, foto_grupo });
     return d.codigo;
   }
 
@@ -117,6 +109,12 @@ const KixikilaManager = (() => {
     return http('grupo/' + codigo + '/solicitar', { telefone, nome });
   }
 
+  async function responderPedido(codigo, pedidoId, acao) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) throw new Error('Sessao invalida');
+    return http('grupo/' + codigo + '/pedido/' + pedidoId + '/' + acao, { criador_telefone: perfil.telefone });
+  }
+
   // ── AVALIACOES ───────────────────────────────────────────────
   async function avaliar(avaliador, avaliado, estrelas, comentario) {
     return http('avaliar', { avaliador, avaliado, estrelas, comentario });
@@ -139,7 +137,7 @@ const KixikilaManager = (() => {
     registar, entrar, eliminarConta, atualizarPerfil,
     carregarFeed, carregarMeusGrupos,
     criarGrupo, carregarGrupo, entrarGrupo, sairGrupo, encerrarGrupo,
-    registarPagamento, enviarMensagem, solicitarEntrada,
+    registarPagamento, enviarMensagem, solicitarEntrada, responderPedido,
     avaliar,
     carregarNotificacoes,
     formatarValor
