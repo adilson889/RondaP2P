@@ -212,4 +212,4 @@ const KixikilaManager = (() => {
     carregarLeaderboard,
     reputacaoTexto, reputacaoEstrelas, formatarValor
   };
-})();
+})(); 
