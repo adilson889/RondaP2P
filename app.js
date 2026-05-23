@@ -1,4 +1,142 @@
 // ════════════════════════════════════════════════════════════
+// SEGURANÇA — Rate limiting, validações, sanitização
+// ════════════════════════════════════════════════════════════
+
+const Seguranca = (() => {
+
+  // Rate limiting em memória
+  const _tentativas = {};
+
+  function chaveLogin(telefone) {
+    return 'login_' + telefone.replace(/\D/g, '');
+  }
+
+  function registarFalha(chave) {
+    const agora = Date.now();
+    if (!_tentativas[chave]) _tentativas[chave] = { count: 0, bloqueadoAte: 0 };
+    _tentativas[chave].count++;
+    const c = _tentativas[chave].count;
+    const espera = c >= 10 ? 30 * 60000 : c >= 6 ? 5 * 60000 : c >= 3 ? 60000 : 0;
+    if (espera) _tentativas[chave].bloqueadoAte = agora + espera;
+  }
+
+  function verificarBloqueio(chave) {
+    const entry = _tentativas[chave];
+    if (!entry) return null;
+    const resto = entry.bloqueadoAte - Date.now();
+    if (resto > 0) {
+      const mins = Math.ceil(resto / 60000);
+      const segs = Math.ceil(resto / 1000);
+      return segs < 60 ? 'Aguarda ' + segs + 's' : 'Bloqueado por ' + mins + ' min';
+    }
+    return null;
+  }
+
+  function limparFalhas(chave) {
+    delete _tentativas[chave];
+  }
+
+  // Validação de telefone angolano
+  function validarTelefone(tel) {
+    if (!tel) return false;
+    const limpo = tel.replace(/[\s\-()]/g, '');
+    const comPrefixo = /^(\+244|00244)(9\d{8})$/.test(limpo);
+    const local = /^9\d{8}$/.test(limpo);
+    return comPrefixo || local;
+  }
+
+  // Força da senha
+  function analisarSenha(senha) {
+    if (!senha) return { nivel: 0, mensagem: '', cor: '' };
+    let pontos = 0;
+    if (senha.length >= 8) pontos++;
+    if (senha.length >= 12) pontos++;
+    if (/[A-Z]/.test(senha)) pontos++;
+    if (/[0-9]/.test(senha)) pontos++;
+    if (/[^A-Za-z0-9]/.test(senha)) pontos++;
+    
+    const obvias = ['123456', 'password', 'senha', 'kixikila', 'angola', 'luanda', '111111', '000000'];
+    if (obvias.some(o => senha.toLowerCase().includes(o))) pontos = Math.min(pontos, 1);
+
+    if (pontos <= 1) return { nivel: 1, mensagem: 'Fraca', cor: '#c0392b' };
+    if (pontos === 2) return { nivel: 2, mensagem: 'Razoavel', cor: '#e67e22' };
+    if (pontos === 3) return { nivel: 3, mensagem: 'Boa', cor: '#f1c40f' };
+    return { nivel: 4, mensagem: 'Forte', cor: '#27ae60' };
+  }
+
+  // Validação de idade mínima
+  function validarIdade(dataNasc, minAnos = 18) {
+    if (!dataNasc) return false;
+    const nasc = new Date(dataNasc);
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - nasc.getFullYear();
+    const mesDiff = hoje.getMonth() - nasc.getMonth();
+    if (mesDiff < 0 || (mesDiff === 0 && hoje.getDate() < nasc.getDate())) {
+      idade--;
+    }
+    return idade >= minAnos;
+  }
+
+  // Detecção de honeypot (anti-bot)
+  function verificarHoneypot() {
+    const campo = document.getElementById('_hp_website');
+    return campo && campo.value !== '';
+  }
+
+  // Sanitização básica
+  function sanitizar(texto) {
+    if (!texto) return '';
+    return String(texto).trim().replace(/<[^>]*>/g, '').slice(0, 300);
+  }
+
+  // Sessão com expiração
+  const SESSAO_TTL = 7 * 24 * 60 * 60 * 1000;
+
+  function guardarSessaoSegura(perfil) {
+    const payload = {
+      perfil: perfil,
+      criado: Date.now(),
+      expira: Date.now() + SESSAO_TTL,
+      ua: navigator.userAgent.slice(0, 80)
+    };
+    try { localStorage.setItem('kx_sessao', JSON.stringify(payload)); } catch (_) {}
+  }
+
+  function carregarSessaoSegura() {
+    try {
+      const raw = localStorage.getItem('kx_sessao');
+      if (!raw) return null;
+      const payload = JSON.parse(raw);
+      if (payload.expira && Date.now() > payload.expira) {
+        localStorage.removeItem('kx_sessao');
+        return null;
+      }
+      if (payload.ua && payload.ua !== navigator.userAgent.slice(0, 80)) {
+        console.warn('[Kixikila] Sessao de outro dispositivo detectada');
+      }
+      return payload.perfil || payload;
+    } catch {
+      localStorage.removeItem('kx_sessao');
+      return null;
+    }
+  }
+
+  return {
+    chaveLogin,
+    registarFalha,
+    verificarBloqueio,
+    limparFalhas,
+    validarTelefone,
+    analisarSenha,
+    validarIdade,
+    verificarHoneypot,
+    sanitizar,
+    guardarSessaoSegura,
+    carregarSessaoSegura
+  };
+})();
+
+// ════════════════════════════════════════════════════════════
 // app.js — KIXIKILA
 // ════════════════════════════════════════════════════════════
 
@@ -28,22 +166,28 @@ function toast(msg) {
 }
 
 function modal(titulo, msg, btns) {
-  document.getElementById('modalTitulo').textContent = titulo;
-  document.getElementById('modalMsg').textContent    = msg || '';
-  const wrap = document.getElementById('modalBtns');
-  wrap.innerHTML = '';
-  (btns || []).forEach(b => {
-    const el = document.createElement('button');
-    el.className   = b.classe || 'btn-outline';
-    el.textContent = b.texto;
-    el.onclick     = () => { fecharModal('modal'); b.acao && b.acao(); };
-    wrap.appendChild(el);
-  });
-  document.getElementById('modal').style.display = 'flex';
+  const modalTitulo = document.getElementById('modalTitulo');
+  const modalMsg = document.getElementById('modalMsg');
+  const modalBtns = document.getElementById('modalBtns');
+  if (modalTitulo) modalTitulo.textContent = titulo;
+  if (modalMsg) modalMsg.textContent = msg || '';
+  if (modalBtns) {
+    modalBtns.innerHTML = '';
+    (btns || []).forEach(b => {
+      const el = document.createElement('button');
+      el.className = b.classe || 'btn-outline';
+      el.textContent = b.texto;
+      el.onclick = () => { fecharModal('modal'); b.acao && b.acao(); };
+      modalBtns.appendChild(el);
+    });
+  }
+  const modalEl = document.getElementById('modal');
+  if (modalEl) modalEl.style.display = 'flex';
 }
 
 function fecharModal(id) {
-  document.getElementById(id).style.display = 'none';
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
 }
 
 function fecharModalSeClicarFora(event, modalElement) {
@@ -53,13 +197,13 @@ function fecharModalSeClicarFora(event, modalElement) {
 }
 
 function pillClass(estado) {
-  if (estado === 'aberto')  return 'pill-aberto';
+  if (estado === 'aberto') return 'pill-aberto';
   if (estado === 'fechado') return 'pill-fechado';
   return 'pill-encerrado';
 }
 
 function pillTexto(estado) {
-  if (estado === 'aberto')  return 'Aberto';
+  if (estado === 'aberto') return 'Aberto';
   if (estado === 'fechado') return 'Completo';
   return 'Encerrado';
 }
@@ -67,8 +211,21 @@ function pillTexto(estado) {
 function renderEstrelas(valor, total) {
   const cheias = Math.round(valor || 0);
   return Array(5).fill(0).map((_, i) =>
-    `<span class="star${i < cheias ? ' on' : ''}">★</span>`
-  ).join('') + (total ? `<small style="color:var(--muted);margin-left:6px">(${total})</small>` : '');
+    '<span class="star' + (i < cheias ? ' on' : '') + '">★</span>'
+  ).join('') + (total ? '<small style="color:var(--muted);margin-left:6px">(' + total + ')</small>' : '');
+}
+
+function renderAvatar(element, foto, nome) {
+  if (!element) return;
+  if (foto && foto !== '') {
+    element.style.backgroundImage = 'url(' + foto + ')';
+    element.style.backgroundSize = 'cover';
+    element.style.backgroundPosition = 'center';
+    element.textContent = '';
+  } else {
+    element.style.backgroundImage = '';
+    element.textContent = (nome?.[0] || '?').toUpperCase();
+  }
 }
 
 function comprimirImagem(ficheiro, maxDim = 800, q = 0.85) {
@@ -81,7 +238,7 @@ function comprimirImagem(ficheiro, maxDim = 800, q = 0.85) {
         let { width: w, height: h } = img;
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-          else       { w = Math.round(w * maxDim / h); h = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
         }
         const c = document.createElement('canvas');
         c.width = w; c.height = h;
@@ -103,11 +260,12 @@ async function previewFotoReg(evento) {
   try {
     const src = await comprimirImagem(f);
     _fotoRegTemp = src;
-    const img    = document.getElementById('fotoPickerImg');
-    const letra  = document.getElementById('fotoPickerLetra');
-    img.src = src; img.style.display = 'block';
-    letra.style.display = 'none';
-    document.getElementById('fotoPicker').style.border = '2px solid var(--r)';
+    const img = document.getElementById('fotoPickerImg');
+    const letra = document.getElementById('fotoPickerLetra');
+    if (img) { img.src = src; img.style.display = 'block'; }
+    if (letra) letra.style.display = 'none';
+    const picker = document.getElementById('fotoPicker');
+    if (picker) picker.style.border = '2px solid var(--r)';
   } catch { toast('Erro ao processar imagem'); }
 }
 
@@ -116,12 +274,9 @@ async function previewFotoPerfil(evento) {
   if (!f) return;
   try {
     const src = await comprimirImagem(f);
-    const av   = document.getElementById('perfilAvatarModal');
-    av.style.backgroundImage    = `url(${src})`;
-    av.style.backgroundSize     = 'cover';
-    av.style.backgroundPosition = 'center';
-    av.textContent = '';
-    av.dataset.novaFoto = src;
+    const av = document.getElementById('perfilAvatarModal');
+    renderAvatar(av, src, '');
+    if (av) av.dataset.novaFoto = src;
   } catch { toast('Erro ao processar imagem'); }
 }
 
@@ -131,17 +286,30 @@ async function previewFotoGrupo(evento) {
   try {
     const src = await comprimirImagem(f, 400, 0.8);
     _fotoGrupoTemp = src;
-    const img    = document.getElementById('fotoGrupoImg');
-    const letra  = document.getElementById('fotoGrupoLetra');
-    img.src = src; img.style.display = 'block';
-    letra.style.display = 'none';
+    const img = document.getElementById('fotoGrupoImg');
+    const letra = document.getElementById('fotoGrupoLetra');
+    if (img) { img.src = src; img.style.display = 'block'; }
+    if (letra) letra.style.display = 'none';
   } catch { toast('Erro ao processar imagem'); }
+}
+
+function atualizarForcaSenha() {
+  const senha = document.getElementById('regSenha')?.value || '';
+  const barra = document.getElementById('forcaSenhaBarra');
+  const texto = document.getElementById('forcaSenhaTexto');
+  if (!barra || !texto) return;
+  const analise = Seguranca.analisarSenha(senha);
+  barra.style.width = (analise.nivel * 25) + '%';
+  barra.style.background = analise.cor;
+  texto.textContent = analise.mensagem;
+  texto.style.color = analise.cor;
 }
 
 // ── NAVEGACAO ────────────────────────────────────────────────
 function irPara(id) {
   document.querySelectorAll('.pagina').forEach(p => p.style.display = 'none');
-  document.getElementById(id).style.display = 'flex';
+  const pagina = document.getElementById(id);
+  if (pagina) pagina.style.display = 'flex';
 }
 
 function voltarMain() {
@@ -160,7 +328,7 @@ function iniciarSync() {
     if (document.visibilityState === 'hidden') return;
     if (!_codigoAtual) return;
     try { await recarregarGrupo(true); } catch (_) {}
-  }, 60_000);
+  }, 60000);
 }
 
 function pararSync() {
@@ -169,55 +337,113 @@ function pararSync() {
 
 // ── AUTH ─────────────────────────────────────────────────────
 function mostrarTab(tab) {
-  document.getElementById('tabRegisto').style.display = tab === 'registo' ? 'block' : 'none';
-  document.getElementById('tabLogin').style.display   = tab === 'login'   ? 'block' : 'none';
+  const tabRegisto = document.getElementById('tabRegisto');
+  const tabLogin = document.getElementById('tabLogin');
+  if (tabRegisto) tabRegisto.style.display = tab === 'registo' ? 'block' : 'none';
+  if (tabLogin) tabLogin.style.display = tab === 'login' ? 'block' : 'none';
   document.querySelectorAll('.auth-tab').forEach((b, i) => {
     b.classList.toggle('activo', (i === 0 && tab === 'registo') || (i === 1 && tab === 'login'));
   });
 }
 
 async function registar() {
-  const nome       = document.getElementById('regNome')?.value.trim() || '';
-  const dataNasc   = document.getElementById('regDataNasc')?.value || '';
-  const telefone   = document.getElementById('regTelefone')?.value.trim() || '';
-  const email      = document.getElementById('regEmail')?.value.trim() || '';
-  const provincia  = document.getElementById('regProvincia')?.value || '';
-  const municipio  = document.getElementById('regMunicipio')?.value.trim() || '';
-  const senha      = document.getElementById('regSenha')?.value.trim() || '';
-  const senhaConf  = document.getElementById('regSenhaConfirm')?.value.trim() || '';
+  // Anti-bot
+  if (Seguranca.verificarHoneypot()) {
+    toast('Erro ao criar conta. Tenta novamente.');
+    return;
+  }
 
-  if (!nome) { toast('Nome completo e obrigatorio'); return; }
+  const nome = Seguranca.sanitizar(document.getElementById('regNome')?.value);
+  const dataNasc = document.getElementById('regDataNasc')?.value || '';
+  const telefone = Seguranca.sanitizar(document.getElementById('regTelefone')?.value);
+  const email = Seguranca.sanitizar(document.getElementById('regEmail')?.value);
+  const provincia = document.getElementById('regProvincia')?.value || '';
+  const municipio = Seguranca.sanitizar(document.getElementById('regMunicipio')?.value);
+  const senha = document.getElementById('regSenha')?.value || '';
+  const senhaConf = document.getElementById('regSenhaConfirm')?.value || '';
+
+  // Validações
+  if (!nome || nome.length < 3) { toast('Nome completo e obrigatorio (min. 3 letras)'); return; }
   if (!dataNasc) { toast('Data de nascimento e obrigatoria'); return; }
+  if (!Seguranca.validarIdade(dataNasc)) { toast('Tens de ter pelo menos 18 anos'); return; }
   if (!telefone) { toast('Telefone e obrigatorio'); return; }
-  if (!email) { toast('Email e obrigatorio'); return; }
+  if (!Seguranca.validarTelefone(telefone)) {
+    toast('Telefone invalido. Ex: +244 923 456 789');
+    document.getElementById('regTelefone')?.focus();
+    return;
+  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    toast('Email invalido');
+    return;
+  }
   if (!provincia) { toast('Seleciona a provincia'); return; }
-  if (!municipio) { toast('Municipio e obrigatorio'); return; }
-  if (!senha) { toast('Senha e obrigatoria'); return; }
-  if (senha.length < 6) { toast('Senha: minimo 6 caracteres'); return; }
+  if (!municipio || municipio.length < 2) { toast('Municipio e obrigatorio'); return; }
+  if (!senha || senha.length < 6) { toast('Senha: minimo 6 caracteres'); return; }
+
+  const analise = Seguranca.analisarSenha(senha);
+  if (analise.nivel < 2) {
+    toast('Senha fraca. Usa letras maiusculas, numeros ou simbolos');
+    document.getElementById('regSenha')?.focus();
+    return;
+  }
   if (senha !== senhaConf) { toast('As senhas nao coincidem'); return; }
 
+  // Rate limiting
+  const chave = Seguranca.chaveLogin(telefone);
+  const bloq = Seguranca.verificarBloqueio(chave);
+  if (bloq) { toast(bloq); return; }
+
+  const btn = document.getElementById('btnCriarConta');
+  if (btn) { btn.disabled = true; btn.textContent = 'A criar...'; }
+
   try {
-    await KixikilaManager.registar({ 
-      telefone, nome, senha, 
+    await KixikilaManager.registar({
+      telefone, nome, senha,
       foto_perfil: _fotoRegTemp || undefined,
       data_nasc: dataNasc,
       email: email,
       provincia: provincia,
       municipio: municipio
     });
+    Seguranca.limparFalhas(chave);
     _fotoRegTemp = null;
     irParaMain();
-  } catch (e) { toast(e.message); }
+  } catch (e) {
+    Seguranca.registarFalha(chave);
+    toast(e.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Criar conta'; }
+  }
 }
 
 async function entrar() {
-  const telefone = document.getElementById('loginTelefone')?.value.trim() || '';
-  const senha    = document.getElementById('loginSenha')?.value.trim()    || '';
+  const telefone = Seguranca.sanitizar(document.getElementById('loginTelefone')?.value);
+  const senha = document.getElementById('loginSenha')?.value || '';
+
   if (!telefone || !senha) { toast('Preenche todos os campos'); return; }
+
+  if (!Seguranca.validarTelefone(telefone)) {
+    toast('Telefone invalido. Ex: +244 923 456 789');
+    return;
+  }
+
+  // Rate limiting
+  const chave = Seguranca.chaveLogin(telefone);
+  const bloq = Seguranca.verificarBloqueio(chave);
+  if (bloq) { toast(bloq + ' — demasiadas tentativas'); return; }
+
+  const btn = document.querySelector('#tabLogin .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'A entrar...'; }
+
   try {
     await KixikilaManager.entrar({ telefone, senha });
+    Seguranca.limparFalhas(chave);
     irParaMain();
-  } catch (e) { toast(e.message); }
+  } catch (e) {
+    Seguranca.registarFalha(chave);
+    const bloqNovo = Seguranca.verificarBloqueio(chave);
+    toast(bloqNovo ? bloqNovo + ' — demasiadas tentativas' : e.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+  }
 }
 
 function logout() {
@@ -226,7 +452,7 @@ function logout() {
     { texto: 'Sair', classe: 'btn-primary', acao: () => {
       pararSync();
       KixikilaManager.limparSessao();
-      fecharModal('modalPerfil'); restaurarBotoesPerfilModal();
+      fecharModal('modalPerfil');
       irPara('paginaAuth');
     }}
   ]);
@@ -244,28 +470,27 @@ function atualizarAvatar() {
   if (!perfil) return;
   const av = document.getElementById('topAvatar');
   if (!av) return;
-  if (perfil.foto_perfil) {
-    av.style.backgroundImage    = `url(${perfil.foto_perfil})`;
-    av.style.backgroundSize     = 'cover';
-    av.style.backgroundPosition = 'center';
-    av.textContent = '';
-  } else {
-    av.style.backgroundImage = '';
-    av.textContent = (perfil.nome?.[0] || 'K').toUpperCase();
-  }
+  renderAvatar(av, perfil.foto_perfil, perfil.nome);
 }
 
 function mostrarTabMain(tab) {
-  document.getElementById('tabFeed').classList.toggle('activo', tab === 'feed');
-  document.getElementById('tabMeus').classList.toggle('activo', tab === 'meus');
-  document.getElementById('conteudoFeed').style.display = tab === 'feed' ? 'block' : 'none';
-  document.getElementById('conteudoMeus').style.display = tab === 'meus' ? 'block' : 'none';
+  const tabFeed = document.getElementById('tabFeed');
+  const tabMeus = document.getElementById('tabMeus');
+  const conteudoFeed = document.getElementById('conteudoFeed');
+  const conteudoMeus = document.getElementById('conteudoMeus');
+  
+  if (tabFeed) tabFeed.classList.toggle('activo', tab === 'feed');
+  if (tabMeus) tabMeus.classList.toggle('activo', tab === 'meus');
+  if (conteudoFeed) conteudoFeed.style.display = tab === 'feed' ? 'block' : 'none';
+  if (conteudoMeus) conteudoMeus.style.display = tab === 'meus' ? 'block' : 'none';
+  
   if (tab === 'feed') carregarFeed();
   if (tab === 'meus') carregarMeus();
 }
 
 async function carregarFeed() {
   const lista = document.getElementById('feedLista');
+  if (!lista) return;
   lista.innerHTML = skeleton();
   try {
     const grupos = await KixikilaManager.carregarFeed({ estado: 'aberto', limite: 30 });
@@ -280,13 +505,13 @@ async function carregarFeed() {
 
 function criarCardFeed(g) {
   const vagas = g.max_membros - g.membros.length;
-  const pct   = Math.round((g.membros.length / g.max_membros) * 100);
-  const div   = document.createElement('div');
+  const pct = Math.round((g.membros.length / g.max_membros) * 100);
+  const div = document.createElement('div');
   div.className = 'feed-card';
-  div.onclick   = () => abrirPreviewGrupo(g);
+  div.onclick = () => abrirPreviewGrupo(g);
   div.innerHTML = `
     <div class="feed-card-top">
-      <div class="feed-icon">${g.foto_grupo ? `<img src="${esc(g.foto_grupo)}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">` : (g.nome||'G')[0].toUpperCase()}</div>
+      <div class="feed-icon">${g.foto_grupo ? '<img src="' + esc(g.foto_grupo) + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px">' : (g.nome||'G')[0].toUpperCase()}</div>
       <div>
         <div class="feed-nome">${esc(g.nome)}</div>
         <div class="feed-sub">${g.membros.length}/${g.max_membros} membros · ${esc(g.periodicidade)}</div>
@@ -304,22 +529,36 @@ function abrirPreviewGrupo(grupo) {
   const vagas = grupo.max_membros - grupo.membros.length;
   const pct = Math.round((grupo.membros.length / grupo.max_membros) * 100);
   
-  document.getElementById('previewTitulo').textContent = grupo.nome;
-  if (grupo.foto_grupo) {
-    document.getElementById('previewFoto').innerHTML = `<img src="${esc(grupo.foto_grupo)}" style="width:100%;height:180px;object-fit:cover;border-radius:12px">`;
-  } else {
-    document.getElementById('previewFoto').innerHTML = `<div style="width:100%;height:180px;background:var(--r-soft);display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--r);border-radius:12px">${(grupo.nome||'G')[0].toUpperCase()}</div>`;
-  }
+  const previewTitulo = document.getElementById('previewTitulo');
+  const previewFoto = document.getElementById('previewFoto');
+  const previewDescricao = document.getElementById('previewDescricao');
+  const previewRegras = document.getElementById('previewRegras');
+  const previewLocalizacao = document.getElementById('previewLocalizacao');
+  const previewValor = document.getElementById('previewValor');
+  const previewProgresso = document.getElementById('previewProgresso');
+  const previewMembros = document.getElementById('previewMembros');
+  const previewVagas = document.getElementById('previewVagas');
+  const previewCriador = document.getElementById('previewCriador');
   
-  document.getElementById('previewDescricao').innerHTML = grupo.descricao ? `<div style="margin:12px 0"><strong>Descricao</strong><br>${esc(grupo.descricao)}</div>` : '';
-  document.getElementById('previewRegras').innerHTML = grupo.regras ? `<div style="margin:12px 0"><strong>Regras do grupo</strong><br>${esc(grupo.regras)}</div>` : '';
-  document.getElementById('previewLocalizacao').innerHTML = grupo.localizacao ? `<div style="margin:12px 0"><strong>Localizacao</strong><br>${esc(grupo.localizacao)}</div>` : '';
-  document.getElementById('previewValor').innerHTML = `${KixikilaManager.formatarValor(grupo.valor)} KZ / ${grupo.periodicidade}`;
-  document.getElementById('previewProgresso').style.width = pct + '%';
-  document.getElementById('previewMembros').textContent = `${grupo.membros.length}/${grupo.max_membros} membros`;
-  document.getElementById('previewVagas').textContent = `${vagas} vaga${vagas!==1?'s':''}`;
-  document.getElementById('previewCriador').textContent = grupo.criador?.nome || '';
-  document.getElementById('modalPreviewGrupo').style.display = 'flex';
+  if (previewTitulo) previewTitulo.textContent = grupo.nome;
+  if (previewFoto) {
+    if (grupo.foto_grupo) {
+      previewFoto.innerHTML = '<img src="' + esc(grupo.foto_grupo) + '" style="width:100%;height:180px;object-fit:cover;border-radius:12px">';
+    } else {
+      previewFoto.innerHTML = '<div style="width:100%;height:180px;background:var(--r-soft);display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--r);border-radius:12px">' + (grupo.nome||'G')[0].toUpperCase() + '</div>';
+    }
+  }
+  if (previewDescricao) previewDescricao.innerHTML = grupo.descricao ? '<div style="margin:12px 0"><strong>Descricao</strong><br>' + esc(grupo.descricao) + '</div>' : '';
+  if (previewRegras) previewRegras.innerHTML = grupo.regras ? '<div style="margin:12px 0"><strong>Regras do grupo</strong><br>' + esc(grupo.regras) + '</div>' : '';
+  if (previewLocalizacao) previewLocalizacao.innerHTML = grupo.localizacao ? '<div style="margin:12px 0"><strong>Localizacao</strong><br>' + esc(grupo.localizacao) + '</div>' : '';
+  if (previewValor) previewValor.innerHTML = KixikilaManager.formatarValor(grupo.valor) + ' KZ / ' + grupo.periodicidade;
+  if (previewProgresso) previewProgresso.style.width = pct + '%';
+  if (previewMembros) previewMembros.textContent = grupo.membros.length + '/' + grupo.max_membros + ' membros';
+  if (previewVagas) previewVagas.textContent = vagas + ' vaga' + (vagas!==1?'s':'');
+  if (previewCriador) previewCriador.textContent = grupo.criador?.nome || '';
+  
+  const modalPreview = document.getElementById('modalPreviewGrupo');
+  if (modalPreview) modalPreview.style.display = 'flex';
 }
 
 async function solicitarEntrada() {
@@ -336,25 +575,26 @@ async function solicitarEntrada() {
 async function carregarMeus() {
   const lista = document.getElementById('meusLista');
   const vazio = document.getElementById('meusVazio');
+  if (!lista) return;
   lista.innerHTML = skeleton();
   try {
     const grupos = await KixikilaManager.carregarMeusGrupos();
     lista.innerHTML = '';
-    if (!grupos.length) { vazio.style.display = 'flex'; return; }
-    vazio.style.display = 'none';
+    if (!grupos.length) { if (vazio) vazio.style.display = 'flex'; return; }
+    if (vazio) vazio.style.display = 'none';
     grupos.forEach(g => lista.appendChild(criarCardMeu(g)));
   } catch { lista.innerHTML = '<div class="vazio"><p>Erro ao carregar.</p></div>'; }
 }
 
 function criarCardMeu(g) {
   const pagos = g.membros.filter(m => m.pago).length;
-  const pct   = Math.round((pagos / g.membros.length) * 100);
-  const div   = document.createElement('div');
+  const pct = Math.round((pagos / g.membros.length) * 100);
+  const div = document.createElement('div');
   div.className = 'feed-card';
-  div.onclick   = () => abrirGrupo(g.codigo);
+  div.onclick = () => abrirGrupo(g.codigo);
   div.innerHTML = `
     <div class="feed-card-top">
-      <div class="feed-icon">${g.foto_grupo ? `<img src="${esc(g.foto_grupo)}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">` : (g.nome||'G')[0].toUpperCase()}</div>
+      <div class="feed-icon">${g.foto_grupo ? '<img src="' + esc(g.foto_grupo) + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px">' : (g.nome||'G')[0].toUpperCase()}</div>
       <div>
         <div class="feed-nome">${esc(g.nome)}</div>
         <div class="feed-sub">${g.membros.length} membros · ${esc(g.periodicidade)}</div>
@@ -370,20 +610,20 @@ function criarCardMeu(g) {
 // ── FAB ──────────────────────────────────────────────────────
 function abrirCriar() {
   modal('O que queres fazer?', '', [
-    { texto: 'Entrar com codigo', classe: 'btn-outline', acao: () => document.getElementById('modalEntrar').style.display = 'flex' },
-    { texto: 'Criar grupo',       classe: 'btn-primary', acao: () => document.getElementById('modalCriar').style.display  = 'flex' }
+    { texto: 'Entrar com codigo', classe: 'btn-outline', acao: () => { const modalEntrar = document.getElementById('modalEntrar'); if (modalEntrar) modalEntrar.style.display = 'flex'; } },
+    { texto: 'Criar grupo', classe: 'btn-primary', acao: () => { const modalCriar = document.getElementById('modalCriar'); if (modalCriar) modalCriar.style.display = 'flex'; } }
   ]);
 }
 
 async function criarGrupo() {
-  const nome        = document.getElementById('criarNome')?.value.trim() || '';
-  const descricao   = document.getElementById('criarDescricao')?.value.trim() || '';
-  const regras      = document.getElementById('criarRegras')?.value.trim() || '';
+  const nome = document.getElementById('criarNome')?.value.trim() || '';
+  const descricao = document.getElementById('criarDescricao')?.value.trim() || '';
+  const regras = document.getElementById('criarRegras')?.value.trim() || '';
   const localizacao = document.getElementById('criarLocalizacao')?.value.trim() || '';
-  const valor       = parseFloat(document.getElementById('criarValor')?.value || 0);
-  const period      = document.getElementById('criarPeriod')?.value || 'mensal';
-  const max         = parseInt(document.getElementById('criarMax')?.value || 6);
-  const perfil      = KixikilaManager.getSessao()?.perfil;
+  const valor = parseFloat(document.getElementById('criarValor')?.value || 0);
+  const period = document.getElementById('criarPeriod')?.value || 'mensal';
+  const max = parseInt(document.getElementById('criarMax')?.value || 6);
+  const perfil = KixikilaManager.getSessao()?.perfil;
   if (!perfil) { toast('Sessao expirada'); return; }
   if (!nome || !valor || valor < 500) { toast('Preenche todos os campos. Minimo 500 KZ'); return; }
   try {
@@ -426,135 +666,124 @@ async function abrirGrupo(codigo) {
 
 async function recarregarGrupo(silencioso = false) {
   try {
-    const grupo  = await KixikilaManager.carregarGrupo(_codigoAtual);
+    const grupo = await KixikilaManager.carregarGrupo(_codigoAtual);
     const perfil = KixikilaManager.getSessao()?.perfil;
     renderGrupo(grupo, perfil);
   } catch { if (!silencioso) toast('Erro ao carregar grupo'); }
 }
 
 function renderGrupo(grupo, perfil) {
-  const pagos    = grupo.membros.filter(m => m.pago).length;
-  const pct      = Math.round((pagos / grupo.membros.length) * 100);
+  const pagos = grupo.membros.filter(m => m.pago).length;
+  const pct = Math.round((pagos / grupo.membros.length) * 100);
   const eCriador = grupo.criador?.telefone === perfil?.telefone;
-  document.getElementById('appNomeGrupo').textContent = grupo.nome;
-  const pill = document.getElementById('appPill');
-  pill.className = 'pill ' + pillClass(grupo.estado);
-  pill.textContent = pillTexto(grupo.estado);
-  document.getElementById('appValor').textContent = KixikilaManager.formatarValor(grupo.valor) + ' KZ';
-  document.getElementById('appProgresso').style.width = pct + '%';
-  document.getElementById('appPagamentos').textContent = pagos + '/' + grupo.membros.length + ' pagamentos';
+  
+  const appNome = document.getElementById('appNomeGrupo');
+  const appPill = document.getElementById('appPill');
+  const appValor = document.getElementById('appValor');
+  const appProgresso = document.getElementById('appProgresso');
+  const appPagamentos = document.getElementById('appPagamentos');
+  const appMeta = document.getElementById('appMeta');
+  const appProximaRonda = document.getElementById('appProximaRonda');
+  const btnEncerrar = document.getElementById('btnEncerrar');
+  
+  if (appNome) appNome.textContent = grupo.nome;
+  if (appPill) { appPill.className = 'pill ' + pillClass(grupo.estado); appPill.textContent = pillTexto(grupo.estado); }
+  if (appValor) appValor.textContent = KixikilaManager.formatarValor(grupo.valor) + ' KZ';
+  if (appProgresso) appProgresso.style.width = pct + '%';
+  if (appPagamentos) appPagamentos.textContent = pagos + '/' + grupo.membros.length + ' pagamentos';
+  
   const memAtual = grupo.membros.find(m => m.ordem === grupo.ordem_atual);
-  document.getElementById('appMeta').textContent = memAtual ? 'Ronda ' + grupo.ordem_atual + ' — A receber: ' + memAtual.nome : 'Ronda ' + (grupo.ordem_atual||1);
-  document.getElementById('appProximaRonda').textContent = grupo.periodicidade;
-  document.getElementById('btnEncerrar').style.display = eCriador ? 'block' : 'none';
+  if (appMeta) appMeta.textContent = memAtual ? 'Ronda ' + grupo.ordem_atual + ' — A receber: ' + memAtual.nome : 'Ronda ' + (grupo.ordem_atual||1);
+  if (appProximaRonda) appProximaRonda.textContent = grupo.periodicidade;
+  if (btnEncerrar) btnEncerrar.style.display = eCriador ? 'block' : 'none';
+  
   renderMembros(grupo, perfil);
   renderRodas(grupo);
 }
 
 function renderMembros(grupo, perfil) {
   const lista = document.getElementById('listaMembros');
+  if (!lista) return;
   lista.innerHTML = '';
   grupo.membros.slice().sort((a, b) => a.ordem - b.ordem).forEach(m => {
-    const eAtual   = m.ordem === grupo.ordem_atual;
+    const eAtual = m.ordem === grupo.ordem_atual;
     const eProprio = m.telefone === perfil?.telefone;
     const div = document.createElement('div');
     div.className = 'membro-item';
-    div.onclick   = () => abrirPerfilMembro(m);
-    div.innerHTML = `
-      <div class="membro-av${eAtual?' atual':''}" style="background-image:${m.foto_perfil ? `url('${esc(m.foto_perfil)}')` : 'none'};background-size:cover;background-position:center">
-        ${!m.foto_perfil ? (m.nome?.[0]||'?').toUpperCase() : ''}
-      </div>
-      <div class="membro-info"><div class="membro-nome">${esc(m.nome)}${eProprio ? ' <small style="color:var(--r)">(tu)</small>' : ''}</div><div class="membro-tel">${esc(m.telefone)}</div></div>
-      <span class="status ${m.pago?'status-pago':eAtual?'status-recebe':'status-pendente'}">${m.pago ? 'PAGO' : eAtual ? 'RECEBE' : 'PENDENTE'}</span>`;
+    div.onclick = () => abrirPerfilMembro(m);
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'membro-av' + (eAtual ? ' atual' : '');
+    renderAvatar(avatarDiv, m.foto_perfil, m.nome);
+    
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'membro-info';
+    infoDiv.innerHTML = '<div class="membro-nome">' + esc(m.nome) + (eProprio ? ' <small style="color:var(--r)">(tu)</small>' : '') + '</div><div class="membro-tel">' + esc(m.telefone) + '</div>';
+    
+    const statusSpan = document.createElement('span');
+    statusSpan.className = 'status ' + (m.pago ? 'status-pago' : eAtual ? 'status-recebe' : 'status-pendente');
+    statusSpan.textContent = m.pago ? 'PAGO' : eAtual ? 'RECEBE' : 'PENDENTE';
+    
+    div.appendChild(avatarDiv);
+    div.appendChild(infoDiv);
+    div.appendChild(statusSpan);
     lista.appendChild(div);
   });
 }
 
 function renderRodas(grupo) {
   const lista = document.getElementById('listaRodas');
+  if (!lista) return;
   lista.innerHTML = '';
   const total = grupo.membros.length;
   grupo.membros.slice().sort((a, b) => a.ordem - b.ordem).forEach(m => {
-    const eAtual    = m.ordem === grupo.ordem_atual;
+    const eAtual = m.ordem === grupo.ordem_atual;
     const concluida = m.ordem < grupo.ordem_atual;
     const div = document.createElement('div');
     div.className = 'roda-item';
     div.innerHTML = `
-      <div class="roda-num${eAtual?' atual':concluida?' concluida':''}">${m.ordem}</div>
+      <div class="roda-num${eAtual ? ' atual' : concluida ? ' concluida' : ''}">${m.ordem}</div>
       <div class="roda-info"><div class="roda-nome">${esc(m.nome)}</div><div class="roda-label">Ronda ${m.ordem} de ${total}</div></div>
-      <span class="roda-estado${eAtual?' atual':concluida?' concluida':' pendente'}">${eAtual ? 'A RECEBER' : concluida ? 'RECEBEU' : 'AGUARDA'}</span>`;
+      <span class="roda-estado${eAtual ? ' atual' : concluida ? ' concluida' : ' pendente'}">${eAtual ? 'A RECEBER' : concluida ? 'RECEBEU' : 'AGUARDA'}</span>`;
     lista.appendChild(div);
   });
 }
 
 // ── PERFIL MEMBRO ────────────────────────────────────────────
-async function abrirPerfilMembro(m) {
-  _membroAtual = m;
-  const euTel  = KixikilaManager.getSessao()?.perfil?.telefone;
-  const eProprio = m.telefone?.replace(/\D/g,'') === euTel?.replace(/\D/g,'');
-
-  // Reutilizar o mesmo modal do perfil principal
-  // Esconder/mostrar controlos consoante é o próprio ou outro
-  const btnEditar   = document.getElementById('perfilBtnEditar');
-  const btnSair     = document.getElementById('perfilBtnSair');
-  const btnEliminar = document.getElementById('perfilBtnEliminar');
-  const secaoEditar = document.getElementById('perfilSecaoEditar');
-  const btnAvaliar  = document.getElementById('perfilBtnAvaliar');
-
-  if (!eProprio) {
-    if (btnEditar)   btnEditar.style.display   = 'none';
-    if (btnSair)     btnSair.style.display     = 'none';
-    if (btnEliminar) btnEliminar.style.display = 'none';
-    if (secaoEditar) secaoEditar.style.display = 'none';
-    if (btnAvaliar)  btnAvaliar.style.display  = 'flex';
-  }
-
-  // Preencher com dados básicos imediatamente (do objeto do grupo)
-  const av = document.getElementById('perfilAvatarModal');
-  av.dataset.novaFoto = '';
-  av.onclick = () => m.foto_perfil ? abrirFotoPreview(m.foto_perfil) : null;
-  if (m.foto_perfil) {
-    av.style.backgroundImage = `url(${m.foto_perfil})`;
-    av.style.backgroundSize  = 'cover';
-    av.style.backgroundPosition = 'center';
-    av.textContent = '';
-  } else {
-    av.style.backgroundImage = '';
-    av.textContent = (m.nome?.[0]||'?').toUpperCase();
-  }
-  document.getElementById('perfilNomeModal').textContent    = m.nome     || '';
-  document.getElementById('perfilTelModal').textContent     = m.telefone || '';
-  document.getElementById('perfilEmail').textContent        = '...';
-  document.getElementById('perfilDataNasc').textContent     = '...';
-  document.getElementById('perfilProvincia').textContent    = '...';
-  document.getElementById('perfilMunicipio').textContent    = '...';
-  document.getElementById('modalPerfil').style.display = 'flex';
-
-  // Fetch completo em background
-  try {
-    const dados = await KixikilaManager.carregarReputacao(m.telefone);
-    document.getElementById('perfilEmail').textContent     = dados.email     || 'Não definido';
-    document.getElementById('perfilDataNasc').textContent  = dados.data_nasc || 'Não definido';
-    document.getElementById('perfilProvincia').textContent = dados.provincia  || 'Não definido';
-    document.getElementById('perfilMunicipio').textContent = dados.municipio  || 'Não definido';
-    if (dados.foto_perfil && !m.foto_perfil) {
-      av.style.backgroundImage = `url(${dados.foto_perfil})`;
-      av.style.backgroundSize  = 'cover';
-      av.textContent = '';
-      av.onclick = () => abrirFotoPreview(dados.foto_perfil);
-    }
-  } catch {}
-}
-
-function abrirFotoPreview(src) {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;cursor:pointer';
-  overlay.onclick = () => overlay.remove();
-  const img = document.createElement('img');
-  img.src = src;
-  img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;border-radius:8px';
-  overlay.appendChild(img);
-  document.body.appendChild(overlay);
+function abrirPerfilMembro(membro) {
+  _membroAtual = membro;
+  
+  const perfilLogado = KixikilaManager.getSessao()?.perfil;
+  const isProprio = membro.telefone === perfilLogado?.telefone;
+  
+  const fotoGrande = document.getElementById('membroFotoGrande');
+  renderAvatar(fotoGrande, membro.foto_perfil, membro.nome);
+  if (fotoGrande) fotoGrande.style.height = '300px';
+  
+  const perfilNome = document.getElementById('membroPerfilNome');
+  const perfilTel = document.getElementById('membroPerfilTel');
+  const membroStars = document.getElementById('membroStars');
+  const membroStarsCount = document.getElementById('membroStarsCount');
+  
+  if (perfilNome) perfilNome.textContent = membro.nome || '';
+  if (perfilTel) perfilTel.textContent = membro.telefone || '';
+  if (membroStars) membroStars.innerHTML = renderEstrelas(membro.reputacao || 0, membro.total_avaliacoes);
+  if (membroStarsCount) membroStarsCount.textContent = membro.total_avaliacoes ? membro.total_avaliacoes + ' avaliacoes' : 'Sem avaliacoes';
+  
+  let infoExtra = '';
+  if (membro.provincia) infoExtra += '<div><span style="color:var(--muted)">Provincia:</span> ' + esc(membro.provincia) + '</div>';
+  if (membro.municipio) infoExtra += '<div><span style="color:var(--muted)">Municipio:</span> ' + esc(membro.municipio) + '</div>';
+  if (membro.data_nasc) infoExtra += '<div><span style="color:var(--muted)">Data de nascimento:</span> ' + esc(membro.data_nasc) + '</div>';
+  if (membro.email) infoExtra += '<div><span style="color:var(--muted)">Email:</span> ' + esc(membro.email) + '</div>';
+  
+  const infoExtraDiv = document.getElementById('membroInfoExtra');
+  if (infoExtraDiv) infoExtraDiv.innerHTML = infoExtra;
+  
+  const btnAvaliar = document.querySelector('#modalMembroPerfil .btn-primary');
+  if (btnAvaliar) btnAvaliar.style.display = isProprio ? 'none' : 'block';
+  
+  const modalMembro = document.getElementById('modalMembroPerfil');
+  if (modalMembro) modalMembro.style.display = 'flex';
 }
 
 // ── AVALIAR MEMBRO ───────────────────────────────────────────
@@ -562,27 +791,40 @@ function abrirAvaliarMembro() {
   if (!_membroAtual) return;
   fecharModal('modalMembroPerfil');
   _estrelasAvaliacao = 0;
-  document.getElementById('avaliarNome').textContent = _membroAtual.nome || '';
-  document.getElementById('avaliarComentario').value = '';
+  
+  const avaliarNome = document.getElementById('avaliarNome');
+  if (avaliarNome) avaliarNome.textContent = _membroAtual.nome || '';
+  
+  const comentario = document.getElementById('avaliarComentario');
+  if (comentario) comentario.value = '';
+  
   const wrap = document.getElementById('estrelasInput');
-  wrap.innerHTML = '';
-  for (let i = 1; i <= 5; i++) {
-    const btn = document.createElement('button');
-    btn.className = 'star-btn';
-    btn.textContent = '★';
-    btn.dataset.val = i;
-    btn.onclick = () => {
-      _estrelasAvaliacao = i;
-      wrap.querySelectorAll('.star-btn').forEach((b, j) => b.classList.toggle('on', j < i));
-    };
-    wrap.appendChild(btn);
+  if (wrap) {
+    wrap.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'star-btn';
+      btn.textContent = '★';
+      btn.onclick = (function(n) {
+        return function() {
+          _estrelasAvaliacao = n;
+          const btns = wrap.querySelectorAll('.star-btn');
+          for (let j = 0; j < btns.length; j++) {
+            btns[j].classList.toggle('on', j < n);
+          }
+        };
+      })(i);
+      wrap.appendChild(btn);
+    }
   }
-  document.getElementById('modalAvaliar').style.display = 'flex';
+  
+  const modalAvaliar = document.getElementById('modalAvaliar');
+  if (modalAvaliar) modalAvaliar.style.display = 'flex';
 }
 
 async function confirmarAvaliacao() {
   if (!_estrelasAvaliacao) { toast('Selecciona as estrelas'); return; }
-  const perfil     = KixikilaManager.getSessao()?.perfil;
+  const perfil = KixikilaManager.getSessao()?.perfil;
   const comentario = document.getElementById('avaliarComentario')?.value.trim() || '';
   if (!perfil || !_membroAtual) return;
   try {
@@ -595,31 +837,36 @@ async function confirmarAvaliacao() {
 // ── PEDIDOS ───────────────────────────────────────────────────
 async function carregarPedidos() {
   if (!_codigoAtual) return;
+  const conteudoPedidos = document.getElementById('conteudoPedidos');
+  if (!conteudoPedidos) return;
+  
   try {
     const grupo = await KixikilaManager.carregarGrupo(_codigoAtual);
     const perfil = KixikilaManager.getSessao()?.perfil;
     const eCriador = grupo.criador?.telefone === perfil?.telefone;
+    
     if (!eCriador) {
-      document.getElementById('conteudoPedidos').innerHTML = '<div class="vazio"><p>Apenas o administrador ve os pedidos.</p></div>';
+      conteudoPedidos.innerHTML = '<div class="vazio"><p>Apenas o administrador ve os pedidos.</p></div>';
       return;
     }
+    
     const pedidos = grupo.pedidos || [];
     if (!pedidos.length) {
-      document.getElementById('conteudoPedidos').innerHTML = '<div class="vazio"><p>Nenhum pedido de entrada pendente.</p></div>';
+      conteudoPedidos.innerHTML = '<div class="vazio"><p>Nenhum pedido de entrada pendente.</p></div>';
       return;
     }
+    
     let html = '';
     for (const p of pedidos) {
-      html += `
-        <div class="pedido-item" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border)">
-          <div class="pedido-avatar" style="width:40px;height:40px;border-radius:50%;background:var(--r-soft);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:var(--r)">${(p.nome?.[0]||'?').toUpperCase()}</div>
-          <div style="flex:1"><div style="font-weight:700">${esc(p.nome)}</div><div style="font-size:.75rem;color:var(--muted)">${esc(p.telefone)}</div></div>
-          <div style="display:flex; gap:8px"><button class="btn-outline" style="padding:6px 12px" onclick="responderPedido('${p.id}', 'aceitar')">Aceitar</button><button class="btn-outline" style="padding:6px 12px;color:var(--r2)" onclick="responderPedido('${p.id}', 'recusar')">Recusar</button></div>
-        </div>`;
+      html += '<div class="pedido-item" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border)">' +
+        '<div class="pedido-avatar" style="width:40px;height:40px;border-radius:50%;background:var(--r-soft);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:var(--r)">' + (p.nome?.[0]||'?').toUpperCase() + '</div>' +
+        '<div style="flex:1"><div style="font-weight:700">' + esc(p.nome) + '</div><div style="font-size:.75rem;color:var(--muted)">' + esc(p.telefone) + '</div></div>' +
+        '<div style="display:flex; gap:8px"><button class="btn-outline" style="padding:6px 12px" onclick="responderPedido(\'' + p.id + '\', \'aceitar\')">Aceitar</button><button class="btn-outline" style="padding:6px 12px;color:var(--r2)" onclick="responderPedido(\'' + p.id + '\', \'recusar\')">Recusar</button></div>' +
+        '</div>';
     }
-    document.getElementById('conteudoPedidos').innerHTML = html;
+    conteudoPedidos.innerHTML = html;
   } catch { 
-    document.getElementById('conteudoPedidos').innerHTML = '<div class="vazio"><p>Erro ao carregar pedidos.</p></div>';
+    conteudoPedidos.innerHTML = '<div class="vazio"><p>Erro ao carregar pedidos.</p></div>';
   }
 }
 
@@ -647,6 +894,7 @@ function mostrarTabApp(tab) {
 
 // ── CHAT ─────────────────────────────────────────────────────
 function autoResizeChat(el) {
+  if (!el) return;
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
@@ -663,26 +911,31 @@ async function enviarMsg() {
   const texto = input?.value.trim();
   const perfil = KixikilaManager.getSessao()?.perfil;
   if (!texto || !perfil) return;
-  input.value = '';
+  if (input) input.value = '';
   autoResizeChat(input);
   try {
     await KixikilaManager.enviarMensagem(_codigoAtual, perfil.telefone, perfil.nome, texto);
     const g = await KixikilaManager.carregarGrupo(_codigoAtual);
-    renderChat(g, perfil);
+    const perfilAtual = KixikilaManager.getSessao()?.perfil;
+    renderChat(g, perfilAtual);
   } catch { toast('Erro ao enviar mensagem'); }
 }
 
 function abrirChat() {
   KixikilaManager.carregarGrupo(_codigoAtual).then(g => {
-    document.getElementById('chatNomeGrupo').textContent = g.nome;
-    document.getElementById('chatMembrosCount').textContent = g.membros.length + ' membros';
-    renderChat(g, KixikilaManager.getSessao()?.perfil);
+    const chatNome = document.getElementById('chatNomeGrupo');
+    const chatMembros = document.getElementById('chatMembrosCount');
+    if (chatNome) chatNome.textContent = g.nome;
+    if (chatMembros) chatMembros.textContent = g.membros.length + ' membros';
+    const perfil = KixikilaManager.getSessao()?.perfil;
+    renderChat(g, perfil);
     irPara('paginaChat');
   }).catch(() => toast('Erro ao abrir chat'));
 }
 
 function renderChat(grupo, perfil) {
   const container = document.getElementById('chatMensagens');
+  if (!container) return;
   const msgs = grupo.mensagens || [];
   container.innerHTML = '';
   if (!msgs.length) {
@@ -693,7 +946,9 @@ function renderChat(grupo, perfil) {
     const meu = msg.telefone === perfil?.telefone;
     const wrap = document.createElement('div');
     wrap.className = 'chat-balao-wrap ' + (meu ? 'meu' : 'outro');
-    wrap.innerHTML = `${!meu ? `<span class="chat-autor">${esc(msg.nome)}</span>` : ''}<div class="chat-balao ${meu?'meu':'outro'}">${esc(msg.texto)}</div><span class="chat-data">${(msg.data||'').replace('T',' ').slice(0,16)}</span>`;
+    wrap.innerHTML = (!meu ? '<span class="chat-autor">' + esc(msg.nome) + '</span>' : '') +
+      '<div class="chat-balao ' + (meu ? 'meu' : 'outro') + '">' + esc(msg.texto) + '</div>' +
+      '<span class="chat-data">' + (msg.data || '').replace('T', ' ').slice(0, 16) + '</span>';
     container.appendChild(wrap);
   });
   container.scrollTop = container.scrollHeight;
@@ -747,59 +1002,75 @@ async function encerrarGrupo() {
 }
 
 // ── PERFIL (O MEU) ───────────────────────────────────────────
-function restaurarBotoesPerfilModal() {
-  const ids = ['perfilBtnEditar','perfilBtnSair','perfilBtnEliminar','perfilSecaoEditar'];
-  ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
-  const btnAvaliar = document.getElementById('perfilBtnAvaliar');
-  if (btnAvaliar) btnAvaliar.style.display = 'none';
-  const av = document.getElementById('perfilAvatarModal');
-  if (av) av.onclick = null;
-}
-
 function abrirPerfil() {
-  restaurarBotoesPerfilModal();
   const perfil = KixikilaManager.getSessao()?.perfil;
   if (!perfil) return;
-  const av = document.getElementById('perfilAvatarModal');
-  av.dataset.novaFoto = '';
-  if (perfil.foto_perfil) {
-    av.style.backgroundImage = `url(${perfil.foto_perfil})`;
-    av.style.backgroundSize = 'cover';
-    av.style.backgroundPosition = 'center';
-    av.textContent = '';
-  } else {
-    av.style.backgroundImage = '';
-    av.textContent = (perfil.nome?.[0]||'K').toUpperCase();
-  }
-  document.getElementById('perfilNomeModal').textContent = perfil.nome || '';
-  document.getElementById('perfilTelModal').textContent = perfil.telefone || '';
-  document.getElementById('editNome').value = perfil.nome || '';
-  document.getElementById('editSenha').value = '';
-  document.getElementById('perfilEmail').textContent = perfil.email || 'Nao definido';
-  document.getElementById('perfilDataNasc').textContent = perfil.data_nasc || 'Nao definido';
-  document.getElementById('perfilProvincia').textContent = perfil.provincia || 'Nao definido';
-  document.getElementById('perfilMunicipio').textContent = perfil.municipio || 'Nao definido';
-  document.getElementById('modalPerfil').style.display = 'flex';
+  
+  const avatarEl = document.getElementById('perfilAvatarModal');
+  renderAvatar(avatarEl, perfil.foto_perfil, perfil.nome);
+  if (avatarEl) avatarEl.dataset.novaFoto = '';
+  
+  const perfilNome = document.getElementById('perfilNomeModal');
+  const perfilTel = document.getElementById('perfilTelModal');
+  const editNome = document.getElementById('editNome');
+  const editSenha = document.getElementById('editSenha');
+  const perfilEmail = document.getElementById('perfilEmail');
+  const perfilDataNasc = document.getElementById('perfilDataNasc');
+  const perfilProvincia = document.getElementById('perfilProvincia');
+  const perfilMunicipio = document.getElementById('perfilMunicipio');
+  const membroStars = document.getElementById('membroStars');
+  const membroStarsCount = document.getElementById('membroStarsCount');
+  
+  if (perfilNome) perfilNome.textContent = perfil.nome || '';
+  if (perfilTel) perfilTel.textContent = perfil.telefone || '';
+  if (editNome) editNome.value = perfil.nome || '';
+  if (editSenha) editSenha.value = '';
+  if (perfilEmail) perfilEmail.textContent = perfil.email || 'Nao definido';
+  if (perfilDataNasc) perfilDataNasc.textContent = perfil.data_nasc || 'Nao definido';
+  if (perfilProvincia) perfilProvincia.textContent = perfil.provincia || 'Nao definido';
+  if (perfilMunicipio) perfilMunicipio.textContent = perfil.municipio || 'Nao definido';
+  if (membroStars) membroStars.innerHTML = renderEstrelas(perfil.reputacao || 0, perfil.total_avaliacoes);
+  if (membroStarsCount) membroStarsCount.textContent = perfil.total_avaliacoes ? perfil.total_avaliacoes + ' avaliacoes' : 'Sem avaliacoes';
+  
+  // Mostrar elementos de edicao
+  const editNomeField = document.getElementById('editNome');
+  const editSenhaField = document.getElementById('editSenha');
+  const modalBtns = document.querySelector('#modalPerfil .modal-btns');
+  const btnEliminar = document.querySelector('#modalPerfil .btn-outline.w100');
+  const avatarEdit = document.querySelector('#modalPerfil .perfil-avatar-edit');
+  const inputFoto = document.getElementById('inputFotoPerfil');
+  const btnAvaliar = document.getElementById('btnAvaliarMembro');
+  
+  if (editNomeField) editNomeField.style.display = 'block';
+  if (editSenhaField) editSenhaField.style.display = 'block';
+  if (modalBtns) modalBtns.style.display = 'flex';
+  if (btnEliminar) btnEliminar.style.display = 'block';
+  if (avatarEdit) avatarEdit.style.display = 'block';
+  if (inputFoto) inputFoto.style.display = 'block';
+  if (btnAvaliar) btnAvaliar.style.display = 'none';
+  
+  const modalPerfil = document.getElementById('modalPerfil');
+  if (modalPerfil) modalPerfil.style.display = 'flex';
 }
 
 async function guardarPerfil() {
   const perfil = KixikilaManager.getSessao()?.perfil;
   if (!perfil) return;
-  const nome     = document.getElementById('editNome')?.value.trim()  || '';
-  const senha    = document.getElementById('editSenha')?.value.trim() || '';
-  const av       = document.getElementById('perfilAvatarModal');
-  const novaFoto = av.dataset.novaFoto || undefined;
+  const nome = document.getElementById('editNome')?.value.trim() || '';
+  const senha = document.getElementById('editSenha')?.value.trim() || '';
+  const av = document.getElementById('perfilAvatarModal');
+  const novaFoto = av?.dataset?.novaFoto || undefined;
   if (!nome) { toast('O nome e obrigatorio'); return; }
   try {
     await KixikilaManager.atualizarPerfil({ telefone: perfil.telefone, nome, foto_perfil: novaFoto, senha: senha || undefined });
-    fecharModal('modalPerfil'); restaurarBotoesPerfilModal();
+    fecharModal('modalPerfil');
     atualizarAvatar();
     toast('Perfil actualizado!');
   } catch (e) { toast(e.message); }
 }
 
 async function confirmarEliminarConta() {
-  fecharModal('modalPerfil'); restaurarBotoesPerfilModal();
+  fecharModal('modalPerfil');
   modal('Eliminar conta', 'Esta accao e irreversivel. Tens a certeza?', [
     { texto: 'Cancelar', classe: 'btn-outline' },
     { texto: 'Eliminar', classe: 'btn-primary', acao: async () => {
@@ -829,13 +1100,11 @@ function skeleton() {
 
 // ── INIT ─────────────────────────────────────────────────────
 (function init() {
-  try {
-    const guardado = localStorage.getItem('kx_sessao');
-    if (guardado) {
-      KixikilaManager.setSessao(JSON.parse(guardado));
-      irParaMain();
-      return;
-    }
-  } catch (_) {}
+  const perfil = Seguranca.carregarSessaoSegura();
+  if (perfil) {
+    KixikilaManager.setSessao(perfil);
+    irParaMain();
+    return;
+  }
   irPara('paginaAuth');
 })();
