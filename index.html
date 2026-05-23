@@ -70,7 +70,7 @@
       max-height: 120px; transition: border-color .2s;
     }
     .chat-textarea:focus { border-color: var(--r); }
-    /* Barra de força da senha */
+    /* Segurança: força da senha */
     .forca-senha-container {
       margin: -8px 0 14px;
     }
@@ -135,12 +135,12 @@
       
       <div class="campo"><label>Municipio / Bairro</label><input id="regMunicipio" type="text" placeholder="Ex: Kilamba Kiaxi"></div>
       
-      <!-- Campo senha com indicador de força -->
+      <!-- Campo senha com segurança (força) -->
       <div class="campo"><label>Senha (minimo 6 caracteres)</label>
         <input id="regSenha" type="password" placeholder="********" oninput="atualizarForcaSenha()">
       </div>
       
-      <!-- Indicador de força da senha -->
+      <!-- Barra de força da senha -->
       <div class="forca-senha-container">
         <div class="forca-senha-barra">
           <div id="forcaSenhaBarra" class="forca-senha-progresso"></div>
@@ -150,7 +150,7 @@
       
       <div class="campo"><label>Confirmar senha</label><input id="regSenhaConfirm" type="password" placeholder="********"></div>
 
-      <!-- Honeypot anti-bot (invisível) -->
+      <!-- Honeypot anti‑bot (invisível) -->
       <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
         <input id="_hp_website" type="text" name="website" tabindex="-1" autocomplete="off">
       </div>
@@ -316,7 +316,7 @@
   </div>
 </div>
 
-<!-- MODAL PERFIL (UNIFICADO) -->
+<!-- MODAL PERFIL -->
 <div id="modalPerfil" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
   <div class="modal" style="max-height:85dvh;overflow-y:auto">
     <div class="perfil-topo">
@@ -330,13 +330,6 @@
     <div class="campo" style="margin-bottom:8px"><label>Data de nascimento</label><div id="perfilDataNasc" style="color:var(--muted); font-size:.9rem">---</div></div>
     <div class="campo" style="margin-bottom:8px"><label>Provincia</label><div id="perfilProvincia" style="color:var(--muted); font-size:.9rem">---</div></div>
     <div class="campo" style="margin-bottom:8px"><label>Municipio</label><div id="perfilMunicipio" style="color:var(--muted); font-size:.9rem">---</div></div>
-    
-    <!-- Estrelas de reputação -->
-    <div class="membro-stars-wrap" style="margin-top:12px; margin-bottom:16px">
-      <div class="membro-stars" id="membroStars"></div>
-      <span class="membro-stars-count" id="membroStarsCount"></span>
-    </div>
-    
     <div id="perfilSecaoEditar">
       <div style="height:1px; background:var(--border); margin:16px 0"></div>
       <div class="campo"><label>Novo nome</label><input id="editNome" type="text"></div>
@@ -348,6 +341,21 @@
       <button id="perfilBtnEliminar" class="btn-outline w100" style="margin-top:8px;color:var(--r2)" onclick="confirmarEliminarConta()">Eliminar conta</button>
     </div>
     <button id="perfilBtnAvaliar" class="btn-primary w100" style="margin-top:12px;display:none" onclick="abrirAvaliarMembro()">Avaliar este membro</button>
+  </div>
+</div>
+
+<!-- MODAL PERFIL MEMBRO -->
+<div id="modalMembroPerfil" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
+  <div class="modal modal-membro">
+    <button class="modal-fechar" onclick="fecharModal('modalMembroPerfil')">&#10005;</button>
+    <div class="membro-foto-grande" id="membroFotoGrande"></div>
+    <div class="membro-perfil-info">
+      <div class="membro-perfil-nome" id="membroPerfilNome"></div>
+      <div class="membro-perfil-tel" id="membroPerfilTel"></div>
+      <div id="membroInfoExtra" style="margin-top:8px; font-size:.85rem"></div>
+      <div class="membro-stars-wrap" style="margin-top:12px"><div class="membro-stars" id="membroStars"></div><span class="membro-stars-count" id="membroStarsCount"></span></div>
+      <button class="btn-primary w100" style="margin-top:16px" onclick="abrirAvaliarMembro()">Avaliar membro</button>
+    </div>
   </div>
 </div>
 
