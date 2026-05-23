@@ -720,14 +720,15 @@ html, body {
 }
 
 .membro-foto-grande {
-  width: 100%;
-  height: 300px;
-  background: var(--bg3);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--r-soft);
   display: flex; align-items: center; justify-content: center;
-  position: relative;
   overflow: hidden;
   background-size: cover;
-  background-position: top center;
+  background-position: center;
+  flex-shrink: 0;
 }
 
 .membro-foto-letra {
