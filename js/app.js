@@ -85,7 +85,7 @@ function mostrarPagina(nome) {
     carregarDashboard();
     carregarFeedDashboard();
     iniciarSync();
-    setTimeout(() => { configurarScrollToTop(); configurarPullToRefresh(); lucide.createIcons(); }, 400);
+    setTimeout(() => { configurarScrollToTop(); configurarPullToRefresh(); garantirIconesCards(); }, 500);
   } else {
     pararSync();
   }
@@ -104,7 +104,7 @@ window.addEventListener('popstate', (e) => {
     const el = document.getElementById('pagina' + pagina);
     if (el) el.style.display = 'flex';
     lucide.createIcons();
-    if (pagina === 'Dashboard') { carregarDashboard(); carregarFeedDashboard(); setTimeout(lucide.createIcons, 400); }
+    if (pagina === 'Dashboard') { carregarDashboard(); carregarFeedDashboard(); }
   }
 });
 
@@ -117,7 +117,7 @@ function iniciarSync() {
   _syncInterval = setInterval(async () => {
     if (document.visibilityState === 'hidden') return;
     try {
-      if (_tabAtual === 'descobrir') await carregarFeedDashboard(true);
+      if (_tabAtual === 'descobrir') { await carregarFeedDashboard(true); setTimeout(garantirIconesCards, 100); }
       else if (_tabAtual === 'meus') await carregarMeusGruposDashboard(true);
       await carregarNotificacoes();
     } catch (_) {}
@@ -267,7 +267,8 @@ async function carregarFeedDashboard(silencioso = false) {
         </div>`;
       container.appendChild(card);
     }
-    lucide.createIcons();
+    // Ícones estáticos fora do feed (navbar, tabs)
+    lucide.createIcons({ attrs: { class: 'lucide' } });
   } catch (e) {
     if (!silencioso) container.innerHTML = '<div style="padding:30px 16px;text-align:center;color:var(--muted);font-size:.88rem">Erro ao carregar grupos.</div>';
   }
