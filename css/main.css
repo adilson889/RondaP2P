@@ -2,7 +2,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* ── TEMA CLARO (PALETA ORIGINAL) ── */
   --bg:      #F5F0EB;
   --bg2:     #FFFFFF;
   --bg3:     #EDE8E2;
@@ -62,7 +61,9 @@ html, body {
   color: #fff;
   font-size: 2rem;
   font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 16px;
 }
 
@@ -121,7 +122,9 @@ html, body {
   color: #fff;
   font-weight: 800;
   font-size: .95rem;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -265,7 +268,9 @@ html, body {
   color: var(--r);
   font-weight: 900;
   font-size: 1.2rem;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -376,7 +381,9 @@ html, body {
   background: var(--bg3);
   color: var(--r);
   font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: .95rem;
   flex-shrink: 0;
 }
@@ -415,7 +422,9 @@ html, body {
   color: var(--muted);
   font-weight: 800;
   font-size: .85rem;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -508,7 +517,9 @@ html, body {
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(139,0,0,0.3);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10;
   transition: transform .2s;
 }
@@ -530,7 +541,9 @@ html, body {
   color: #fff;
   font-size: 1.4rem;
   font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   background-size: cover;
   background-position: center;
@@ -672,7 +685,9 @@ html, body {
   border-radius: 50%;
   background: var(--bg3);
   border: 2px dashed var(--border);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
   transition: border-color .2s;
@@ -696,7 +711,9 @@ html, body {
   background: var(--r);
   border-radius: 50%;
   font-size: .65rem;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #fff;
 }
 
@@ -721,14 +738,15 @@ html, body {
 
 .membro-foto-grande {
   width: 100%;
-  height: 260px;
-  background: var(--r-soft);
-  display: flex; align-items: center; justify-content: center;
+  height: 300px;
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   overflow: hidden;
   background-size: cover;
-  background-position: center;
-  border-radius: 0;
-  flex-shrink: 0;
+  background-position: top center;
 }
 
 .membro-foto-letra {
@@ -754,24 +772,91 @@ html, body {
   margin-bottom: 14px;
 }
 
+/* ── INFORMAÇÕES EXTRA DO MEMBRO (ESTILIZADAS) ──────────────── */
+.membro-info-extra {
+  margin: 16px 0;
+  padding: 12px 16px;
+  background: var(--bg3);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.membro-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.membro-info-item:last-child {
+  border-bottom: none;
+}
+
+.membro-info-label {
+  width: 100px;
+  font-weight: 700;
+  font-size: .8rem;
+  color: var(--r);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.membro-info-value {
+  flex: 1;
+  color: var(--text);
+  font-weight: 500;
+  font-size: .9rem;
+  word-break: break-word;
+}
+
+.membro-info-label::after {
+  content: ":";
+  margin-left: 2px;
+}
+
+/* ── SEPARADOR ──────────────────────────────────────────────── */
+.membro-separador {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 16px 0;
+}
+
+/* ── ESTRELAS GRANDES E ESTILIZADAS ─────────────────────────── */
 .membro-stars-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 12px 16px;
+  background: var(--bg3);
+  border-radius: 16px;
+  border: 1px solid var(--border);
 }
 
-.membro-stars { display: flex; gap: 2px; }
-
-.star {
-  font-size: 1.1rem;
-  color: var(--bg3);
+.membro-stars {
+  display: flex;
+  gap: 8px;
 }
 
-.star.on { color: #FBBF24; }
+.membro-stars .star {
+  font-size: 1.5rem;
+  color: #D4D4D4;
+}
+
+.membro-stars .star.on {
+  color: #FBBF24;
+}
 
 .membro-stars-count {
-  font-size: .8rem;
-  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--r);
+  background: var(--bg2);
+  padding: 6px 16px;
+  border-radius: 40px;
+  border: 1px solid var(--border);
 }
 
 /* ── ESTRELAS INPUT (avaliar) ───────────────────────────────── */
@@ -791,27 +876,23 @@ html, body {
   transition: color .15s, transform .15s;
 }
 
-.star-btn.on         { color: #FBBF24; }
-.star-btn:active     { transform: scale(1.2); }
-
-/* Esconde todos os inputs de upload dentro do perfil */
-#modalPerfil input[type="file"],
-#modalPerfil .perfil-avatar-wrap + input {
-  display: none !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-  position: absolute !important;
+.star-btn.on {
+  color: #FBBF24;
+}
+.top-icon-btn {
+  background: var(--r);
+  color: #fff;
 }
 
-/* Alinha o nome e telefone */
-.perfil-topo {
+.top-icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  justify-content: center;
 }
-.perfil-nome, .perfil-tel {
-  margin: 0;
-  line-height: 1.4;
-}
+.top-icon-btn:hover { background: var(--bg3); }
