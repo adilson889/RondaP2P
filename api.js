@@ -1,5 +1,6 @@
 const KixikilaManager = (() => {
   const BASE = 'https://sire-kixikila-api.vercel.app/';
+  const BASE_P2P = 'https://kixikila-p2p.vercel.app/';
   let _sessao = null;
 
   function getSessao() { return _sessao; }
@@ -31,6 +32,16 @@ const KixikilaManager = (() => {
         await esperar(1000 * (i + 1));
       }
     }
+  }
+
+  async function httpP2P(endpoint, corpo) {
+    const opcoes = corpo
+      ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) }
+      : { method: 'GET' };
+    const r = await fetch(BASE_P2P + endpoint, opcoes);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.erro || 'Erro ' + r.status);
+    return d;
   }
 
   function esperar(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -109,10 +120,17 @@ const KixikilaManager = (() => {
     return http('grupo/' + codigo + '/solicitar', { telefone, nome });
   }
 
+  // ── REPUTAÇÃO ─────────────────────────────────────────────────
+  async function carregarReputacao(telefone) {
+    const d = await http('membro/' + telefone.replace(/\+/g, '') + '/reputacao');
+    return d;
+  }
+
+  // ── RESPONDER PEDIDO ─────────────────────────────────────────
   async function responderPedido(codigo, pedidoId, acao) {
     const perfil = _sessao?.perfil;
     if (!perfil) throw new Error('Sessao invalida');
-    return http('grupo/' + codigo + '/pedido/' + pedidoId + '/' + acao, { criador_telefone: perfil.telefone });
+    return http(`grupo/${codigo}/pedido/${pedidoId}/${acao}`, { criador_telefone: perfil.telefone });
   }
 
   // ── AVALIACOES ───────────────────────────────────────────────
@@ -127,19 +145,100 @@ const KixikilaManager = (() => {
     return http('notificacoes/' + tel.replace(/\+/g, ''));
   }
 
+  // ── P2P (posts sociais) ──────────────────────────────────────
+  async function criarPostP2P(texto) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) throw new Error('Sessao invalida');
+    return httpP2P('p2p/post', {
+      telefone: perfil.telefone,
+      nome: perfil.nome,
+      foto_perfil: perfil.foto_perfil || '',
+      texto
+    });
+  }
+
+  async function carregarPostsP2P(limite = 30) {
+    const d = await httpP2P(`p2p/feed?limite=${limite}`);
+    return d.posts || [];
+  }
+
+  async function darLikeP2P(postId) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) throw new Error('Sessao invalida');
+    return httpP2P('p2p/like', { postId, telefone: perfil.telefone, nome: perfil.nome });
+  }
+
+  async function removerLikeP2P(postId) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) throw new Error('Sessao invalida');
+    return httpP2P('p2p/unlike', { postId, telefone: perfil.telefone });
+  }
+
+  async function adicionarComentarioP2P(postId, texto) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) throw new Error('Sessao invalida');
+    return httpP2P('p2p/comentario', {
+      postId,
+      telefone: perfil.telefone,
+      nome: perfil.nome,
+      foto_perfil: perfil.foto_perfil || '',
+      texto
+    });
+  }
+
+  async function carregarComentariosP2P(postId) {
+    const d = await httpP2P(`p2p/comentarios/${postId}`);
+    return d.comentarios || [];
+  }
+  
+  
+  // ── CHAT PRIVADO P2P ─────────────────────────────────────────
+async function enviarMsgPrivada(para, texto) {
+  const perfil = _sessao?.perfil;
+  if (!perfil) throw new Error('Sessao invalida');
+  return httpP2P('p2p/mensagem', {
+    de: perfil.telefone,
+    deNome: perfil.nome,
+    para: para,
+    texto
+  });
+}
+
+async function carregarMensagensPrivadas(comTelefone) {
+  const perfil = _sessao?.perfil;
+  if (!perfil) return { mensagens: [] };
+  return httpP2P(`p2p/mensagens/${perfil.telefone}/${comTelefone}`);
+}
+  
+  async function carregarConversas() {
+  const perfil = _sessao?.perfil;
+  if (!perfil) return { conversas: [] };
+  return httpP2P(`p2p/conversas/${perfil.telefone}`);
+}
+
+async function carregarUsuariosParaSeguir() {
+  const perfil = _sessao?.perfil;
+  if (!perfil) return [];
+  const d = await http(`perfil/${perfil.telefone}/recomendacoes`);
+  return d.usuarios || [];
+}
+
   // ── UTILITARIOS ──────────────────────────────────────────────
   function formatarValor(v) {
     return new Intl.NumberFormat('pt-AO').format(v || 0);
   }
 
-  return {
+    return {
     getSessao, setSessao, limparSessao,
     registar, entrar, eliminarConta, atualizarPerfil,
     carregarFeed, carregarMeusGrupos,
     criarGrupo, carregarGrupo, entrarGrupo, sairGrupo, encerrarGrupo,
-    registarPagamento, enviarMensagem, solicitarEntrada, responderPedido,
-    avaliar,
+    registarPagamento, enviarMensagem, solicitarEntrada,
+    carregarReputacao, responderPedido, avaliar,
     carregarNotificacoes,
+    enviarMsgPrivada, carregarMensagensPrivadas, carregarConversas, carregarUsuariosParaSeguir,
+    criarPostP2P, carregarPostsP2P, darLikeP2P, removerLikeP2P,
+    adicionarComentarioP2P, carregarComentariosP2P,
     formatarValor
   };
 })();
