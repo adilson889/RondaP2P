@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Kixikila</title>
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="main.css">
   <style>
+    /* Estilos adicionais para os termos */
     .termos-wrap {
       margin-bottom: 20px;
       border: 1px solid var(--border);
@@ -33,64 +34,85 @@
     }
     .termos-scroll::-webkit-scrollbar { width: 4px; }
     .termos-scroll::-webkit-scrollbar-thumb { background: var(--r); border-radius: 4px; }
-    .termos-conteudo h4 { font-size: 1rem; margin-bottom: 4px; }
-    .termos-conteudo h5 { font-size: .85rem; margin: 12px 0 6px; }
-    .termos-conteudo p { font-size: .82rem; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
-    .termos-data { font-size: .7rem; margin-bottom: 12px; }
-    .termos-contacto { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
-    .termos-hint {
-      display: flex; align-items: center; gap: 6px; padding: 8px 16px;
-      background: var(--r-soft); font-size: .72rem; color: var(--r); font-weight: 600;
-      border-top: 1px solid var(--border);
-    }
-    .termos-hint.lido { color: var(--green); background: rgba(34,197,94,0.1); }
-    .termos-check-wrap {
-      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      cursor: pointer; border-top: 1px solid var(--border);
-    }
-    .termos-check-wrap input { width: 18px; height: 18px; accent-color: var(--r); cursor: pointer; }
-    .termos-check-label { font-size: .8rem; color: var(--text); }
-    .termos-check-label span { color: var(--r); font-weight: 700; }
-    textarea {
-      width: 100%; padding: 12px;
-      border: 1px solid var(--border); border-radius: 10px;
-      background: var(--bg3); color: var(--text);
-      font-size: .9rem; font-family: var(--sans);
-      outline: none; resize: vertical;
-    }
-    textarea:focus { border-color: var(--r); }
-    .foto-picker-group { margin-bottom: 16px; }
-    .chat-textarea {
-      flex: 1; padding: 11px 14px;
-      border: 1px solid var(--border); border-radius: 20px;
-      background: var(--bg3); color: var(--text);
-      font-family: var(--sans); font-size: .9rem;
-      outline: none; resize: none;
-      overflow-y: hidden; line-height: 1.45;
-      max-height: 120px; transition: border-color .2s;
-    }
-    .chat-textarea:focus { border-color: var(--r); }
-    /* Segurança: força da senha */
-    .forca-senha-container {
-      margin: -8px 0 14px;
-    }
-    .forca-senha-barra {
-      height: 4px;
-      background: var(--bg3);
-      border-radius: 99px;
-      overflow: hidden;
+    .termos-conteudo h4 {
+      font-size: 1rem;
       margin-bottom: 4px;
     }
-    .forca-senha-progresso {
-      height: 100%;
-      width: 0;
-      border-radius: 99px;
-      transition: all .3s;
+    .termos-conteudo h5 {
+      font-size: .85rem;
+      margin: 12px 0 6px;
     }
-    .forca-senha-texto {
-      font-size: .75rem;
+    .termos-conteudo p {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .termos-data {
+      font-size: .7rem;
+      margin-bottom: 12px;
+    }
+    .termos-contacto {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .termos-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--r-soft);
+      font-size: .72rem;
+      color: var(--r);
       font-weight: 600;
+      border-top: 1px solid var(--border);
     }
+    .termos-hint.lido {
+      color: var(--green);
+      background: rgba(34,197,94,0.1);
+    }
+    .termos-check-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      border-top: 1px solid var(--border);
+    }
+    .termos-check-wrap input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--r);
+      cursor: pointer;
+    }
+    .termos-check-label {
+      font-size: .8rem;
+      color: var(--text);
+    }
+    .termos-check-label span {
+      color: var(--r);
+      font-weight: 700;
+    }
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg3);
+      color: var(--text);
+      font-size: .9rem;
+      font-family: var(--sans);
+      outline: none;
+      resize: vertical;
+    }
+    textarea:focus {
+      border-color: var(--r);
+    }
+    .foto-picker-group {
+      margin-bottom: 16px;
+    }
+    
   </style>
 </head>
 <body>
@@ -108,6 +130,7 @@
     </div>
 
     <div id="tabRegisto">
+      <!-- FOTO DE PERFIL -->
       <div class="foto-picker" onclick="document.getElementById('inputFotoReg').click()">
         <div class="foto-picker-inner" id="fotoPicker">
           <span id="fotoPickerLetra">+</span>
@@ -117,44 +140,66 @@
       </div>
       <input id="inputFotoReg" type="file" accept="image/*" style="display:none" onchange="previewFotoReg(event)">
 
-      <div class="campo"><label>Nome completo</label><input id="regNome" type="text" placeholder="Como no documento"></div>
-      <div class="campo"><label>Data de nascimento</label><input id="regDataNasc" type="date"></div>
-      <div class="campo"><label>Telefone (WhatsApp)</label><input id="regTelefone" type="tel" placeholder="+244 9XX XXX XXX"></div>
-      <div class="campo"><label>Email</label><input id="regEmail" type="email" placeholder="exemplo@email.com"></div>
-      
+      <div class="campo">
+        <label>Nome completo</label>
+        <input id="regNome" type="text" placeholder="Como no documento">
+      </div>
+
+      <div class="campo">
+        <label>Data de nascimento</label>
+        <input id="regDataNasc" type="date">
+      </div>
+
+      <div class="campo">
+        <label>Telefone (WhatsApp)</label>
+        <input id="regTelefone" type="tel" placeholder="+244 9XX XXX XXX">
+      </div>
+
+      <div class="campo">
+        <label>Email</label>
+        <input id="regEmail" type="email" placeholder="exemplo@email.com">
+      </div>
+
       <div class="campo">
         <label>Provincia</label>
         <select id="regProvincia">
           <option value="">Selecionar</option>
-          <option>Luanda</option><option>Benguela</option><option>Huila</option><option>Bie</option>
-          <option>Cabinda</option><option>Cuando Cubango</option><option>Cuanza Norte</option><option>Cuanza Sul</option>
-          <option>Cunene</option><option>Huambo</option><option>Lunda Norte</option><option>Lunda Sul</option>
-          <option>Malanje</option><option>Moxico</option><option>Namibe</option><option>Uige</option><option>Zaire</option>
+          <option>Luanda</option>
+          <option>Benguela</option>
+          <option>Huila</option>
+          <option>Bie</option>
+          <option>Cabinda</option>
+          <option>Cuando Cubango</option>
+          <option>Cuanza Norte</option>
+          <option>Cuanza Sul</option>
+          <option>Cunene</option>
+          <option>Huambo</option>
+          <option>Lunda Norte</option>
+          <option>Lunda Sul</option>
+          <option>Malanje</option>
+          <option>Moxico</option>
+          <option>Namibe</option>
+          <option>Uige</option>
+          <option>Zaire</option>
         </select>
       </div>
-      
-      <div class="campo"><label>Municipio / Bairro</label><input id="regMunicipio" type="text" placeholder="Ex: Kilamba Kiaxi"></div>
-      
-      <!-- Campo senha com segurança (força) -->
-      <div class="campo"><label>Senha (minimo 6 caracteres)</label>
-        <input id="regSenha" type="password" placeholder="********" oninput="atualizarForcaSenha()">
-      </div>
-      
-      <!-- Barra de força da senha -->
-      <div class="forca-senha-container">
-        <div class="forca-senha-barra">
-          <div id="forcaSenhaBarra" class="forca-senha-progresso"></div>
-        </div>
-        <span id="forcaSenhaTexto" class="forca-senha-texto"></span>
-      </div>
-      
-      <div class="campo"><label>Confirmar senha</label><input id="regSenhaConfirm" type="password" placeholder="********"></div>
 
-      <!-- Honeypot anti‑bot (invisível) -->
-      <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
-        <input id="_hp_website" type="text" name="website" tabindex="-1" autocomplete="off">
+      <div class="campo">
+        <label>Municipio / Bairro</label>
+        <input id="regMunicipio" type="text" placeholder="Ex: Kilamba Kiaxi">
       </div>
 
+      <div class="campo">
+        <label>Senha (minimo 6 caracteres)</label>
+        <input id="regSenha" type="password" placeholder="********">
+      </div>
+
+      <div class="campo">
+        <label>Confirmar senha</label>
+        <input id="regSenhaConfirm" type="password" placeholder="********">
+      </div>
+
+      <!-- TERMOS DE USO E POLITICA -->
       <div class="termos-wrap">
         <div class="termos-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -164,23 +209,63 @@
           <div class="termos-conteudo">
             <h4>TERMOS DE USO - KIXIKILA</h4>
             <p class="termos-data">Ultima actualizacao: Maio de 2026</p>
-            <p>Bem-vindo a KIXIKILA! Estes Termos de Uso regulam o acesso e utilizacao da plataforma...</p>
-            <h5>1. Aceitacao dos Termos</h5><p>Ao aceder ou utilizar a KIXIKILA, voce concorda com estes Termos na integra.</p>
-            <h5>2. Descricao do Servico</h5><p>A KIXIKILA e uma plataforma que permite criar e gerir grupos de poupanca rotativa...</p>
-            <h5>3. Responsabilidades</h5><p>A KIXIKILA e apenas uma ferramenta de organizacao. Nao somos responsaveis por pagamentos...</p>
-            <h5>4. Regras de Utilizacao</h5><p>E proibido usar a plataforma para actividades ilegais, fraudes ou branqueamento de capitais.</p>
-            <h5>5. Doacoes</h5><p>A plataforma e gratuita. As doacoes sao voluntarias.</p>
-            <h5>6. Limitacao de Responsabilidade</h5><p>A KIXIKILA e disponibilizada "no estado em que se encontra".</p>
-            <h5>7. Suspensao e Cancelamento</h5><p>Reservamos o direito de suspender ou terminar contas que violem estes Termos.</p>
-            <h5>8. Alteracoes</h5><p>Podemos actualizar estes Termos.</p>
-            <h5>9. Lei Aplicavel</h5><p>Estes Termos sao regidos pelas leis de Angola.</p>
+            <p>Bem-vindo a KIXIKILA! Estes Termos de Uso regulam o acesso e utilizacao da plataforma KIXIKILA, disponibilizada por Adilson Rafael (desenvolvedor independente).</p>
+            
+            <h5>1. Aceitacao dos Termos</h5>
+            <p>Ao aceder ou utilizar a KIXIKILA, voce concorda com estes Termos na integra. Se nao concordar, nao deve utilizar a plataforma.</p>
+            
+            <h5>2. Descricao do Servico</h5>
+            <p>A KIXIKILA e uma plataforma que permite aos usuarios: criar e gerir grupos de kixikila/poupanca rotativa; gerar codigos de convite; definir valores e acompanhar rodadas; comunicar dentro dos grupos. A plataforma nao realiza cobrancas, transferencias nem guarda dinheiro de nenhum usuario. Todos os pagamentos sao feitos diretamente entre os participantes fora da plataforma.</p>
+            
+            <h5>3. Responsabilidades</h5>
+            <p>A KIXIKILA e apenas uma ferramenta de organizacao. Nao somos responsaveis por acordos, pagamentos, dividas ou conflitos entre os membros dos grupos. Cada usuario e totalmente responsavel pelos seus proprios grupos, pagamentos e combinacoes. A plataforma nao funciona como banco, instituicao financeira ou intermediaria de pagamentos.</p>
+            
+            <h5>4. Regras de Utilizacao</h5>
+            <p>E proibido: usar a plataforma para actividades ilegais, fraudes ou branqueamento de capitais; partilhar conteudo ofensivo, violento ou discriminatorio; criar grupos com intencao de prejudicar terceiros; tentar aceder a contas de outros usuarios.</p>
+            
+            <h5>5. Doacoes</h5>
+            <p>A plataforma e gratuita. As doacoes sao voluntarias e ajudam a manter e melhorar o projecto. Nao ha reembolso de doacoes.</p>
+            
+            <h5>6. Limitacao de Responsabilidade</h5>
+            <p>A KIXIKILA e disponibilizada "no estado em que se encontra". Nao garantimos que esteja livre de erros ou interrupcoes. Nao nos responsabilizamos por eventuais danos directos ou indirectos decorrentes do uso da plataforma.</p>
+            
+            <h5>7. Suspensao e Cancelamento</h5>
+            <p>Reservamos o direito de suspender ou terminar contas que violem estes Termos.</p>
+            
+            <h5>8. Alteracoes</h5>
+            <p>Podemos actualizar estes Termos. A continuacao do uso apos actualizacoes significa aceitacao das novas versoes.</p>
+            
+            <h5>9. Lei Aplicavel</h5>
+            <p>Estes Termos sao regidos pelas leis de Angola. Qualquer disputa sera resolvida nos tribunais de Luanda.</p>
+            
             <h4 style="margin-top:16px">POLITICA DE PRIVACIDADE - KIXIKILA</h4>
             <p class="termos-data">Ultima actualizacao: Maio de 2026</p>
-            <p>Respeitamos a sua privacidade e cumprimos a Lei n. 22/11, de 17 de Junho de Angola.</p>
-            <h5>1. Dados que recolhemos</h5><p>Nome, email, telefone, data de nascimento, provincia, municipio, foto.</p>
-            <h5>2. Como usamos os seus dados</h5><p>Para fornecer e melhorar a plataforma, gerir grupos e notificacoes.</p>
-            <h5>3. Partilha de dados</h5><p>Nao vendemos os seus dados. So partilhamos com autoridades se exigido por lei.</p>
-            <h5>4. Seus direitos</h5><p>Voce tem direito a aceder, corrigir ou apagar os seus dados.</p>
+            <p>Respeitamos a sua privacidade e cumprimos a Lei n. 22/11, de 17 de Junho (Lei de Proteccao de Dados Pessoais) de Angola.</p>
+            
+            <h5>1. Dados que recolhemos</h5>
+            <p>- Dados de registo: nome, email, telefone, data de nascimento, provincia, municipio;<br>- Dados do perfil e grupos criados;<br>- Dados de utilizacao (quais funcionalidades usa);<br>- Informacoes tecnicas (IP, navegador, dispositivo).</p>
+            
+            <h5>2. Como usamos os seus dados</h5>
+            <p>- Fornecer e melhorar a plataforma;<br>- Gerir os seus grupos e notificacoes;<br>- Comunicar actualizacoes importantes;<br>- Prevenir abusos e fraudes;<br>- Analisar uso da plataforma (estatisticas anonimas).</p>
+            
+            <h5>3. Partilha de dados</h5>
+            <p>Nao vendemos os seus dados. Podemos partilhar apenas: com autoridades, se exigido por lei; para proteger direitos, seguranca ou propriedade da plataforma.</p>
+            
+            <h5>4. Cookies e tecnologias semelhantes</h5>
+            <p>Usamos cookies para melhorar a experiencia (sessao, preferencias). Pode gerir os cookies no seu navegador.</p>
+            
+            <h5>5. Seus direitos</h5>
+            <p>Voce tem direito a: aceder aos seus dados; corrigir dados incorrectos; apagar os seus dados (em certos casos); revogar consentimento.</p>
+            
+            <h5>6. Seguranca</h5>
+            <p>Tomamos medidas razoaveis para proteger os seus dados, mas nenhum sistema e 100% seguro.</p>
+            
+            <h5>7. Menores</h5>
+            <p>A plataforma nao e destinada a menores de 18 anos sem consentimento dos pais/responsaveis.</p>
+            
+            <h5>8. Alteracoes</h5>
+            <p>Podemos actualizar esta Politica. Recomendamos que reveja periodicamente.</p>
+            
             <p class="termos-contacto">Desenvolvedor: Adilson Rafael<br>Contacto: <a href="https://wa.me/244921325366" target="_blank" style="color:var(--r)">+244 921 325 366</a></p>
           </div>
         </div>
@@ -190,25 +275,42 @@
         </div>
         <label class="termos-check-wrap" id="termosCheckWrap" style="opacity:0.4;pointer-events:none;">
           <input type="checkbox" id="termosCheck" disabled onchange="atualizarBotaoCriar()">
-          <span class="termos-check-label">Li e aceito os <span>Termos de Uso</span> e a <span>Politica de Privacidade</span> da KIXIKILA</span>
+          <span class="termos-check-label">
+            Li e aceito os <span>Termos de Uso</span> e a <span>Politica de Privacidade</span> da KIXIKILA
+          </span>
         </label>
       </div>
+
       <button class="btn-primary w100" onclick="registar()" id="btnCriarConta" disabled>Criar conta</button>
     </div>
 
     <div id="tabLogin" style="display:none">
-      <div class="campo"><label>Telefone</label><input id="loginTelefone" type="tel" placeholder="+244 9XX XXX XXX"></div>
-      <div class="campo"><label>Senha</label><input id="loginSenha" type="password" placeholder="A tua senha"></div>
+      <div class="campo">
+        <label>Telefone</label>
+        <input id="loginTelefone" type="tel" placeholder="+244 9XX XXX XXX">
+      </div>
+      <div class="campo">
+        <label>Senha</label>
+        <input id="loginSenha" type="password" placeholder="A tua senha">
+      </div>
       <button class="btn-primary w100" onclick="entrar()">Entrar</button>
     </div>
   </div>
 </div>
 
-<!-- MAIN -->
 <div id="paginaMain" class="pagina" style="display:none">
   <div class="top-bar">
-    <span class="top-titulo">Kixikila</span>
-    <div class="top-avatar" id="topAvatar" onclick="abrirPerfil()"></div>
+    <span class="top-titulo" style="font-size:1.3rem;font-weight:900;letter-spacing:-0.5px">
+      <span style="color:var(--r)">K</span>ixikila
+    </span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="top-icon-btn" onclick="abrirListaConversas()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+      <div class="top-avatar" id="topAvatar" onclick="abrirPerfil()"></div>
+    </div>
   </div>
   <div class="tabs">
     <button class="tab activo" id="tabFeed" onclick="mostrarTabMain('feed')">Descobrir</button>
@@ -226,7 +328,6 @@
   </div>
   <button class="fab" onclick="abrirCriar()">+</button>
 </div>
-
 <!-- APP (ver grupo) -->
 <div id="paginaApp" class="pagina" style="display:none">
   <div class="top-bar">
@@ -238,34 +339,52 @@
     <div class="grupo-card">
       <div class="grupo-valor" id="appValor"></div>
       <div class="grupo-meta" id="appMeta"></div>
-      <div class="progresso-wrap"><div class="progresso-bar" id="appProgresso"></div></div>
-      <div class="grupo-rodape"><span id="appPagamentos"></span><span id="appProximaRonda"></span></div>
+      <div class="progresso-wrap">
+        <div class="progresso-bar" id="appProgresso"></div>
+      </div>
+      <div class="grupo-rodape">
+        <span id="appPagamentos"></span>
+        <span id="appProximaRonda"></span>
+      </div>
     </div>
     <div class="tabs tabs-sm">
       <button class="tab activo" id="tabMembros" onclick="mostrarTabApp('membros')">Membros</button>
       <button class="tab" id="tabRodas" onclick="mostrarTabApp('rodas')">Rodas</button>
       <button class="tab" id="tabChat" onclick="abrirChat()">Chat</button>
-      <button class="tab" id="tabPedidos" onclick="mostrarTabApp('pedidos')">Pedidos</button>
     </div>
-    <div id="conteudoMembros"><div id="listaMembros"></div><div class="acoes-grupo">
-      <button class="btn-primary" onclick="registarPagamento()">Confirmar pagamento</button>
-      <button class="btn-outline" id="btnEncerrar" onclick="encerrarGrupo()" style="display:none">Encerrar grupo</button>
-      <button class="btn-outline" onclick="sairDoGrupo()">Sair do grupo</button>
-    </div></div>
-    <div id="conteudoRodas" style="display:none"><div id="listaRodas"></div></div>
-    <div id="conteudoPedidos" style="display:none"></div>
+    <div id="conteudoMembros">
+      <div id="listaMembros"></div>
+      <div class="acoes-grupo">
+        <button class="btn-primary" onclick="registarPagamento()">Confirmar pagamento</button>
+        <button class="btn-outline" id="btnEncerrar" onclick="encerrarGrupo()" style="display:none">Encerrar grupo</button>
+        <button class="btn-outline" onclick="sairDoGrupo()">Sair do grupo</button>
+      </div>
+    </div>
+    <div id="conteudoRodas" style="display:none">
+      <div id="listaRodas"></div>
+    </div>
   </div>
 </div>
 
-<!-- CHAT -->
+<!-- CHAT (tela cheia) -->
 <div id="paginaChat" class="pagina" style="display:none">
   <div class="top-bar">
     <button class="btn-voltar" onclick="voltarApp()">&#8592;</button>
-    <div style="flex:1"><div class="top-titulo" id="chatNomeGrupo"></div><div style="font-size:.75rem;color:var(--muted)" id="chatMembrosCount"></div></div>
+    <div style="flex:1">
+      <div class="top-titulo" id="chatNomeGrupo"></div>
+      <div style="font-size:.75rem;color:var(--muted)" id="chatMembrosCount"></div>
+    </div>
   </div>
   <div id="chatMensagens" class="chat-lista"></div>
   <div class="chat-input-wrap">
-    <textarea id="chatInput" class="chat-textarea" placeholder="Mensagem..." rows="1" oninput="autoResizeChat(this)" onkeydown="handleChatKey(event)"></textarea>
+    <textarea
+      id="chatInput"
+      class="chat-textarea"
+      placeholder="Mensagem..."
+      rows="1"
+      oninput="crescerTextarea(this)"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMsg()}"
+    ></textarea>
     <button class="btn-enviar" onclick="enviarMsg()">&#10148;</button>
   </div>
 </div>
@@ -274,25 +393,66 @@
 <div id="modalCriar" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
   <div class="modal">
     <h3>Criar grupo</h3>
-    <div class="foto-picker-group">
+    
+    <!-- Foto do grupo -->
+    <div class="foto-picker-group" style="margin-bottom:16px">
       <div class="foto-picker" onclick="document.getElementById('inputFotoGrupo').click()" style="margin-bottom:0">
-        <div class="foto-picker-inner" id="fotoGrupoPicker"><span id="fotoGrupoLetra">+</span><img id="fotoGrupoImg" src="" style="display:none"></div>
+        <div class="foto-picker-inner" id="fotoGrupoPicker">
+          <span id="fotoGrupoLetra">+</span>
+          <img id="fotoGrupoImg" src="" style="display:none">
+        </div>
         <span class="foto-picker-label">Foto do grupo</span>
       </div>
       <input id="inputFotoGrupo" type="file" accept="image/*" style="display:none" onchange="previewFotoGrupo(event)">
     </div>
-    <div class="campo"><label>Nome do grupo</label><input id="criarNome" type="text" placeholder="Ex: Grupo Familia"></div>
-    <div class="campo"><label>Descricao</label><textarea id="criarDescricao" rows="2" placeholder="Descreva o objetivo do grupo..."></textarea></div>
-    <div class="campo"><label>Regras do grupo</label><textarea id="criarRegras" rows="2" placeholder="Ex: Pagar ate dia 10 de cada mes..."></textarea></div>
-    <div class="campo"><label>Valor por ronda (KZ)</label><input id="criarValor" type="number" placeholder="Ex: 50000"></div>
-    <div class="campo"><label>Periodicidade</label><select id="criarPeriod"><option value="mensal">Mensal</option><option value="quinzenal">Quinzenal</option><option value="semanal">Semanal</option></select></div>
-    <div class="campo"><label>Max. membros</label><input id="criarMax" type="number" value="6" min="2" max="20"></div>
-    <div class="campo"><label>Localizacao (opcional)</label><input id="criarLocalizacao" type="text" placeholder="Ex: Luanda, Kilamba"></div>
-    <div class="modal-btns"><button class="btn-outline" onclick="fecharModal('modalCriar')">Cancelar</button><button class="btn-primary" onclick="criarGrupo()">Criar</button></div>
+    
+    <div class="campo">
+      <label>Nome do grupo</label>
+      <input id="criarNome" type="text" placeholder="Ex: Grupo Familia">
+    </div>
+    
+    <div class="campo">
+      <label>Descricao</label>
+      <textarea id="criarDescricao" rows="2" placeholder="Descreva o objetivo do grupo..."></textarea>
+    </div>
+    
+    <div class="campo">
+      <label>Regras do grupo</label>
+      <textarea id="criarRegras" rows="2" placeholder="Ex: Pagar ate dia 10 de cada mes..."></textarea>
+    </div>
+    
+    <div class="campo">
+      <label>Valor por ronda (KZ)</label>
+      <input id="criarValor" type="number" placeholder="Ex: 50000">
+    </div>
+    
+    <div class="campo">
+      <label>Periodicidade</label>
+      <select id="criarPeriod">
+        <option value="mensal">Mensal</option>
+        <option value="quinzenal">Quinzenal</option>
+        <option value="semanal">Semanal</option>
+      </select>
+    </div>
+    
+    <div class="campo">
+      <label>Max. membros</label>
+      <input id="criarMax" type="number" value="6" min="2" max="20">
+    </div>
+    
+    <div class="campo">
+      <label>Localizacao (opcional)</label>
+      <input id="criarLocalizacao" type="text" placeholder="Ex: Luanda, Kilamba">
+    </div>
+    
+    <div class="modal-btns">
+      <button class="btn-outline" onclick="fecharModal('modalCriar')">Cancelar</button>
+      <button class="btn-primary" onclick="criarGrupo()">Criar</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL PREVIEW GRUPO -->
+<!-- MODAL PREVIEW GRUPO (feed) -->
 <div id="modalPreviewGrupo" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
   <div class="modal" style="max-height:85dvh;overflow-y:auto">
     <h3 id="previewTitulo"></h3>
@@ -302,49 +462,64 @@
     <div id="previewLocalizacao"></div>
     <div style="margin:12px 0"><strong>Valor</strong><br><span id="previewValor"></span></div>
     <div class="progresso-wrap" style="margin:12px 0"><div class="progresso-bar" id="previewProgresso" style="width:0%"></div></div>
-    <div style="display:flex;justify-content:space-between;margin:8px 0"><span>Membros: <span id="previewMembros"></span></span><span>Vagas: <span id="previewVagas"></span></span></div>
+    <div style="display:flex;justify-content:space-between;margin:8px 0">
+      <span>Membros: <span id="previewMembros"></span></span>
+      <span>Vagas: <span id="previewVagas"></span></span>
+    </div>
     <div style="margin:8px 0"><strong>Criador</strong><br><span id="previewCriador"></span></div>
-    <div class="modal-btns" style="margin-top:16px"><button class="btn-outline" onclick="fecharModal('modalPreviewGrupo')">Fechar</button><button class="btn-primary" onclick="solicitarEntrada()">Solicitar entrada</button></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn-outline" onclick="fecharModal('modalPreviewGrupo')">Fechar</button>
+      <button class="btn-primary" onclick="solicitarEntrada()">Solicitar entrada</button>
+    </div>
   </div>
 </div>
 
 <!-- MODAL ENTRAR GRUPO -->
 <div id="modalEntrar" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
-  <div class="modal"><h3>Entrar num grupo</h3>
-    <div class="campo"><label>Codigo do grupo</label><input id="entrarCodigo" type="text" placeholder="Ex: ABC123" style="text-transform:uppercase"></div>
-    <div class="modal-btns"><button class="btn-outline" onclick="fecharModal('modalEntrar')">Cancelar</button><button class="btn-primary" onclick="entrarGrupo()">Entrar</button></div>
+  <div class="modal">
+    <h3>Entrar num grupo</h3>
+    <div class="campo">
+      <label>Codigo do grupo</label>
+      <input id="entrarCodigo" type="text" placeholder="Ex: ABC123" style="text-transform:uppercase">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-outline" onclick="fecharModal('modalEntrar')">Cancelar</button>
+      <button class="btn-primary" onclick="entrarGrupo()">Entrar</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL PERFIL -->
+<!-- MODAL PERFIL (o meu) -->
 <div id="modalPerfil" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
-  <div class="modal" style="max-height:85dvh;overflow-y:auto">
+  <div class="modal">
     <div class="perfil-topo">
-      <div class="perfil-avatar-wrap" id="perfilAvatarWrap" onclick="document.getElementById('inputFotoPerfil').click()">
-        <div class="perfil-avatar" id="perfilAvatarModal"></div><span class="perfil-avatar-edit">&#9998;</span>
+      <div class="perfil-avatar-wrap" onclick="document.getElementById('inputFotoPerfil').click()">
+        <div class="perfil-avatar" id="perfilAvatarModal"></div>
+        <span class="perfil-avatar-edit">&#9998;</span>
       </div>
       <input id="inputFotoPerfil" type="file" accept="image/*" style="display:none" onchange="previewFotoPerfil(event)">
-      <div><div class="perfil-nome" id="perfilNomeModal"></div><div class="perfil-tel" id="perfilTelModal"></div></div>
-    </div>
-    <div class="campo" style="margin-bottom:8px"><label>Email</label><div id="perfilEmail" style="color:var(--muted); font-size:.9rem">---</div></div>
-    <div class="campo" style="margin-bottom:8px"><label>Data de nascimento</label><div id="perfilDataNasc" style="color:var(--muted); font-size:.9rem">---</div></div>
-    <div class="campo" style="margin-bottom:8px"><label>Provincia</label><div id="perfilProvincia" style="color:var(--muted); font-size:.9rem">---</div></div>
-    <div class="campo" style="margin-bottom:8px"><label>Municipio</label><div id="perfilMunicipio" style="color:var(--muted); font-size:.9rem">---</div></div>
-    <div id="perfilSecaoEditar">
-      <div style="height:1px; background:var(--border); margin:16px 0"></div>
-      <div class="campo"><label>Novo nome</label><input id="editNome" type="text"></div>
-      <div class="campo"><label>Nova senha (opcional)</label><input id="editSenha" type="password" placeholder="Deixa vazio para manter"></div>
-      <div class="modal-btns">
-        <button id="perfilBtnSair" class="btn-outline" onclick="logout()">Sair</button>
-        <button id="perfilBtnEditar" class="btn-primary" onclick="guardarPerfil()">Guardar</button>
+      <div>
+        <div class="perfil-nome" id="perfilNomeModal"></div>
+        <div class="perfil-tel" id="perfilTelModal"></div>
       </div>
-      <button id="perfilBtnEliminar" class="btn-outline w100" style="margin-top:8px;color:var(--r2)" onclick="confirmarEliminarConta()">Eliminar conta</button>
     </div>
-    <button id="perfilBtnAvaliar" class="btn-primary w100" style="margin-top:12px;display:none" onclick="abrirAvaliarMembro()">Avaliar este membro</button>
+    <div class="campo">
+      <label>Novo nome</label>
+      <input id="editNome" type="text">
+    </div>
+    <div class="campo">
+      <label>Nova senha (opcional)</label>
+      <input id="editSenha" type="password" placeholder="Deixa vazio para manter">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-outline" onclick="logout()">Sair</button>
+      <button class="btn-primary" onclick="guardarPerfil()">Guardar</button>
+    </div>
+    <button class="btn-outline w100" style="margin-top:8px;color:var(--r2)" onclick="confirmarEliminarConta()">Eliminar conta</button>
   </div>
 </div>
 
-<!-- MODAL PERFIL MEMBRO -->
+<!-- MODAL PERFIL MEMBRO (ver membro) -->
 <div id="modalMembroPerfil" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
   <div class="modal modal-membro">
     <button class="modal-fechar" onclick="fecharModal('modalMembroPerfil')">&#10005;</button>
@@ -352,25 +527,82 @@
     <div class="membro-perfil-info">
       <div class="membro-perfil-nome" id="membroPerfilNome"></div>
       <div class="membro-perfil-tel" id="membroPerfilTel"></div>
+      
+      <!-- DIV PARA INFORMAÇÕES EXTRA (email, província, município, data nascimento) -->
       <div id="membroInfoExtra" style="margin-top:8px; font-size:.85rem"></div>
-      <div class="membro-stars-wrap" style="margin-top:12px"><div class="membro-stars" id="membroStars"></div><span class="membro-stars-count" id="membroStarsCount"></span></div>
+      
+      <div class="membro-stars-wrap" style="margin-top:12px">
+        <div class="membro-stars" id="membroStars"></div>
+        <span class="membro-stars-count" id="membroStarsCount"></span>
+      </div>
       <button class="btn-primary w100" style="margin-top:16px" onclick="abrirAvaliarMembro()">Avaliar membro</button>
     </div>
   </div>
 </div>
 
+
 <!-- MODAL AVALIAR MEMBRO -->
 <div id="modalAvaliar" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
-  <div class="modal"><h3>Avaliar <span id="avaliarNome"></span></h3>
+  <div class="modal">
+    <h3>Avaliar <span id="avaliarNome"></span></h3>
     <div class="estrelas-input" id="estrelasInput"></div>
-    <div class="campo" style="margin-top:12px"><label>Comentario (opcional)</label><input id="avaliarComentario" type="text" placeholder="Ex: Sempre pagou a tempo"></div>
-    <div class="modal-btns"><button class="btn-outline" onclick="fecharModal('modalAvaliar')">Cancelar</button><button class="btn-primary" onclick="confirmarAvaliacao()">Enviar</button></div>
+    <div class="campo" style="margin-top:12px">
+      <label>Comentario (opcional)</label>
+      <input id="avaliarComentario" type="text" placeholder="Ex: Sempre pagou a tempo">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-outline" onclick="fecharModal('modalAvaliar')">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarAvaliacao()">Enviar</button>
+    </div>
+  </div>
+</div>
+<!-- MODAL PUBLICAR POST -->
+<div id="modalPost" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3>Nova publicação</h3>
+      <button onclick="fecharModal('modalPost')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <div class="campo">
+      <textarea id="postTexto" rows="4" placeholder="Partilha uma dica, pergunta ou ideia sobre poupança..." style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-size:.9rem;resize:none;box-sizing:border-box;font-family:var(--sans)"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-outline" onclick="fecharModal('modalPost')">Cancelar</button>
+      <button class="btn-primary" onclick="criarPost()">Publicar</button>
+    </div>
   </div>
 </div>
 
+<!-- MODAL COMENTÁRIOS POST -->
+<div id="modalComentariosPost" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
+  <div class="modal" style="max-height:85dvh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 id="comentariosTituloPost">Comentários</h3>
+      <button onclick="fecharModal('modalComentariosPost')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <div id="comentariosListaPost" style="flex:1;overflow-y:auto;margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px;border-top:1px solid var(--border);padding-top:12px">
+      <input id="comentarioTextoPost" type="text" placeholder="Escreve um comentário..."
+        style="flex:1;padding:11px 14px;border:1px solid var(--border);border-radius:20px;background:var(--bg3);color:var(--text);font-size:.9rem;outline:none"
+        onkeydown="if(event.key==='Enter')enviarComentarioPost()">
+      <button class="btn-enviar" onclick="enviarComentarioPost()">&#10148;</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.post-acao-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-size:.83rem;cursor:pointer;padding:4px 8px;border-radius:8px;transition:.15s}
+.post-acao-btn:hover{background:var(--bg3)}
+.post-acao-btn.liked{color:var(--r)}
+</style>
+
 <!-- MODAL GENERICO -->
 <div id="modal" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event, this)">
-  <div class="modal"><h3 id="modalTitulo"></h3><p id="modalMsg" style="color:var(--muted);font-size:.9rem;margin:8px 0 16px"></p><div class="modal-btns" id="modalBtns"></div></div>
+  <div class="modal">
+    <h3 id="modalTitulo"></h3>
+    <p id="modalMsg" style="color:var(--muted);font-size:.9rem;margin:8px 0 16px"></p>
+    <div class="modal-btns" id="modalBtns"></div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -395,12 +627,27 @@ function verificarScrollTermos() {
     check.disabled = false;
   }
 }
+
 function atualizarBotaoCriar() {
   const btn = document.getElementById('btnCriarConta');
   const chk = document.getElementById('termosCheck');
   if (btn && chk) btn.disabled = !chk.checked;
 }
-</script>
 
+// Restaurar sessao com verificacao de expiracao
+(function restaurarSessao() {
+  try {
+    const raw = localStorage.getItem('kx_sessao');
+    if (!raw) return;
+    const dados = JSON.parse(raw);
+    const perfil = dados.perfil || dados;
+    if (dados.expira && Date.now() > dados.expira) {
+      localStorage.removeItem('kx_sessao');
+      return;
+    }
+    KixikilaManager.setSessao(perfil);
+  } catch(_) {}
+})();
+</script>
 </body>
 </html>
