@@ -239,6 +239,13 @@ const KixikilaManager = (() => {
     const d = await httpP2P('p2p/comentarios/' + postId);
     return d.comentarios || [];
   }
+  
+  // Aqui
+async function carregarStats() {
+  const tel = _sessao?.perfil?.telefone;
+  if (!tel) throw new Error('Sessao invalida');
+  return http('perfil/' + tel.replace(/\D/g, '') + '/stats');
+}
 
   // ── CHAT PRIVADO ─────────────────────────────────────────────
   async function enviarMsgPrivada(para, texto) {
@@ -277,16 +284,16 @@ const KixikilaManager = (() => {
   }
 
   return {
-    getSessao, setSessao, limparSessao, getToken,
-    registar, entrar, eliminarConta, atualizarPerfil,
-    carregarFeed, carregarMeusGrupos,
-    criarGrupo, carregarGrupo, entrarGrupo, sairGrupo, encerrarGrupo,
-    registarPagamento, enviarMensagem, solicitarEntrada,
-    carregarReputacao, responderPedido, avaliar,
-    carregarNotificacoes,
-    enviarMsgPrivada, carregarMensagensPrivadas, carregarConversas, carregarUsuariosParaSeguir,
-    criarPostP2P, apagarPostP2P, carregarPostsP2P, darLikeP2P, removerLikeP2P,
-    adicionarComentarioP2P, carregarComentariosP2P,
-    formatarValor
-  };
+  getSessao, setSessao, limparSessao, getToken,
+  registar, entrar, eliminarConta, atualizarPerfil,
+  carregarFeed, carregarMeusGrupos,
+  criarGrupo, carregarGrupo, entrarGrupo, sairGrupo, encerrarGrupo,
+  registarPagamento, enviarMensagem, solicitarEntrada,
+  carregarReputacao, carregarStats, responderPedido, avaliar,
+  carregarNotificacoes,
+  enviarMsgPrivada, carregarMensagensPrivadas, carregarConversas, carregarUsuariosParaSeguir,
+  criarPostP2P, apagarPostP2P, carregarPostsP2P, darLikeP2P, removerLikeP2P,
+  adicionarComentarioP2P, carregarComentariosP2P,
+  formatarValor
+};
 })();
