@@ -1,5 +1,5 @@
 const KixikilaManager = (() => {
-  const BASE = 'https://sire-kixikila-api.vercel.app/';
+  const BASE     = 'https://sire-kixikila-api.vercel.app/';
   const BASE_P2P = 'https://kixikila-p2p.vercel.app/';
   let _sessao = null;
 
@@ -13,18 +13,51 @@ const KixikilaManager = (() => {
 
   function limparSessao() {
     _sessao = null;
-    try { localStorage.removeItem('kx_sessao'); } catch (_) {}
+    try {
+      localStorage.removeItem('kx_sessao');
+      localStorage.removeItem('kx_auth');
+    } catch (_) {}
   }
 
+  function getToken() {
+    try {
+      const raw = localStorage.getItem('kx_auth');
+      if (!raw) return null;
+      const dados = JSON.parse(raw);
+      if (dados.expira && Date.now() > dados.expira) {
+        localStorage.removeItem('kx_auth');
+        return null;
+      }
+      return dados.token;
+    } catch { return null; }
+  }
+
+  function guardarToken(token) {
+    localStorage.setItem('kx_auth', JSON.stringify({
+      token,
+      expira: Date.now() + 7 * 24 * 60 * 60 * 1000
+    }));
+  }
+
+  function esperar(ms) { return new Promise(r => setTimeout(r, ms)); }
+
   async function http(endpoint, corpo) {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
     const opcoes = corpo
-      ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) }
-      : { method: 'GET' };
+      ? { method: 'POST', headers, body: JSON.stringify(corpo) }
+      : { method: 'GET', headers };
     for (let i = 0; i < 3; i++) {
       try {
         const r = await fetch(BASE + endpoint, opcoes);
         const d = await r.json();
         if (r.status === 429) { await esperar(2000 * (i + 1)); continue; }
+        if (r.status === 401) {
+          localStorage.removeItem('kx_auth');
+          window.location.href = 'login.html';
+          return;
+        }
         if (!r.ok) throw new Error(d.erro || d.message || 'Erro ' + r.status);
         return d;
       } catch (e) {
@@ -44,17 +77,28 @@ const KixikilaManager = (() => {
     return d;
   }
 
-  function esperar(ms) { return new Promise(r => setTimeout(r, ms)); }
-
   // ── AUTH ─────────────────────────────────────────────────────
   async function registar({ telefone, nome, senha, foto_perfil, data_nasc, email, provincia, municipio }) {
-    const d = await http('auth/registar', { telefone, nome, senha, foto_perfil, data_nasc, email, provincia, municipio });
+    const r = await fetch(BASE + 'auth/registar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telefone, nome, senha, foto_perfil, data_nasc, email, provincia, municipio })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.erro || 'Erro ao registar');
     setSessao(d.perfil);
     return d.perfil;
   }
 
   async function entrar({ telefone, senha }) {
-    const d = await http('auth/entrar', { telefone, senha });
+    const r = await fetch(BASE + 'auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telefone, senha })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.erro || 'Erro ao entrar');
+    guardarToken(d.token);
     setSessao(d.perfil);
     return d.perfil;
   }
@@ -120,17 +164,16 @@ const KixikilaManager = (() => {
     return http('grupo/' + codigo + '/solicitar', { telefone, nome });
   }
 
-  // ── REPUTAÇÃO ─────────────────────────────────────────────────
+  // ── REPUTACAO ─────────────────────────────────────────────────
   async function carregarReputacao(telefone) {
-    const d = await http('membro/' + telefone.replace(/\+/g, '') + '/reputacao');
-    return d;
+    return http('membro/' + telefone.replace(/\+/g, '') + '/reputacao');
   }
 
-  // ── RESPONDER PEDIDO ─────────────────────────────────────────
+  // ── PEDIDOS ──────────────────────────────────────────────────
   async function responderPedido(codigo, pedidoId, acao) {
     const perfil = _sessao?.perfil;
     if (!perfil) throw new Error('Sessao invalida');
-    return http(`grupo/${codigo}/pedido/${pedidoId}/${acao}`, { criador_telefone: perfil.telefone });
+    return http('grupo/' + codigo + '/pedido/' + pedidoId + '/' + acao, { criador_telefone: perfil.telefone });
   }
 
   // ── AVALIACOES ───────────────────────────────────────────────
@@ -145,7 +188,7 @@ const KixikilaManager = (() => {
     return http('notificacoes/' + tel.replace(/\+/g, ''));
   }
 
-  // ── P2P (posts sociais) ──────────────────────────────────────
+  // ── P2P POSTS ────────────────────────────────────────────────
   async function criarPostP2P(texto) {
     const perfil = _sessao?.perfil;
     if (!perfil) throw new Error('Sessao invalida');
@@ -157,8 +200,14 @@ const KixikilaManager = (() => {
     });
   }
 
+  async function apagarPostP2P(postId) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) throw new Error('Sessao invalida');
+    return httpP2P('p2p/post/apagar', { postId, telefone: perfil.telefone });
+  }
+
   async function carregarPostsP2P(limite = 30) {
-    const d = await httpP2P(`p2p/feed?limite=${limite}`);
+    const d = await httpP2P('p2p/feed?limite=' + limite);
     return d.posts || [];
   }
 
@@ -187,49 +236,48 @@ const KixikilaManager = (() => {
   }
 
   async function carregarComentariosP2P(postId) {
-    const d = await httpP2P(`p2p/comentarios/${postId}`);
+    const d = await httpP2P('p2p/comentarios/' + postId);
     return d.comentarios || [];
   }
-  
-  
-  // ── CHAT PRIVADO P2P ─────────────────────────────────────────
-async function enviarMsgPrivada(para, texto) {
-  const perfil = _sessao?.perfil;
-  if (!perfil) throw new Error('Sessao invalida');
-  return httpP2P('p2p/mensagem', {
-    de: perfil.telefone,
-    deNome: perfil.nome,
-    para: para,
-    texto
-  });
-}
 
-async function carregarMensagensPrivadas(comTelefone) {
-  const perfil = _sessao?.perfil;
-  if (!perfil) return { mensagens: [] };
-  return httpP2P(`p2p/mensagens/${perfil.telefone}/${comTelefone}`);
-}
-  
+  // ── CHAT PRIVADO ─────────────────────────────────────────────
+  async function enviarMsgPrivada(para, texto) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) throw new Error('Sessao invalida');
+    return httpP2P('p2p/mensagem', {
+      de: perfil.telefone,
+      deNome: perfil.nome,
+      para,
+      texto
+    });
+  }
+
+  async function carregarMensagensPrivadas(comTelefone) {
+    const perfil = _sessao?.perfil;
+    if (!perfil) return { mensagens: [] };
+    return httpP2P('p2p/mensagens/' + perfil.telefone + '/' + comTelefone);
+  }
+
   async function carregarConversas() {
-  const perfil = _sessao?.perfil;
-  if (!perfil) return { conversas: [] };
-  return httpP2P(`p2p/conversas/${perfil.telefone}`);
-}
+    const perfil = _sessao?.perfil;
+    if (!perfil) return { conversas: [] };
+    return httpP2P('p2p/conversas/' + perfil.telefone);
+  }
 
-async function carregarUsuariosParaSeguir() {
-  const perfil = _sessao?.perfil;
-  if (!perfil) return [];
-  const d = await http(`perfil/${perfil.telefone}/recomendacoes`);
-  return d.usuarios || [];
-}
+  async function carregarUsuariosParaSeguir() {
+    const perfil = _sessao?.perfil;
+    if (!perfil) return [];
+    const d = await http('perfil/' + perfil.telefone + '/recomendacoes');
+    return d.usuarios || [];
+  }
 
-  // ── UTILITARIOS ──────────────────────────────────────────────
+  // ── UTILS ─────────────────────────────────────────────────────
   function formatarValor(v) {
     return new Intl.NumberFormat('pt-AO').format(v || 0);
   }
 
-    return {
-    getSessao, setSessao, limparSessao,
+  return {
+    getSessao, setSessao, limparSessao, getToken,
     registar, entrar, eliminarConta, atualizarPerfil,
     carregarFeed, carregarMeusGrupos,
     criarGrupo, carregarGrupo, entrarGrupo, sairGrupo, encerrarGrupo,
@@ -237,7 +285,7 @@ async function carregarUsuariosParaSeguir() {
     carregarReputacao, responderPedido, avaliar,
     carregarNotificacoes,
     enviarMsgPrivada, carregarMensagensPrivadas, carregarConversas, carregarUsuariosParaSeguir,
-    criarPostP2P, carregarPostsP2P, darLikeP2P, removerLikeP2P,
+    criarPostP2P, apagarPostP2P, carregarPostsP2P, darLikeP2P, removerLikeP2P,
     adicionarComentarioP2P, carregarComentariosP2P,
     formatarValor
   };
