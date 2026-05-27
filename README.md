@@ -1,6 +1,6 @@
 ![Descrição da imagem](assets/logo.jpg)
 
-# Plataforma-Kixikila
+# RondaP2P 
 
 >Rede Coletiva de Poupança
 
