@@ -1,5 +1,37 @@
+// Adicionar no início
+function getToken() {
+  try {
+    const raw = localStorage.getItem('kx_auth');
+    if (!raw) return null;
+    const dados = JSON.parse(raw);
+    if (dados.expira && Date.now() > dados.expira) {
+      localStorage.removeItem('kx_auth');
+      return null;
+    }
+    return dados.token;
+  } catch { return null; }
+}
+
+// Modificar as funções http e httpP2P
+async function http(endpoint, corpo) {
+  const token = getToken();
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+  if (token) {
+    headers['Authorization'] = 'Bearer ' + token;
+  }
+  
+  const opcoes = corpo
+    ? { method: 'POST', headers, body: JSON.stringify(corpo) }
+    : { method: 'GET', headers };
+  // ... resto
+}
+
+// O mesmo para httpP2P
+
 // ════════════════════════════════════════════════════════════
-// app.js — KIXIKILA
+// app.js — KIXIKILA (App principal, sem autenticação)
 // ════════════════════════════════════════════════════════════
 
 var _codigoAtual       = '';
@@ -7,7 +39,6 @@ var _tabAppAtual       = 'membros';
 var _syncInterval      = null;
 var _membroAtual       = null;
 var _estrelasAvaliacao = 0;
-var _fotoRegTemp       = null;
 var _fotoGrupoTemp     = null;
 var _grupoPreview      = null;
 
@@ -43,7 +74,8 @@ function modal(titulo, msg, btns) {
 }
 
 function fecharModal(id) {
-  document.getElementById(id).style.display = 'none';
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
 }
 
 function fecharModalSeClicarFora(event, modalElement) {
@@ -71,7 +103,22 @@ function renderEstrelas(valor, total) {
   ).join('') + (total ? `<small style="color:var(--muted);margin-left:6px">(${total})</small>` : '');
 }
 
-function comprimirImagem(ficheiro, maxDim = 800, q = 0.85) {
+// ── FOTO PERFIL (modal editar) ────────────────────────────────
+async function previewFotoPerfil(evento) {
+  const f = evento.target.files[0];
+  if (!f) return;
+  try {
+    const src = await comprimirImagemPerfil(f);
+    const av   = document.getElementById('perfilAvatarModal');
+    av.style.backgroundImage    = `url(${src})`;
+    av.style.backgroundSize     = 'cover';
+    av.style.backgroundPosition = 'center';
+    av.textContent = '';
+    av.dataset.novaFoto = src;
+  } catch { toast('Erro ao processar imagem'); }
+}
+
+async function comprimirImagemPerfil(ficheiro, maxDim = 800, q = 0.85) {
   return new Promise((res, rej) => {
     if (!ficheiro?.type.startsWith('image/')) { rej(new Error('Invalido')); return; }
     const r = new FileReader();
@@ -96,48 +143,43 @@ function comprimirImagem(ficheiro, maxDim = 800, q = 0.85) {
   });
 }
 
-// ── FOTO REGISTO ─────────────────────────────────────────────
-async function previewFotoReg(evento) {
-  const f = evento.target.files[0];
-  if (!f) return;
-  try {
-    const src = await comprimirImagem(f);
-    _fotoRegTemp = src;
-    const img    = document.getElementById('fotoPickerImg');
-    const letra  = document.getElementById('fotoPickerLetra');
-    img.src = src; img.style.display = 'block';
-    letra.style.display = 'none';
-    document.getElementById('fotoPicker').style.border = '2px solid var(--r)';
-  } catch { toast('Erro ao processar imagem'); }
-}
-
-// ── FOTO PERFIL (modal editar) ────────────────────────────────
-async function previewFotoPerfil(evento) {
-  const f = evento.target.files[0];
-  if (!f) return;
-  try {
-    const src  = await comprimirImagem(f);
-    const av   = document.getElementById('perfilAvatarModal');
-    av.style.backgroundImage    = `url(${src})`;
-    av.style.backgroundSize     = 'cover';
-    av.style.backgroundPosition = 'center';
-    av.textContent = '';
-    av.dataset.novaFoto = src;
-  } catch { toast('Erro ao processar imagem'); }
-}
-
 // ── FOTO GRUPO ────────────────────────────────────────────────
 async function previewFotoGrupo(evento) {
   const f = evento.target.files[0];
   if (!f) return;
   try {
-    const src = await comprimirImagem(f, 400, 0.8);
+    const src = await comprimirImagemGrupo(f, 400, 0.8);
     _fotoGrupoTemp = src;
     const img    = document.getElementById('fotoGrupoImg');
     const letra  = document.getElementById('fotoGrupoLetra');
     img.src = src; img.style.display = 'block';
     letra.style.display = 'none';
   } catch { toast('Erro ao processar imagem'); }
+}
+
+async function comprimirImagemGrupo(ficheiro, maxDim = 400, q = 0.8) {
+  return new Promise((res, rej) => {
+    if (!ficheiro?.type.startsWith('image/')) { rej(new Error('Invalido')); return; }
+    const r = new FileReader();
+    r.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let { width: w, height: h } = img;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else       { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        res(c.toDataURL('image/jpeg', q));
+      };
+      img.onerror = rej;
+      img.src = e.target.result;
+    };
+    r.onerror = rej;
+    r.readAsDataURL(ficheiro);
+  });
 }
 
 // ── NAVEGACAO ────────────────────────────────────────────────
@@ -169,126 +211,19 @@ function pararSync() {
   if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
 }
 
-// ── AUTH ─────────────────────────────────────────────────────
-function mostrarTab(tab) {
-  document.getElementById('tabRegisto').style.display = tab === 'registo' ? 'block' : 'none';
-  document.getElementById('tabLogin').style.display   = tab === 'login'   ? 'block' : 'none';
-  document.querySelectorAll('.auth-tab').forEach((b, i) => {
-    b.classList.toggle('activo', (i === 0 && tab === 'registo') || (i === 1 && tab === 'login'));
-  });
-}
-
-async function registar() {
-  const nome      = document.getElementById('regNome')?.value.trim()        || '';
-  const dataNasc  = document.getElementById('regDataNasc')?.value           || '';
-  const telefone  = document.getElementById('regTelefone')?.value.trim()    || '';
-  const email     = document.getElementById('regEmail')?.value.trim()       || '';
-  const provincia = document.getElementById('regProvincia')?.value          || '';
-  const municipio = document.getElementById('regMunicipio')?.value.trim()   || '';
-  const senha     = document.getElementById('regSenha')?.value              || '';
-  const senhaConf = document.getElementById('regSenhaConfirm')?.value       || '';
-
-  if (!nome)      { toast('Nome completo e obrigatorio'); return; }
-  if (!dataNasc)  { toast('Data de nascimento e obrigatoria'); return; }
-  if (!telefone)  { toast('Telefone e obrigatorio'); return; }
-  if (!/^\+?[0-9]{9,15}$/.test(telefone.replace(/\s/g, ''))) { toast('Formato de telefone inválido'); return; }
-  if (!email)     { toast('Email e obrigatorio'); return; }
-  if (!provincia) { toast('Seleciona a provincia'); return; }
-  if (!municipio) { toast('Municipio e obrigatorio'); return; }
-
-  const erroSenha = validarSenhaFrontend(senha);
-  if (erroSenha)  { toast(erroSenha); return; }
-  if (senha !== senhaConf) { toast('As senhas nao coincidem'); return; }
-
-  try {
-    const perfil = await KixikilaManager.registar({
-      telefone, nome, senha,
-      foto_perfil: _fotoRegTemp || undefined,
-      data_nasc: dataNasc, email, provincia, municipio
-    });
-    guardarSessao(perfil);
-    _fotoRegTemp = null;
-    irParaMain();
-  } catch (e) { toast(e.message); }
-}
-
-async function entrar() {
-  if (!verificarRlFrontend()) return;
-
-  const telefone = document.getElementById('loginTelefone')?.value.trim() || '';
-  const senha    = document.getElementById('loginSenha')?.value           || '';
-  if (!telefone || !senha) { toast('Preenche todos os campos'); return; }
-
-  try {
-    const perfil = await KixikilaManager.entrar({ telefone, senha });
-    _rl.count = 0;
-    guardarSessao(perfil);
-    irParaMain();
-  } catch (e) {
-    registarFalhaFrontend();
-    toast(e.message);
-  }
-}
-
+// ── LOGOUT ───────────────────────────────────────────────────
 function logout() {
   modal('Sair', 'Tens a certeza?', [
     { texto: 'Cancelar', classe: 'btn-outline' },
     { texto: 'Sair', classe: 'btn-primary', acao: () => {
       pararSync();
       KixikilaManager.limparSessao();
+      localStorage.removeItem('kx_sessao');
       fecharModal('modalPerfil');
-      irPara('paginaAuth');
+      window.location.href = 'login.html';
     }}
   ]);
 }
-
-function guardarSessao(perfil) {
-  const dados = { perfil, expira: Date.now() + 24 * 60 * 60 * 1000 };
-  localStorage.setItem('kx_sessao', JSON.stringify(dados));
-}
-
-function carregarSessao() {
-  try {
-    const raw = localStorage.getItem('kx_sessao');
-    if (!raw) return null;
-    const dados = JSON.parse(raw);
-    if (dados.expira && Date.now() > dados.expira) {
-      localStorage.removeItem('kx_sessao');
-      return null;
-    }
-    return dados.perfil || dados;
-  } catch { return null; }
-}
-
-// ── RATE LIMIT FRONTEND ───────────────────────────────────────
-const _rl = { count: 0, bloqueadoAte: 0 };
-
-function verificarRlFrontend() {
-  if (Date.now() < _rl.bloqueadoAte) {
-    const seg = Math.ceil((_rl.bloqueadoAte - Date.now()) / 1000);
-    toast(`Muitas tentativas. Aguarda ${seg}s`);
-    return false;
-  }
-  return true;
-}
-
-function registarFalhaFrontend() {
-  _rl.count++;
-  if (_rl.count >= 5) {
-    _rl.bloqueadoAte = Date.now() + 30_000;
-    _rl.count = 0;
-    toast('5 tentativas falhadas. Bloqueado por 30 segundos');
-  }
-}
-
-// ── VALIDACAO DE SENHA ────────────────────────────────────────
-function validarSenhaFrontend(senha) {
-  if (!senha || senha.length < 6) return 'Senha deve ter mínimo 6 caracteres';
-  if (!/[A-Za-z]/.test(senha))    return 'Senha deve conter letras';
-  if (!/[0-9]/.test(senha))       return 'Senha deve conter números';
-  return null;
-}
-
 
 // ── MAIN ─────────────────────────────────────────────────────
 function irParaMain() {
@@ -321,17 +256,68 @@ function mostrarTabMain(tab) {
   if (tab === 'feed') carregarFeed();
   if (tab === 'meus') carregarMeus();
 }
+// ── ANUNCIOS (cache 2 min) ────────────────────────────────────
+var _anunciosCache     = null;
+var _anunciosCacheTime = 0;
+const ANUNCIOS_TTL     = 2 * 60 * 1000;
 
+async function carregarAnuncios() {
+  if (_anunciosCache && (Date.now() - _anunciosCacheTime) < ANUNCIOS_TTL) {
+    return _anunciosCache;
+  }
+  try {
+    const r = await fetch('https://kixikila-p2p.vercel.app/anuncios');
+    if (!r.ok) return [];
+    const d = await r.json();
+    _anunciosCache     = d.anuncios || [];
+    _anunciosCacheTime = Date.now();
+    return _anunciosCache;
+  } catch { return _anunciosCache || []; }
+}
 
+function escurecer(hex) {
+  try {
+    const n = parseInt(hex.replace('#', ''), 16);
+    const r = Math.max(0, (n >> 16) - 50);
+    const g = Math.max(0, ((n >> 8) & 0xff) - 50);
+    const b = Math.max(0, (n & 0xff) - 50);
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  } catch { return '#5a0000'; }
+}
+
+function criarCardAnuncio(a) {
+  const cor       = a.cor || '#8B0000';
+  const numProds  = (a.produtos || []).filter(p => p.disponivel).length;
+  const div       = document.createElement('div');
+  div.className   = 'anuncio-card';
+  div.onclick     = () => window.open('loja.html?c=' + a.codigo, '_blank');
+  div.innerHTML   = `
+    <div class="anuncio-header" style="background:linear-gradient(135deg,${cor} 0%,${escurecer(cor)} 100%)">
+      <div class="anuncio-header-top">
+        <div class="anuncio-logo">${(a.nome?.[0] || 'R').toUpperCase()}</div>
+        <div class="anuncio-header-info">
+          <div class="anuncio-nome">${esc(a.nome)}</div>
+          ${a.slogan     ? `<div class="anuncio-slogan">${esc(a.slogan)}</div>`      : ''}
+          ${a.localizacao? `<div class="anuncio-local">&#9679; ${esc(a.localizacao)}</div>` : ''}
+        </div>
+        <span class="anuncio-badge">PATROCINADO</span>
+      </div>
+    </div>
+    <div class="anuncio-rodape">
+      <span class="anuncio-prods">${numProds} produto${numProds !== 1 ? 's' : ''} disponíve${numProds !== 1 ? 'is' : 'l'}</span>
+      <button class="anuncio-btn" style="background:${cor}" onclick="event.stopPropagation();window.open('loja.html?c=${a.codigo}','_blank')">Ver loja</button>
+    </div>`;
+  return div;
+}
 
 async function carregarFeed() {
   const lista = document.getElementById('feedLista');
   lista.innerHTML = skeleton();
   try {
-    // Carrega grupos e posts em paralelo
-    const [grupos, posts] = await Promise.all([
+    const [grupos, posts, anuncios] = await Promise.all([
       KixikilaManager.carregarFeed({ estado: 'aberto', limite: 20 }),
-      KixikilaManager.carregarPostsP2P(20).catch(() => [])
+      KixikilaManager.carregarPostsP2P(20).catch(() => []),
+      carregarAnuncios()
     ]);
 
     lista.innerHTML = '';
@@ -341,50 +327,193 @@ async function carregarFeed() {
       return;
     }
 
-    // Mistura e ordena por data
     const itens = [
       ...grupos.map(g => ({ tipo: 'grupo', data: g.criado_em || '', dado: g })),
       ...posts.map(p  => ({ tipo: 'post',  data: p.data      || '', dado: p }))
     ].sort((a, b) => new Date(b.data) - new Date(a.data));
 
-    itens.forEach(item => {
-      if (item.tipo === 'grupo') lista.appendChild(criarCardFeed(item.dado));
-      else                       lista.appendChild(criarCardPost(item.dado));
+    let anuncioIdx = 0;
+    itens.forEach((item, i) => {
+      lista.appendChild(item.tipo === 'grupo' ? criarCardFeed(item.dado) : criarCardPost(item.dado));
+      if ((i + 1) % 4 === 0 && anuncioIdx < anuncios.length) {
+        lista.appendChild(criarCardAnuncio(anuncios[anuncioIdx++]));
+      }
     });
+
+    while (anuncioIdx < anuncios.length) {
+      lista.appendChild(criarCardAnuncio(anuncios[anuncioIdx++]));
+    }
+
   } catch {
     lista.innerHTML = '<div class="vazio"><p>Erro ao carregar.</p></div>';
   }
 }
 
 function criarCardPost(post) {
-  const perfil = KixikilaManager.getSessao()?.perfil;
-  const liked  = post.likes?.some(l => l.telefone === perfil?.telefone) || false;
-  const diff   = Math.floor((Date.now() - new Date(post.data)) / 60000);
-  const tempo  = diff < 1 ? 'agora' : diff < 60 ? diff+'m' : diff < 1440 ? Math.floor(diff/60)+'h' : Math.floor(diff/1440)+'d';
+  const perfil  = KixikilaManager.getSessao()?.perfil;
+  const liked   = post.likes?.some(l => l.telefone === perfil?.telefone) || false;
+  const diff    = Math.floor((Date.now() - new Date(post.data)) / 60000);
+  const tempo   = diff < 1 ? 'agora' : diff < 60 ? diff + 'm' : diff < 1440 ? Math.floor(diff / 60) + 'h' : Math.floor(diff / 1440) + 'd';
+  const eProprio = post.autor.telefone === perfil?.telefone;
+
+  let partilha = null;
+  let textoExibir = post.texto;
+
+  try {
+    const parsed = JSON.parse(post.texto);
+    if (parsed._tipo === 'partilha') {
+      partilha    = parsed;
+      textoExibir = parsed.comentario || '';
+    }
+  } catch (_) {}
+
+  const fotoStyle = post.autor.foto_perfil
+    ? `background-image:url('${esc(post.autor.foto_perfil)}');background-size:cover;background-position:center`
+    : '';
+  const fotoLetra = !post.autor.foto_perfil ? (post.autor.nome?.[0] || 'U').toUpperCase() : '';
+
+  const cardPartilhado = partilha ? `
+    <div style="margin:0 16px 12px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg3)">
+      <div style="display:flex;align-items:center;gap:9px;padding:10px 12px 6px">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--r-soft);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:var(--r);flex-shrink:0;${partilha.original.autorFoto?`background-image:url('${esc(partilha.original.autorFoto)}');background-size:cover;background-position:center`:''}">${!partilha.original.autorFoto?(partilha.original.autorNome?.[0]||'U').toUpperCase():''}</div>
+        <div style="font-weight:700;font-size:.82rem">${esc(partilha.original.autorNome)}</div>
+      </div>
+      <div style="padding:0 12px 12px;font-size:.85rem;color:var(--muted);line-height:1.5">${esc(partilha.original.texto)}</div>
+    </div>` : '';
 
   const div = document.createElement('div');
-  div.className = 'feed-card post-card';
+  div.className = 'post-card';
   div.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div class="feed-icon" style="flex-shrink:0;${post.autor.foto_perfil?`background-image:url('${esc(post.autor.foto_perfil)}');background-size:cover;background-position:center`:''}">${!post.autor.foto_perfil?(post.autor.nome?.[0]||'U').toUpperCase():''}</div>
+    <div class="post-card-header">
+      <div class="post-avatar-lg" style="${fotoStyle}">${fotoLetra}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:.9rem">${esc(post.autor.nome)}</div>
-        <div style="font-size:.75rem;color:var(--muted)">${tempo}</div>
+        <div class="post-autor-nome">${esc(post.autor.nome)}</div>
+        <div class="post-autor-tempo">${tempo}</div>
       </div>
-      <span class="pill" style="background:var(--bg3);color:var(--muted);font-size:.65rem">Post</span>
+      <button class="post-menu-btn" onclick="toggleMenuPost(event,'${esc(post.id)}',${eProprio})">···</button>
     </div>
-    <div style="font-size:.92rem;line-height:1.55;margin-bottom:12px;color:var(--text)">${esc(post.texto)}</div>
-    <div style="display:flex;gap:16px;border-top:1px solid var(--border);padding-top:10px">
-      <button class="post-acao-btn${liked?' liked':''}" data-postid="${esc(post.id)}" onclick="toggleLikePost(this,'${esc(post.id)}')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="${liked?'var(--r)':'none'}" stroke="${liked?'var(--r)':'currentColor'}" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-        <span class="like-count">${post.likes_count||0}</span>
+    ${textoExibir ? `<div class="post-body">${esc(textoExibir)}</div>` : ''}
+    ${cardPartilhado}
+    <div class="post-footer">
+      <button class="post-footer-btn${liked ? ' liked' : ''}" onclick="toggleLikePost(this,'${esc(post.id)}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="${liked?'var(--r)':'none'}" stroke="${liked?'var(--r)':'currentColor'}" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        <span class="like-count">${post.likes_count || 0}</span>
       </button>
-      <button class="post-acao-btn" onclick="abrirComentariosPost('${esc(post.id)}','${esc(post.autor.nome)}')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span>${post.comentarios_count||0}</span>
+      <div class="post-footer-sep"></div>
+      <button class="post-footer-btn" onclick="abrirComentariosPost('${esc(post.id)}','${esc(post.autor.nome)}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>${post.comentarios_count || 0}</span>
+      </button>
+      <div class="post-footer-sep"></div>
+      <button class="post-footer-btn" onclick="partilharPost('${esc(post.id)}','${esc(post.autor.nome)}','${esc(post.autor.foto_perfil||'')}','${esc((partilha?partilha.original.texto:post.texto).replace(/'/g,"\\'").slice(0,120))}','${tempo}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Partilhar
       </button>
     </div>`;
+
   return div;
+}
+  
+
+function toggleMenuPost(e, postId, eProprio) {
+  e.stopPropagation();
+  document.querySelectorAll('.post-menu-popup').forEach(p => p.remove());
+
+  const btn  = e.currentTarget;
+  const card = btn.closest('.post-card-header');
+  const menu = document.createElement('div');
+  menu.className = 'post-menu-popup';
+
+  if (eProprio) {
+    menu.innerHTML = `<button class="danger" onclick="apagarPost('${postId}')">Apagar post</button>`;
+  } else {
+    menu.innerHTML = `<button onclick="reportarPost('${postId}')">Denunciar</button>`;
+  }
+
+  card.style.position = 'relative';
+  card.appendChild(menu);
+
+  setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 10);
+}
+function partilharPost(postId, autorNome, autorFoto, textoOriginal, tempoOriginal) {
+  const perfil = KixikilaManager.getSessao()?.perfil;
+  if (!perfil) { toast('Sessao expirada'); return; }
+
+  const fotoStyle = autorFoto ? `background-image:url('${esc(autorFoto)}');background-size:cover;background-position:center` : '';
+  const fotoLetra = !autorFoto ? (autorNome?.[0] || 'U').toUpperCase() : '';
+
+  const overlayId = 'overlayPartilhar';
+  document.getElementById(overlayId)?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id        = overlayId;
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.innerHTML = `
+    <div class="modal" style="padding:0;overflow:hidden;width:100%">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px">
+        <strong style="font-size:1rem">Partilhar publicacao</strong>
+        <button onclick="document.getElementById('${overlayId}').remove()" style="background:none;border:none;font-size:1.3rem;color:var(--muted);cursor:pointer">✕</button>
+      </div>
+      <div style="padding:0 16px 12px">
+        <textarea id="textoPartilha" rows="3" placeholder="Diz algo sobre isto..." style="width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:12px;background:var(--bg3);color:var(--text);font-size:.92rem;resize:none;box-sizing:border-box;font-family:inherit;outline:none"></textarea>
+      </div>
+      <div class="post-partilhado-wrap">
+        <div class="post-partilhado-header">
+          <div class="post-partilhado-avatar" style="${fotoStyle}">${fotoLetra}</div>
+          <div>
+            <div class="post-partilhado-nome">${esc(autorNome)}</div>
+            <div class="post-partilhado-tempo">${tempoOriginal}</div>
+          </div>
+        </div>
+        <div class="post-partilhado-texto">${esc(textoOriginal)}</div>
+      </div>
+      <div style="display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--border)">
+        <button class="btn-outline" style="flex:1" onclick="document.getElementById('${overlayId}').remove()">Cancelar</button>
+        <button class="btn-primary" style="flex:1" onclick="confirmarPartilha('${esc(postId)}','${esc(autorNome)}','${esc(autorFoto)}','${esc(textoOriginal.replace(/'/g,"\\'"))}')">Partilhar</button>
+      </div>
+    </div>`;
+
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('textoPartilha')?.focus(), 100);
+}
+
+async function confirmarPartilha(postId, autorNome, autorFoto, textoOriginal) {
+  const perfil = KixikilaManager.getSessao()?.perfil;
+  if (!perfil) return;
+  const comentario = document.getElementById('textoPartilha')?.value.trim() || '';
+  const overlay    = document.getElementById('overlayPartilhar');
+
+  const textoFinal = JSON.stringify({
+    _tipo: 'partilha',
+    comentario,
+    original: { postId, autorNome, autorFoto, texto: textoOriginal }
+  });
+
+  try {
+    await KixikilaManager.criarPostP2P(textoFinal);
+    overlay?.remove();
+    toast('Publicacao partilhada!');
+    carregarFeed();
+  } catch (e) { toast(e.message); }
+}
+
+function apagarPost(postId) {
+  modal('Apagar post', 'Tens a certeza?', [
+    { texto: 'Cancelar', classe: 'btn-outline' },
+    { texto: 'Apagar', classe: 'btn-primary', acao: async () => {
+      try {
+        await KixikilaManager.apagarPostP2P(postId);
+        toast('Post apagado.');
+        carregarFeed();
+      } catch (e) { toast(e.message); }
+    }}
+  ]);
+}
+
+function reportarPost(postId) {
+  toast('Denúncia enviada. Obrigado.');
 }
 
 async function toggleLikePost(btn, postId) {
@@ -394,7 +523,6 @@ async function toggleLikePost(btn, postId) {
   const span     = btn.querySelector('.like-count');
   const svg      = btn.querySelector('svg');
   const count    = parseInt(span?.textContent || '0');
-  // Optimistic
   if (liked) {
     btn.classList.remove('liked');
     svg.setAttribute('fill','none'); svg.setAttribute('stroke','currentColor');
@@ -583,7 +711,7 @@ async function criarPost() {
     await KixikilaManager.criarPostP2P(texto);
     document.getElementById('modalPost').style.display = 'none';
     toast('Post publicado!');
-    carregarFeed(); // recarrega o feed misto
+    carregarFeed();
   } catch (e) {
     toast(e.message);
   } finally {
@@ -634,9 +762,6 @@ async function entrarGrupo() {
 }
 
 // ── APP (ver grupo) ──────────────────────────────────────────
-
-
-// ── APP (ver grupo) ──────────────────────────────────────────
 async function abrirGrupo(codigo) {
   _codigoAtual = codigo;
   irPara('paginaApp');
@@ -650,7 +775,6 @@ async function recarregarGrupo(silencioso = false) {
     const grupo = await KixikilaManager.carregarGrupo(_codigoAtual);
     const perfil = KixikilaManager.getSessao()?.perfil;
     
-    // Buscar foto de cada membro individualmente
     for (let i = 0; i < grupo.membros.length; i++) {
       const m = grupo.membros[i];
       if (m.telefone) {
@@ -762,59 +886,51 @@ function renderRodas(grupo) {
 }
 
 
-// ── PERFIL MEMBRO ────────────────────────────────────────────
- 
 function abrirPerfilMembro(membro) {
   _membroAtual = membro;
-  
-  // Buscar dados completos do backend (inclui foto_perfil)
+
   KixikilaManager.carregarReputacao(membro.telefone).then(dados => {
     const m = { ...membro, ...dados };
-    
     const perfilLogado = KixikilaManager.getSessao()?.perfil;
     const isProprio = m.telefone === perfilLogado?.telefone;
-    
-    // ----- FOTO GRANDE (CORRIGIDO) -----
+
     const fotoEl = document.getElementById('membroFotoGrande');
     if (m.foto_perfil && m.foto_perfil.trim() !== '') {
-      // Aplica a foto como background
       fotoEl.style.backgroundImage = `url(${m.foto_perfil})`;
       fotoEl.style.backgroundSize = 'cover';
       fotoEl.style.backgroundPosition = 'center';
-      fotoEl.innerHTML = ''; // Remove qualquer letra/ícone
+      fotoEl.textContent = '';
     } else {
       fotoEl.style.backgroundImage = '';
-      fotoEl.innerHTML = `<span class="membro-foto-letra">${(m.nome?.[0] || '?').toUpperCase()}</span>`;
+      fotoEl.textContent = (m.nome?.[0] || '?').toUpperCase();
     }
-    
-    // Nome e telefone
+
     document.getElementById('membroPerfilNome').textContent = m.nome || '';
-    document.getElementById('membroPerfilTel').textContent = m.telefone || '';
-    
-    // Informações extra
-    let infoExtra = '';
-    if (m.email) infoExtra += `<div><span style="color:var(--muted)">Email:</span> ${esc(m.email)}</div>`;
-    if (m.provincia) infoExtra += `<div><span style="color:var(--muted)">Província:</span> ${esc(m.provincia)}</div>`;
-    if (m.municipio) infoExtra += `<div><span style="color:var(--muted)">Município:</span> ${esc(m.municipio)}</div>`;
-    if (m.data_nasc) infoExtra += `<div><span style="color:var(--muted)">Data de nascimento:</span> ${esc(m.data_nasc)}</div>`;
-    document.getElementById('membroInfoExtra').innerHTML = infoExtra;
-    
-    // Estrelas
+    document.getElementById('membroPerfilTel').textContent  = m.telefone || '';
+    document.getElementById('membroLocalizacao').textContent = [m.provincia, m.municipio].filter(Boolean).join(', ');
+    document.getElementById('membroScoreNum').textContent = m.reputacao ? m.reputacao.toFixed(1) : '—';
+
     const estrelasHtml = renderEstrelas(m.reputacao || 0, m.total_avaliacoes);
     document.getElementById('membroStars').innerHTML = estrelasHtml;
-    document.getElementById('membroStarsCount').textContent = m.total_avaliacoes ? `${m.total_avaliacoes} ` : 'Sem avaliações';
-    
-    // Botão avaliar
-    const btnAvaliar = document.querySelector('#modalMembroPerfil .btn-primary');
-    if (btnAvaliar) btnAvaliar.style.display = isProprio ? 'none' : 'block';
-    
-    // Abrir modal
+    document.getElementById('membroStarsCount').textContent = m.total_avaliacoes ? `${m.total_avaliacoes} avaliações` : 'Sem avaliações';
+
+    let infoExtra = '';
+    if (m.email)     infoExtra += `<div style="display:flex;align-items:center;gap:10px;background:var(--bg3);padding:11px 14px;border-radius:12px"><span style="font-size:.75rem;font-weight:700;color:var(--muted);width:60px;flex-shrink:0">EMAIL</span><span style="font-size:.88rem">${esc(m.email)}</span></div>`;
+    if (m.data_nasc) infoExtra += `<div style="display:flex;align-items:center;gap:10px;background:var(--bg3);padding:11px 14px;border-radius:12px"><span style="font-size:.75rem;font-weight:700;color:var(--muted);width:60px;flex-shrink:0">NASC.</span><span style="font-size:.88rem">${esc(m.data_nasc)}</span></div>`;
+    document.getElementById('membroInfoExtra').innerHTML = infoExtra;
+
+    document.getElementById('btnMensagemMembro').style.display = isProprio ? 'none' : 'flex';
+    document.getElementById('btnAvaliarMembro').style.display  = isProprio ? 'none' : 'block';
+
     document.getElementById('modalMembroPerfil').style.display = 'flex';
-  }).catch(e => {
-    console.error('Erro ao carregar dados do membro:', e);
+  }).catch(() => {
     toast('Erro ao carregar dados do membro');
-    document.getElementById('modalMembroPerfil').style.display = 'flex';
   });
+}
+
+function enviarMensagemMembro() {
+  fecharModal('modalMembroPerfil');
+  window.location.href = 'p2p.html';
 }
 
 // ── AVALIAR MEMBRO ───────────────────────────────────────────
@@ -865,15 +981,9 @@ function mostrarTabApp(tab) {
   document.getElementById('tabChat')?.classList.remove('activo');
 }
 
-
-
 // ── CHAT ─────────────────────────────────────────────────────
-
-
-   // ── CHAT ─────────────────────────────────────────────────────
 function abrirChat() {
   KixikilaManager.carregarGrupo(_codigoAtual).then(async g => {
-    // Buscar fotos dos membros para o chat
     for (let i = 0; i < g.membros.length; i++) {
       const m = g.membros[i];
       if (m.telefone && !m.foto_perfil) {
@@ -903,7 +1013,6 @@ function renderChat(grupo, perfil) {
     return;
   }
   
-  // Mapa de membros para buscar foto rapidamente
   const membrosMap = {};
   grupo.membros.forEach(m => {
     membrosMap[m.telefone] = m;
@@ -917,14 +1026,12 @@ function renderChat(grupo, perfil) {
     const wrap = document.createElement('div');
     wrap.className = 'chat-balao-wrap ' + (meu ? 'meu' : 'outro');
     
-    // Container flex horizontal
     const linha = document.createElement('div');
     linha.style.display = 'flex';
     linha.style.flexDirection = 'row';
     linha.style.alignItems = 'flex-start';
     linha.style.gap = '10px';
     
-    // Avatar do autor (só para mensagens de outros) - CLICÁVEL
     if (!meu && autor) {
       const avatarDiv = document.createElement('div');
       avatarDiv.style.width = '36px';
@@ -933,7 +1040,10 @@ function renderChat(grupo, perfil) {
       avatarDiv.style.flexShrink = '0';
       avatarDiv.style.overflow = 'hidden';
       avatarDiv.style.cursor = 'pointer';
-      avatarDiv.title = 'Ver perfil de ' + (autor.nome || '');
+      avatarDiv.style.backgroundColor = 'var(--r-soft)';
+      avatarDiv.style.display = 'flex';
+      avatarDiv.style.alignItems = 'center';
+      avatarDiv.style.justifyContent = 'center';
       avatarDiv.onclick = (e) => {
         e.stopPropagation();
         abrirPerfilMembro(autor);
@@ -945,19 +1055,11 @@ function renderChat(grupo, perfil) {
         avatarDiv.style.backgroundPosition = 'center';
         avatarDiv.textContent = '';
       } else {
-        avatarDiv.style.background = 'var(--r-soft)';
-        avatarDiv.style.display = 'flex';
-        avatarDiv.style.alignItems = 'center';
-        avatarDiv.style.justifyContent = 'center';
-        avatarDiv.style.fontSize = '.9rem';
-        avatarDiv.style.fontWeight = '800';
-        avatarDiv.style.color = 'var(--r)';
         avatarDiv.textContent = (autor.nome?.[0] || '?').toUpperCase();
       }
       linha.appendChild(avatarDiv);
     }
     
-    // Container do conteúdo (nome + balão + data)
     const conteudo = document.createElement('div');
     conteudo.style.flex = '1';
     conteudo.style.minWidth = '0';
@@ -1004,7 +1106,7 @@ async function enviarMsg() {
   const perfil = KixikilaManager.getSessao()?.perfil;
   if (!texto || !perfil) return;
   input.value = '';
-  crescerTextarea(input);
+  if (typeof crescerTextarea === 'function') crescerTextarea(input);
   try {
     await KixikilaManager.enviarMensagem(_codigoAtual, perfil.telefone, perfil.nome, texto);
     const g = await KixikilaManager.carregarGrupo(_codigoAtual);
@@ -1018,9 +1120,6 @@ function crescerTextarea(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 140) + 'px';
 }
-    
-
-
 
 // ── ACOES GRUPO ──────────────────────────────────────────────
 async function registarPagamento() {
@@ -1070,25 +1169,36 @@ async function encerrarGrupo() {
 }
 
 // ── PERFIL (O MEU) ───────────────────────────────────────────
-function abrirPerfil() {
+
+async function abrirPerfil() {
   const perfil = KixikilaManager.getSessao()?.perfil;
   if (!perfil) return;
   const av = document.getElementById('perfilAvatarModal');
   av.dataset.novaFoto = '';
   if (perfil.foto_perfil) {
-    av.style.backgroundImage    = `url(${perfil.foto_perfil})`;
-    av.style.backgroundSize     = 'cover';
+    av.style.backgroundImage = `url(${perfil.foto_perfil})`;
+    av.style.backgroundSize = 'cover';
     av.style.backgroundPosition = 'center';
     av.textContent = '';
   } else {
     av.style.backgroundImage = '';
-    av.textContent = (perfil.nome?.[0]||'K').toUpperCase();
+    av.textContent = (perfil.nome?.[0] || 'K').toUpperCase();
   }
   document.getElementById('perfilNomeModal').textContent = perfil.nome || '';
   document.getElementById('perfilTelModal').textContent  = perfil.telefone || '';
+  document.getElementById('perfilLocalizacaoModal').textContent = [perfil.provincia, perfil.municipio].filter(Boolean).join(', ');
   document.getElementById('editNome').value  = perfil.nome || '';
   document.getElementById('editSenha').value = '';
   document.getElementById('modalPerfil').style.display = 'flex';
+
+  // Carregar stats
+  try {
+    const tel = perfil.telefone.replace(/\+/g, '');
+    const stats = await KixikilaManager.http('perfil/' + tel + '/stats');
+    document.getElementById('statGruposAtivos').textContent  = stats.grupos_activos || 0;
+    document.getElementById('statReputacao').textContent     = stats.reputacao ? stats.reputacao.toFixed(1) + '★' : '—';
+    document.getElementById('statConcluidos').textContent    = stats.grupos_concluidos || 0;
+  } catch(_) {}
 }
 
 async function guardarPerfil() {
@@ -1123,6 +1233,7 @@ async function confirmarEliminarConta() {
       try {
         await KixikilaManager.eliminarConta(perfil.telefone, senha);
         KixikilaManager.limparSessao();
+        localStorage.removeItem('kx_sessao');
         irPara('paginaAuth');
         toast('Conta eliminada.');
       } catch (e) { toast(e.message); }
@@ -1145,6 +1256,7 @@ function skeleton() {
       <div class="skel" style="height:4px;border-radius:99px"></div>
     </div>`).join('');
 }
+
 function abrirListaConversas() {
   window.location.href = 'p2p.html';
 }
@@ -1152,11 +1264,22 @@ function abrirListaConversas() {
 // ── INIT ─────────────────────────────────────────────────────
 (function init() {
   if (window.__P2P_PAGE__) return;
-  const perfil = carregarSessao();
-  if (perfil) {
-    KixikilaManager.setSessao(perfil);
-    irParaMain();
+  const raw = localStorage.getItem('kx_sessao');
+  if (!raw) {
+    window.location.href = 'login.html';
     return;
   }
-  irPara('paginaAuth');
+  try {
+    const dados = JSON.parse(raw);
+    const perfil = dados.perfil || dados;
+    if (dados.expira && Date.now() > dados.expira) {
+      localStorage.removeItem('kx_sessao');
+      window.location.href = 'login.html';
+      return;
+    }
+    KixikilaManager.setSessao(perfil);
+    irParaMain();
+  } catch(e) {
+    window.location.href = 'login.html';
+  }
 })();
