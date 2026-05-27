@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>RondaP2P - Entrar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <style>
+    html, body { overflow-y: auto; }
+
+    .login-wrap {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px 32px;
+      background: var(--bg);
+    }
+
+    .login-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .login-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .login-titulo  { font-size: 2rem; font-weight: 900; letter-spacing: -.5px; margin-bottom: 6px; }
+    .login-sub     { color: var(--muted); font-size: .88rem; }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px 24px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+
+    .card-titulo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    /* STEPS */
+    .steps-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 24px;
+    }
+
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--bg3);
+      color: var(--muted);
+      font-size: .75rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .25s;
+    }
+
+    .step-dot.activo { background: var(--r); color: #fff; box-shadow: 0 2px 10px rgba(139,0,0,0.3); }
+    .step-dot.feito  { background: var(--green); color: #fff; }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      transition: background .25s;
+    }
+
+    .step-line.feito { background: var(--green); }
+
+    /* ESQUECEU */
+    .esqueceu-link {
+      display: block;
+      text-align: right;
+      font-size: .8rem;
+      color: var(--r);
+      font-weight: 600;
+      margin-top: -8px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .login-divider {
+      text-align: center;
+      color: var(--muted);
+      font-size: .82rem;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 38%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .login-divider::before { left: 0; }
+    .login-divider::after  { right: 0; }
+
+    .btn-registo {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      background: transparent;
+      color: var(--r);
+      border: 1.5px solid var(--r);
+      border-radius: 14px;
+      font-size: .95rem;
+      font-weight: 700;
+      font-family: var(--sans);
+      cursor: pointer;
+      text-align: center;
+      transition: background .2s;
+    }
+
+    .btn-registo:hover { background: var(--r-soft); }
+
+    .btn-voltar-reg {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      border-radius: 50%;
+      transition: background .15s;
+    }
+
+    .btn-voltar-reg:hover { background: var(--bg3); }
+
+    /* FOTO STEP */
+    .foto-step-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0 8px;
+    }
+
+    .foto-step-avatar {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 3px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color .2s;
+      position: relative;
+    }
+
+    .foto-step-avatar:hover { border-color: var(--r); }
+    .foto-step-avatar img   { width: 100%; height: 100%; object-fit: cover; }
+
+    .foto-step-avatar .foto-edit-icon {
+      position: absolute;
+      bottom: 4px; right: 4px;
+      width: 24px; height: 24px;
+      background: var(--r);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: .65rem;
+    }
+
+    .foto-step-label  { font-size: .88rem; color: var(--muted); text-align: center; }
+    .foto-step-skip   { font-size: .8rem; color: var(--r); font-weight: 600; cursor: pointer; }
+
+    /* TERMOS */
+    .termos-wrap {
+      margin-bottom: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .termos-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--r-soft);
+      border-bottom: 1px solid var(--border);
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--r);
+    }
+
+    .termos-scroll {
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 14px;
+      scrollbar-width: thin;
+    }
+
+    .termos-scroll::-webkit-scrollbar { width: 4px; }
+    .termos-scroll::-webkit-scrollbar-thumb { background: var(--r); border-radius: 4px; }
+    .termos-conteudo h4 { font-size: .95rem; margin-bottom: 4px; }
+    .termos-conteudo h5 { font-size: .82rem; margin: 10px 0 4px; }
+    .termos-conteudo p  { font-size: .8rem; color: var(--muted); line-height: 1.6; margin-bottom: 6px; }
+    .termos-data        { font-size: .68rem; margin-bottom: 10px; }
+    .termos-contacto    { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+
+    .termos-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--r-soft);
+      font-size: .72rem;
+      color: var(--r);
+      font-weight: 600;
+      border-top: 1px solid var(--border);
+    }
+
+    .termos-hint.lido { color: var(--green); background: rgba(34,197,94,0.1); }
+
+    .termos-check-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      border-top: 1px solid var(--border);
+    }
+
+    .termos-check-wrap input  { width: 18px; height: 18px; accent-color: var(--r); cursor: pointer; }
+    .termos-check-label       { font-size: .8rem; color: var(--text); }
+    .termos-check-label span  { color: var(--r); font-weight: 700; }
+
+    /* FORCA SENHA */
+    .forca-senha-container { margin: -6px 0 16px; }
+    .forca-senha-barra     { height: 4px; background: var(--bg3); border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
+    .forca-senha-progresso { height: 100%; width: 0; border-radius: 99px; transition: all .3s; }
+    .forca-senha-texto     { font-size: .73rem; font-weight: 700; letter-spacing: .3px; }
+
+    /* FOOTER */
+    .login-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .login-footer a { color: var(--r); font-weight: 600; text-decoration: none; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal {
+      background: var(--bg2);
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px 40px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .modal h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+    .modal p  { font-size: .88rem; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+
+    .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
+    .modal-btns .btn-primary,
+    .modal-btns .btn-outline { flex: 1; }
+
+    .rec-step { display: none; }
+    .rec-step.activo { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <!-- HERO -->
+  <div class="login-hero">
+    <div class="login-logo">
+      <img src="logo.jpg" alt="RondaP2P Logo">
+    </div>
+    <h1 class="login-titulo"></h1>
+    <p class="login-sub">Roda • Poupa • Recebe</p>
+  </div>
+
+  <!-- CARD LOGIN -->
+  <div class="login-card" id="cardLogin">
+    <div class="card-titulo">Entrar na conta</div>
+
+    <div class="campo">
+      <label>Telefone</label>
+      <input id="loginTelefone" type="tel" placeholder="+244 9XX XXX XXX">
+    </div>
+
+    <div class="campo">
+      <label>Senha</label>
+      <input id="loginSenha" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')entrar()">
+    </div>
+
+    <a class="esqueceu-link" onclick="abrirRecuperar()">Esqueceu a senha?</a>
+
+    <button class="btn-primary w100" onclick="entrar()">Entrar</button>
+
+    <div class="login-divider">ou</div>
+
+    <button class="btn-registo" onclick="iniciarRegisto()">Ainda não tens conta? Registar</button>
+  </div>
+
+  <!-- CARD REGISTO (multi-step) -->
+  <div class="login-card" id="cardRegisto" style="display:none">
+
+    <!-- HEADER -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <button class="btn-voltar-reg" id="btnVoltarReg" onclick="voltarStep()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="card-titulo" style="margin-bottom:0" id="stepTitulo">Criar conta</div>
+    </div>
+
+    <!-- BARRA DE PASSOS -->
+    <div class="steps-bar">
+      <div class="step-dot activo" id="sdot1">1</div>
+      <div class="step-line" id="sline1"></div>
+      <div class="step-dot" id="sdot2">2</div>
+      <div class="step-line" id="sline2"></div>
+      <div class="step-dot" id="sdot3">3</div>
+      <div class="step-line" id="sline3"></div>
+      <div class="step-dot" id="sdot4">4</div>
+    </div>
+
+    <!-- PASSO 1: Identidade -->
+    <div id="step1">
+      <div class="foto-step-wrap">
+        <div class="foto-step-avatar" onclick="document.getElementById('inputFotoReg').click()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <img id="fotoPickerImg" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+          <div class="foto-edit-icon">&#9998;</div>
+        </div>
+        <span class="foto-step-label">Foto de perfil<br><small>(opcional)</small></span>
+      </div>
+      <input id="inputFotoReg" type="file" accept="image/*" style="display:none" onchange="previewFotoReg(event)">
+
+      <div class="campo"><label>Nome completo</label><input id="regNome" type="text" placeholder="Como no documento"></div>
+      <div class="campo"><label>Data de nascimento</label><input id="regDataNasc" type="date"></div>
+      <button class="btn-primary w100" onclick="avancarStep(1)">Continuar</button>
+    </div>
+
+    <!-- PASSO 2: Contacto -->
+    <div id="step2" style="display:none">
+      <div class="campo"><label>Telefone (WhatsApp)</label><input id="regTelefone" type="tel" placeholder="+244 9XX XXX XXX"></div>
+      <div class="campo"><label>Email</label><input id="regEmail" type="email" placeholder="exemplo@email.com"></div>
+      <button class="btn-primary w100" onclick="avancarStep(2)">Continuar</button>
+    </div>
+
+    <!-- PASSO 3: Localização -->
+    <div id="step3" style="display:none">
+      <div class="campo">
+        <label>Província</label>
+        <select id="regProvincia">
+          <option value="">Selecionar</option>
+          <option>Luanda</option><option>Benguela</option><option>Huíla</option><option>Bié</option>
+          <option>Cabinda</option><option>Cuando Cubango</option><option>Cuanza Norte</option><option>Cuanza Sul</option>
+          <option>Cunene</option><option>Huambo</option><option>Lunda Norte</option><option>Lunda Sul</option>
+          <option>Malanje</option><option>Moxico</option><option>Namibe</option><option>Uíge</option><option>Zaire</option>
+        </select>
+      </div>
+      <div class="campo"><label>Município / Bairro</label><input id="regMunicipio" type="text" placeholder="Ex: Kilamba Kiaxi"></div>
+      <button class="btn-primary w100" onclick="avancarStep(3)">Continuar</button>
+    </div>
+
+    <!-- PASSO 4: Senha + Termos -->
+    <div id="step4" style="display:none">
+      <div class="campo">
+        <label>Senha</label>
+        <input id="regSenha" type="password" placeholder="••••••••" oninput="atualizarForcaSenha()">
+      </div>
+      <div class="forca-senha-container">
+        <div class="forca-senha-barra"><div id="forcaSenhaBarra" class="forca-senha-progresso"></div></div>
+        <span id="forcaSenhaTexto" class="forca-senha-texto"></span>
+      </div>
+      <div class="campo"><label>Confirmar senha</label><input id="regSenhaConfirm" type="password" placeholder="••••••••"></div>
+
+      <div class="termos-wrap">
+        <div class="termos-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Termos de Uso e Privacidade
+        </div>
+        <div class="termos-scroll" id="termosScroll" onscroll="verificarScrollTermos()">
+          <div class="termos-conteudo">
+            <h4>TERMOS DE USO — RONDAP2P</h4>
+            <p class="termos-data">Última actualização: Maio de 2026</p>
+            <p>Estes Termos regulam o acesso e utilização da plataforma RONDAP2P, disponibilizada por Adilson Rafael (desenvolvedor independente).</p>
+            <h5>1. Aceitação</h5>
+            <p>Ao utilizar a RONDAP2P, concorda com estes Termos na íntegra.</p>
+            <h5>2. Serviço</h5>
+            <p>A RondaP2P permite criar e gerir grupos de poupança rotativa. Não realiza cobranças nem guarda dinheiro. Todos os pagamentos são feitos directamente entre participantes.</p>
+            <h5>3. Responsabilidades</h5>
+            <p>Somos apenas uma ferramenta de organização. Não somos responsáveis por acordos, pagamentos ou conflitos entre membros.</p>
+            <h5>4. Proibições</h5>
+            <p>É proibido usar a plataforma para actividades ilegais, fraudes ou branqueamento de capitais.</p>
+            <h5>5. Lei Aplicável</h5>
+            <p>Regido pelas leis de Angola. Disputas resolvidas nos tribunais de Luanda.</p>
+            <h4 style="margin-top:14px">POLÍTICA DE PRIVACIDADE</h4>
+            <p class="termos-data">Última actualização: Maio de 2026</p>
+            <p>Cumprimos a Lei n.º 22/11 de Angola. Recolhemos nome, email, telefone, data de nascimento, província e foto. Não vendemos os seus dados.</p>
+            <p class="termos-contacto">Desenvolvedor: Adilson Rafael — <a href="https://wa.me/244921325366" target="_blank" style="color:var(--r)">+244 921 325 366</a></p>
+          </div>
+        </div>
+        <div class="termos-hint" id="termosHint">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          Leia até ao fim para activar o registo
+        </div>
+        <label class="termos-check-wrap" id="termosCheckWrap" style="opacity:.4;pointer-events:none">
+          <input type="checkbox" id="termosCheck" disabled onchange="atualizarBotaoCriar()">
+          <span class="termos-check-label">Li e aceito os <span>Termos</span> e a <span>Política de Privacidade</span></span>
+        </label>
+      </div>
+
+      <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
+        <input id="_hp_website" type="text" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button class="btn-primary w100" onclick="registar()" id="btnCriarConta" disabled>Criar conta</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="login-footer">
+    &copy; 2026 RondaP2P &nbsp;·&nbsp;
+    <a href="https://wa.me/244921325366" target="_blank">Suporte</a>
+    &nbsp;·&nbsp;
+    <a href="#" onclick="iniciarRegisto()">Registar</a>
+  </div>
+</div>
+
+<!-- MODAL RECUPERAR SENHA -->
+<div id="modalRecuperar" class="modal-overlay" style="display:none" onclick="if(event.target===this)fecharRecuperar()">
+  <div class="modal">
+
+    <!-- PASSO 1: verificar identidade -->
+    <div class="rec-step activo" id="recStep1">
+      <h3>Recuperar senha</h3>
+      <p>Introduz o teu telefone e data de nascimento para verificarmos a tua identidade.</p>
+      <div class="campo"><label>Telefone registado</label><input id="recTelefone" type="tel" placeholder="+244 9XX XXX XXX"></div>
+      <div class="campo"><label>Data de nascimento</label><input id="recDataNasc" type="date"></div>
+      <div class="modal-btns">
+        <button class="btn-outline" onclick="fecharRecuperar()">Cancelar</button>
+        <button class="btn-primary" onclick="verificarIdentidade()">Verificar</button>
+      </div>
+    </div>
+
+    <!-- PASSO 2: nova senha -->
+    <div class="rec-step" id="recStep2">
+      <h3>Nova senha</h3>
+      <p>Identidade verificada. Define a tua nova senha.</p>
+      <div class="campo">
+        <label>Nova senha</label>
+        <input id="recNovaSenha" type="password" placeholder="••••••••" oninput="atualizarForcaSenhaRec()">
+      </div>
+      <div class="forca-senha-container">
+        <div class="forca-senha-barra"><div id="forcaSenhaBarraRec" class="forca-senha-progresso"></div></div>
+        <span id="forcaSenhaTextoRec" class="forca-senha-texto"></span>
+      </div>
+      <div class="campo"><label>Confirmar nova senha</label><input id="recConfirmarSenha" type="password" placeholder="••••••••"></div>
+      <div class="modal-btns">
+        <button class="btn-outline" onclick="fecharRecuperar()">Cancelar</button>
+        <button class="btn-primary" onclick="redefinirSenha()">Guardar senha</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="auth.js"></script>
+</body>
+</html>

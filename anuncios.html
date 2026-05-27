@@ -1,0 +1,732 @@
+l<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>RondaP2P — Minha Loja</title>
+  <link rel="stylesheet" href="main.css">
+  <style>
+    html, body { overflow-y: auto; height: auto; }
+
+    .an-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+    }
+
+    .an-hero {
+      background: linear-gradient(135deg, var(--r) 0%, #3a0000 100%);
+      padding: 32px 20px 24px;
+      color: #fff;
+    }
+
+    .an-hero-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .an-logo {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .an-nome   { font-size: 1.1rem; font-weight: 800; }
+    .an-plano  { font-size: .75rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+    .an-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .an-stat {
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .an-stat-num   { font-size: 1.3rem; font-weight: 900; color: #fff; }
+    .an-stat-label { font-size: .65rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: .4px; }
+
+    .an-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .an-tab {
+      flex: 1;
+      padding: 13px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-family: var(--sans);
+    }
+
+    .an-tab.activo { color: var(--r); border-bottom-color: var(--r); }
+
+    .an-secao { display: none; padding: 16px; }
+    .an-secao.activa { display: block; }
+
+    .an-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .an-card-titulo {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 14px;
+    }
+
+    .produto-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .produto-item:last-child { border-bottom: none; }
+
+    .produto-item-info { flex: 1; min-width: 0; }
+    .produto-item-nome { font-weight: 700; font-size: .9rem; }
+    .produto-item-preco { font-size: .82rem; color: var(--r); font-weight: 700; margin-top: 2px; }
+
+    .produto-item-acoes { display: flex; gap: 6px; }
+
+    .btn-sm {
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: .75rem;
+      font-weight: 600;
+      font-family: var(--sans);
+    }
+
+    .btn-sm.danger { border-color: transparent; color: var(--r2); }
+    .btn-sm.success { border-color: var(--green); color: var(--green); }
+
+    .link-loja {
+      background: var(--bg3);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .link-loja-url {
+      flex: 1;
+      font-size: .78rem;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-copiar {
+      background: var(--r);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: .75rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .expira-bar {
+      height: 5px;
+      background: var(--bg3);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .expira-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 99px;
+    }
+
+    .cor-picker-wrap {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .cor-opt {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: border-color .15s;
+    }
+
+    .cor-opt.seleccionada { border-color: var(--text); }
+
+    .toggle-disponivel {
+      width: 42px; height: 24px;
+      border-radius: 99px;
+      background: var(--bg3);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+
+    .toggle-disponivel.on { background: var(--green); }
+
+    .toggle-disponivel::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px; left: 3px;
+      transition: left .2s;
+    }
+
+    .toggle-disponivel.on::after { left: 21px; }
+
+    #toastAn {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text);
+      color: var(--bg2);
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: .85rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s;
+      z-index: 200;
+      white-space: nowrap;
+    }
+
+    #toastAn.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .estado-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    .badge-activo   { background: rgba(34,197,94,0.15); color: var(--green); }
+    .badge-expirado { background: rgba(204,0,0,0.1); color: var(--r2); }
+  </style>
+</head>
+<body>
+
+<div class="an-wrap">
+
+  <!-- TELA LOGIN ANUNCIANTE -->
+  <div id="telaLoginAn" style="padding:48px 24px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:64px;height:64px;border-radius:20px;background:var(--r);color:#fff;font-size:1.8rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">R</div>
+      <div style="font-size:1.4rem;font-weight:900">Minha Loja</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-top:4px">RondaP2P para Negócios</div>
+    </div>
+    <div class="campo">
+      <label>Código da loja</label>
+      <input id="anCodigo" type="text" placeholder="Ex: ABC123" style="text-transform:uppercase" onkeydown="if(event.key==='Enter')entrarLoja()">
+    </div>
+    <div class="campo">
+      <label>Telefone (registado)</label>
+      <input id="anTelefone" type="tel" placeholder="+244 9XX XXX XXX" onkeydown="if(event.key==='Enter')entrarLoja()">
+    </div>
+    <button class="btn-primary w100" onclick="entrarLoja()">Aceder à loja</button>
+    <div style="text-align:center;margin-top:20px">
+      <span style="color:var(--muted);font-size:.82rem">Não tens loja? </span>
+      <span style="color:var(--r);font-weight:700;cursor:pointer;font-size:.82rem" onclick="mostrarCriarLoja()">Criar agora</span>
+    </div>
+  </div>
+
+  <!-- TELA CRIAR LOJA -->
+  <div id="telaCriarLoja" style="display:none;padding:24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+      <button class="btn-voltar" onclick="voltarLogin()">&#8592;</button>
+      <div style="font-size:1.1rem;font-weight:800">Criar loja</div>
+    </div>
+    <div class="campo"><label>Nome do negócio</label><input id="criarNomeAn" type="text" placeholder="Ex: Mercearia Central"></div>
+    <div class="campo"><label>Slogan</label><input id="criarSloganAn" type="text" placeholder="Ex: Tudo fresco, todo dia"></div>
+    <div class="campo"><label>Descrição</label><input id="criarDescAn" type="text" placeholder="Breve descrição do negócio"></div>
+    <div class="campo">
+      <label>Categoria</label>
+      <select id="criarCatAn">
+        <option value="geral">Geral</option>
+        <option value="alimentacao">Alimentação</option>
+        <option value="moda">Moda</option>
+        <option value="tecnologia">Tecnologia</option>
+        <option value="beleza">Beleza</option>
+        <option value="servicos">Serviços</option>
+        <option value="imoveis">Imóveis</option>
+        <option value="saude">Saúde</option>
+        <option value="educacao">Educação</option>
+      </select>
+    </div>
+    <div class="campo"><label>WhatsApp</label><input id="criarWppAn" type="tel" placeholder="+244 9XX XXX XXX"></div>
+    <div class="campo"><label>Telefone</label><input id="criarTelAn" type="tel" placeholder="+244 9XX XXX XXX"></div>
+    <div class="campo"><label>Localização</label><input id="criarLocalAn" type="text" placeholder="Ex: Luanda, Kilamba"></div>
+    <div class="campo">
+      <label>Cor da marca</label>
+      <div class="cor-picker-wrap" id="corPicker">
+        <div class="cor-opt seleccionada" style="background:#8B0000" data-cor="#8B0000" onclick="selCor(this)"></div>
+        <div class="cor-opt" style="background:#1a5276" data-cor="#1a5276" onclick="selCor(this)"></div>
+        <div class="cor-opt" style="background:#145a32" data-cor="#145a32" onclick="selCor(this)"></div>
+        <div class="cor-opt" style="background:#6c3483" data-cor="#6c3483" onclick="selCor(this)"></div>
+        <div class="cor-opt" style="background:#b7950b" data-cor="#b7950b" onclick="selCor(this)"></div>
+        <div class="cor-opt" style="background:#1a1a1a" data-cor="#1a1a1a" onclick="selCor(this)"></div>
+        <input type="color" id="corCustom" value="#8B0000" style="width:36px;height:36px;border-radius:50%;border:none;padding:0;cursor:pointer" onchange="selCorCustom(this)">
+      </div>
+    </div>
+    <div class="campo">
+      <label>Plano</label>
+      <select id="criarPlanoAn">
+        <option value="semanal">Semanal — 500 KZ</option>
+        <option value="quinzenal">Quinzenal — 900 KZ</option>
+        <option value="mensal" selected>Mensal — 1.500 KZ</option>
+      </select>
+    </div>
+    <button class="btn-primary w100" onclick="criarLoja()">Criar loja</button>
+  </div>
+
+  <!-- PAINEL LOJA -->
+  <div id="painelLoja" style="display:none">
+
+    <div class="an-hero" id="anHero">
+      <div class="an-hero-top">
+        <button onclick="sairLoja()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">&#8592;</button>
+        <div class="an-logo" id="anLogo"></div>
+        <div style="flex:1;min-width:0">
+          <div class="an-nome" id="anNome"></div>
+          <div class="an-plano" id="anPlano"></div>
+        </div>
+        <div id="anEstado"></div>
+      </div>
+      <div class="an-stats">
+        <div class="an-stat">
+          <div class="an-stat-num" id="anStatProdutos">0</div>
+          <div class="an-stat-label">Produtos</div>
+        </div>
+        <div class="an-stat">
+          <div class="an-stat-num" id="anStatDias">0</div>
+          <div class="an-stat-label">Dias restantes</div>
+        </div>
+        <div class="an-stat">
+          <div class="an-stat-num" id="anStatVisitas">—</div>
+          <div class="an-stat-label">Visitas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="an-tabs">
+      <button class="an-tab activo" onclick="mostrarTabAn('visao')">Visão geral</button>
+      <button class="an-tab" onclick="mostrarTabAn('produtos')">Produtos</button>
+      <button class="an-tab" onclick="mostrarTabAn('config')">Configurar</button>
+    </div>
+
+    <!-- TAB VISÃO GERAL -->
+    <div class="an-secao activa" id="anTabVisao">
+      <div class="an-card">
+        <div class="an-card-titulo">Link da loja</div>
+        <div class="link-loja">
+          <div class="link-loja-url" id="linkLojaUrl"></div>
+          <button class="btn-copiar" onclick="copiarLink()">Copiar</button>
+        </div>
+        <button class="btn-outline w100" onclick="verLoja()">Ver como cliente</button>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-titulo">Validade do plano</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.85rem" id="anValidadeTexto"></span>
+          <span id="anValidadeDias" style="font-size:.85rem;font-weight:700;color:var(--green)"></span>
+        </div>
+        <div class="expira-bar"><div class="expira-fill" id="anValidadeBarra" style="width:80%"></div></div>
+        <button class="btn-primary w100" style="margin-top:12px" onclick="renovarPlano()">Renovar plano</button>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-titulo">Partilhar</div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-outline" style="flex:1" onclick="partilharWhatsApp()">WhatsApp</button>
+          <button class="btn-outline" style="flex:1" onclick="copiarLink()">Copiar link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB PRODUTOS -->
+    <div class="an-secao" id="anTabProdutos">
+      <div class="an-card">
+        <div class="an-card-titulo">Adicionar produto/serviço</div>
+        <div class="campo"><label>Nome</label><input id="novoProdNome" type="text" placeholder="Ex: Arroz 5kg"></div>
+        <div class="campo"><label>Preço (KZ)</label><input id="novoProdPreco" type="number" placeholder="Ex: 2500"></div>
+        <div class="campo"><label>Descrição (opcional)</label><input id="novoProdDesc" type="text" placeholder="Breve descrição"></div>
+        <button class="btn-primary w100" onclick="adicionarProduto()">Adicionar</button>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-titulo">Os meus produtos</div>
+        <div id="listaProdutosAn"></div>
+      </div>
+    </div>
+
+    <!-- TAB CONFIGURAR -->
+    <div class="an-secao" id="anTabConfig">
+      <div class="an-card">
+        <div class="an-card-titulo">Informações da loja</div>
+        <div class="campo"><label>Nome</label><input id="cfgNome" type="text"></div>
+        <div class="campo"><label>Slogan</label><input id="cfgSlogan" type="text"></div>
+        <div class="campo"><label>Descrição</label><input id="cfgDesc" type="text"></div>
+        <div class="campo"><label>WhatsApp</label><input id="cfgWpp" type="tel"></div>
+        <div class="campo"><label>Telefone</label><input id="cfgTel" type="tel"></div>
+        <div class="campo"><label>Localização</label><input id="cfgLocal" type="text"></div>
+        <div class="campo">
+          <label>Cor da marca</label>
+          <div class="cor-picker-wrap" id="corPickerCfg">
+            <div class="cor-opt" style="background:#8B0000" data-cor="#8B0000" onclick="selCorCfg(this)"></div>
+            <div class="cor-opt" style="background:#1a5276" data-cor="#1a5276" onclick="selCorCfg(this)"></div>
+            <div class="cor-opt" style="background:#145a32" data-cor="#145a32" onclick="selCorCfg(this)"></div>
+            <div class="cor-opt" style="background:#6c3483" data-cor="#6c3483" onclick="selCorCfg(this)"></div>
+            <div class="cor-opt" style="background:#b7950b" data-cor="#b7950b" onclick="selCorCfg(this)"></div>
+            <div class="cor-opt" style="background:#1a1a1a" data-cor="#1a1a1a" onclick="selCorCfg(this)"></div>
+            <input type="color" id="corCustomCfg" style="width:36px;height:36px;border-radius:50%;border:none;padding:0;cursor:pointer" onchange="selCorCustomCfg(this)">
+          </div>
+        </div>
+        <button class="btn-primary w100" onclick="guardarConfig()">Guardar alterações</button>
+      </div>
+    </div>
+
+  </div><!-- /painelLoja -->
+</div>
+
+<div id="toastAn"></div>
+
+<script>
+  const API_P2P = 'https://kixikila-p2p.vercel.app/';
+  let _anuncio  = null;
+  let _corSel   = '#8B0000';
+  let _corSelCfg = '#8B0000';
+
+  function esc(t) {
+    if (!t) return '';
+    const d = document.createElement('div');
+    d.textContent = String(t);
+    return d.innerHTML;
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toastAn');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  function formatarValor(v) {
+    return new Intl.NumberFormat('pt-AO').format(v || 0);
+  }
+
+  function escurecer(hex) {
+    try {
+      const n = parseInt(hex.replace('#',''), 16);
+      const r = Math.max(0, (n>>16) - 50);
+      const g = Math.max(0, ((n>>8)&0xff) - 50);
+      const b = Math.max(0, (n&0xff) - 50);
+      return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+    } catch { return '#5a0000'; }
+  }
+
+  // ── COR ──────────────────────────────────────────────────────
+  function selCor(el) {
+    document.querySelectorAll('#corPicker .cor-opt').forEach(e => e.classList.remove('seleccionada'));
+    el.classList.add('seleccionada');
+    _corSel = el.dataset.cor;
+  }
+
+  function selCorCustom(input) {
+    _corSel = input.value;
+    document.querySelectorAll('#corPicker .cor-opt').forEach(e => e.classList.remove('seleccionada'));
+  }
+
+  function selCorCfg(el) {
+    document.querySelectorAll('#corPickerCfg .cor-opt').forEach(e => e.classList.remove('seleccionada'));
+    el.classList.add('seleccionada');
+    _corSelCfg = el.dataset.cor;
+  }
+
+  function selCorCustomCfg(input) {
+    _corSelCfg = input.value;
+    document.querySelectorAll('#corPickerCfg .cor-opt').forEach(e => e.classList.remove('seleccionada'));
+  }
+
+  // ── NAVEGAÇÃO ─────────────────────────────────────────────────
+  function mostrarCriarLoja() {
+    document.getElementById('telaLoginAn').style.display  = 'none';
+    document.getElementById('telaCriarLoja').style.display = 'block';
+  }
+
+  function voltarLogin() {
+    document.getElementById('telaLoginAn').style.display   = 'block';
+    document.getElementById('telaCriarLoja').style.display = 'none';
+  }
+
+  function sairLoja() {
+    _anuncio = null;
+    document.getElementById('painelLoja').style.display  = 'none';
+    document.getElementById('telaLoginAn').style.display = 'block';
+    document.getElementById('anCodigo').value   = '';
+    document.getElementById('anTelefone').value = '';
+  }
+
+  function mostrarTabAn(tab) {
+    document.querySelectorAll('.an-tab').forEach((b,i) => {
+      b.classList.toggle('activo', ['visao','produtos','config'][i] === tab);
+    });
+    document.querySelectorAll('.an-secao').forEach(s => s.classList.remove('activa'));
+    document.getElementById('anTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('activa');
+  }
+
+  // ── LOGIN ─────────────────────────────────────────────────────
+  async function entrarLoja() {
+    const codigo   = document.getElementById('anCodigo').value.trim().toUpperCase();
+    const telefone = document.getElementById('anTelefone').value.trim().replace(/\s/g,'');
+    if (!codigo || !telefone) { toast('Preenche todos os campos'); return; }
+
+    try {
+      const res  = await fetch(API_P2P + 'anuncios/' + codigo);
+      const data = await res.json();
+      if (!res.ok) { toast('Loja não encontrada'); return; }
+
+      const telLimpo = telefone.replace(/\D/g,'');
+      const wppLimpo = (data.whatsapp||'').replace(/\D/g,'');
+      const telLoja  = (data.telefone||'').replace(/\D/g,'');
+
+      if (telLimpo !== wppLimpo && telLimpo !== telLoja) {
+        toast('Telefone não corresponde à loja');
+        return;
+      }
+
+      _anuncio = data;
+      mostrarPainel(data);
+    } catch(e) { toast('Erro ao aceder'); }
+  }
+
+  // ── CRIAR LOJA ────────────────────────────────────────────────
+  async function criarLoja() {
+    const nome  = document.getElementById('criarNomeAn').value.trim();
+    const slogan = document.getElementById('criarSloganAn').value.trim();
+    const desc  = document.getElementById('criarDescAn').value.trim();
+    const cat   = document.getElementById('criarCatAn').value;
+    const wpp   = document.getElementById('criarWppAn').value.trim();
+    const tel   = document.getElementById('criarTelAn').value.trim();
+    const local = document.getElementById('criarLocalAn').value.trim();
+    const plano = document.getElementById('criarPlanoAn').value;
+
+    if (!nome || !wpp) { toast('Nome e WhatsApp obrigatórios'); return; }
+
+    try {
+      const res = await fetch(API_P2P + 'anuncios/criar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, slogan, descricao: desc, categoria: cat, cor: _corSel, telefone: tel, whatsapp: wpp, localizacao: local, plano })
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data.erro || 'Erro'); return; }
+      _anuncio = data.anuncio;
+      toast('Loja criada! Código: ' + data.codigo);
+      document.getElementById('telaCriarLoja').style.display = 'none';
+      mostrarPainel(data.anuncio);
+    } catch(e) { toast('Erro ao criar: ' + e.message); }
+  }
+
+  // ── PAINEL ────────────────────────────────────────────────────
+  function mostrarPainel(a) {
+    document.getElementById('telaLoginAn').style.display  = 'none';
+    document.getElementById('telaCriarLoja').style.display = 'none';
+    document.getElementById('painelLoja').style.display   = 'block';
+
+    const cor = a.cor || '#8B0000';
+    document.getElementById('anHero').style.background = `linear-gradient(135deg, ${cor} 0%, ${escurecer(cor)} 100%)`;
+    document.getElementById('anLogo').textContent = (a.nome?.[0]||'R').toUpperCase();
+    document.getElementById('anNome').textContent  = a.nome || '';
+    document.getElementById('anPlano').textContent = 'Plano ' + (a.plano || 'mensal');
+
+    const expira  = new Date(a.expira_em);
+    const agora   = new Date();
+    const dias    = Math.max(0, Math.ceil((expira - agora) / 86400000));
+    const activo  = dias > 0 && a.activo;
+    const pct     = Math.min(100, Math.round((dias / (a.plano==='semanal'?7:a.plano==='quinzenal'?15:30)) * 100));
+
+    document.getElementById('anEstado').innerHTML = activo
+      ? '<span class="estado-badge badge-activo">Activo</span>'
+      : '<span class="estado-badge badge-expirado">Expirado</span>';
+
+    document.getElementById('anStatProdutos').textContent = (a.produtos||[]).filter(p=>p.disponivel).length;
+    document.getElementById('anStatDias').textContent     = dias;
+    document.getElementById('anStatVisitas').textContent  = '—';
+
+    const url = window.location.origin + '/loja.html?c=' + a.codigo;
+    document.getElementById('linkLojaUrl').textContent   = url;
+    document.getElementById('anValidadeTexto').textContent = 'Expira em ' + expira.toLocaleDateString('pt-PT');
+    document.getElementById('anValidadeDias').textContent  = dias + ' dias';
+    document.getElementById('anValidadeBarra').style.width = pct + '%';
+    document.getElementById('anValidadeBarra').style.background = dias < 3 ? 'var(--r)' : 'var(--green)';
+
+    // Config
+    document.getElementById('cfgNome').value   = a.nome || '';
+    document.getElementById('cfgSlogan').value = a.slogan || '';
+    document.getElementById('cfgDesc').value   = a.descricao || '';
+    document.getElementById('cfgWpp').value    = a.whatsapp || '';
+    document.getElementById('cfgTel').value    = a.telefone || '';
+    document.getElementById('cfgLocal').value  = a.localizacao || '';
+    _corSelCfg = a.cor || '#8B0000';
+    document.getElementById('corCustomCfg').value = _corSelCfg;
+
+    renderProdutosAn();
+  }
+
+  function renderProdutosAn() {
+    const lista = document.getElementById('listaProdutosAn');
+    const prods = _anuncio?.produtos || [];
+    if (!prods.length) {
+      lista.innerHTML = '<div style="padding:12px 0;color:var(--muted);font-size:.85rem">Sem produtos ainda.</div>';
+      return;
+    }
+    lista.innerHTML = prods.map((p, i) => `
+      <div class="produto-item">
+        <div class="produto-item-info">
+          <div class="produto-item-nome">${esc(p.nome)}</div>
+          <div class="produto-item-preco">${formatarValor(p.preco)} KZ</div>
+        </div>
+        <div class="produto-item-acoes">
+          <button class="toggle-disponivel ${p.disponivel?'on':''}" onclick="toggleDisponivel(${i})" title="${p.disponivel?'Disponível':'Indisponível'}"></button>
+          <button class="btn-sm danger" onclick="removerProduto(${i})">&#10005;</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── PRODUTOS ──────────────────────────────────────────────────
+  async function adicionarProduto() {
+    const nome  = document.getElementById('novoProdNome').value.trim();
+    const preco = parseFloat(document.getElementById('novoProdPreco').value);
+    const desc  = document.getElementById('novoProdDesc').value.trim();
+    if (!nome || !preco) { toast('Nome e preço obrigatórios'); return; }
+
+    try {
+      const res = await fetch(API_P2P + 'anuncios/' + _anuncio.codigo + '/produto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, preco, descricao: desc })
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data.erro || 'Erro'); return; }
+      _anuncio.produtos = _anuncio.produtos || [];
+      _anuncio.produtos.push({ id: Date.now().toString(), nome, preco, descricao: desc, disponivel: true });
+      document.getElementById('novoProdNome').value  = '';
+      document.getElementById('novoProdPreco').value = '';
+      document.getElementById('novoProdDesc').value  = '';
+      toast('Produto adicionado!');
+      renderProdutosAn();
+    } catch(e) { toast('Erro: ' + e.message); }
+  }
+
+  async function toggleDisponivel(idx) {
+    _anuncio.produtos[idx].disponivel = !_anuncio.produtos[idx].disponivel;
+    await guardarAnuncio();
+    renderProdutosAn();
+  }
+
+  async function removerProduto(idx) {
+    _anuncio.produtos.splice(idx, 1);
+    await guardarAnuncio();
+    toast('Produto removido.');
+    renderProdutosAn();
+  }
+
+  // ── CONFIG ────────────────────────────────────────────────────
+  async function guardarConfig() {
+    _anuncio.nome       = document.getElementById('cfgNome').value.trim();
+    _anuncio.slogan     = document.getElementById('cfgSlogan').value.trim();
+    _anuncio.descricao  = document.getElementById('cfgDesc').value.trim();
+    _anuncio.whatsapp   = document.getElementById('cfgWpp').value.trim();
+    _anuncio.telefone   = document.getElementById('cfgTel').value.trim();
+    _anuncio.localizacao = document.getElementById('cfgLocal').value.trim();
+    _anuncio.cor        = _corSelCfg;
+    await guardarAnuncio();
+    toast('Alterações guardadas!');
+    mostrarPainel(_anuncio);
+  }
+
+  async function guardarAnuncio() {
+    await fetch(API_P2P + 'anuncios/' + _anuncio.codigo + '/actualizar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(_anuncio)
+    });
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────────
+  function copiarLink() {
+    const url = window.location.origin + '/loja.html?c=' + _anuncio?.codigo;
+    navigator.clipboard?.writeText(url);
+    toast('Link copiado!');
+  }
+
+  function verLoja() {
+    window.open('loja.html?c=' + _anuncio?.codigo);
+  }
+
+  function partilharWhatsApp() {
+    const url = window.location.origin + '/loja.html?c=' + _anuncio?.codigo;
+    const msg = encodeURIComponent(`Visita a minha loja no RondaP2P:\n${_anuncio?.nome}\n${url}`);
+    window.open(`https://wa.me/?text=${msg}`);
+  }
+
+  function renovarPlano() {
+    const wpp = '+244921325366';
+    const msg = encodeURIComponent(`Olá! Quero renovar o plano da minha loja no RondaP2P.\nCódigo: ${_anuncio?.codigo}\nNome: ${_anuncio?.nome}`);
+    window.open(`https://wa.me/${wpp}?text=${msg}`);
+  }
+</script>
+
+</body>
+</html>

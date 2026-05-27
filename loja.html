@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>RondaP2P — Loja</title>
+  <link rel="stylesheet" href="main.css">
+  <style>
+    html, body { overflow-y: auto; height: auto; }
+
+    .loja-hero {
+      padding: 48px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .loja-logo {
+      width: 80px; height: 80px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.2);
+      border: 3px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .loja-nome   { font-size: 1.6rem; font-weight: 900; color: #fff; letter-spacing: -.5px; }
+    .loja-slogan { font-size: .88rem; color: rgba(255,255,255,0.8); margin-top: 6px; }
+    .loja-local  { font-size: .75rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .loja-desc   { font-size: .85rem; color: rgba(255,255,255,0.75); margin-top: 10px; max-width: 340px; line-height: 1.5; }
+
+    .loja-contactos {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-contacto {
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 99px;
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background .2s;
+      font-family: var(--sans);
+    }
+
+    .btn-contacto:hover { background: rgba(255,255,255,0.25); }
+
+    .loja-body {
+      background: var(--bg);
+      min-height: 60vh;
+      padding: 20px 16px 48px;
+    }
+
+    .categoria-titulo {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin: 20px 0 10px;
+    }
+
+    .produto-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .produto-info { flex: 1; min-width: 0; }
+    .produto-nome { font-weight: 700; font-size: .95rem; }
+    .produto-desc { font-size: .78rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+    .produto-preco { font-size: 1.1rem; font-weight: 900; margin-top: 6px; }
+
+    .btn-encomendar {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 99px;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      flex-shrink: 0;
+      font-family: var(--sans);
+      transition: opacity .2s;
+    }
+
+    .btn-encomendar:active { opacity: .8; }
+
+    .loja-footer {
+      text-align: center;
+      padding: 24px;
+      font-size: .75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 16px;
+    }
+
+    .loja-footer a { color: var(--r); font-weight: 700; text-decoration: none; }
+
+    .badge-categoria {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: .7rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      margin-top: 8px;
+    }
+
+    .vazio-loja {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+    }
+
+    .partilhar-btn {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      font-size: .9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .voltar-btn {
+      position: absolute;
+      top: 14px; left: 14px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .stat-loja {
+      text-align: center;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 8px 16px;
+    }
+
+    .stat-loja-num   { font-size: 1.1rem; font-weight: 900; color: #fff; }
+    .stat-loja-label { font-size: .65rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: .4px; }
+
+    .sem-produtos {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    #toastLoja {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text);
+      color: var(--bg2);
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: .85rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s;
+      white-space: nowrap;
+      z-index: 200;
+    }
+
+    #toastLoja.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<div id="paginaLoja">
+
+  <!-- HERO (cor dinâmica) -->
+  <div class="loja-hero" id="lojaHero">
+    <button class="voltar-btn" onclick="history.back()">&#8592;</button>
+    <button class="partilhar-btn" onclick="partilharLoja()">&#8679;</button>
+    <div class="loja-logo" id="lojaLogo"></div>
+    <div class="loja-nome" id="lojaNome">A carregar...</div>
+    <div class="loja-slogan" id="lojaSlogan"></div>
+    <div class="loja-local" id="lojaLocal"></div>
+    <div class="badge-categoria" id="lojaBadge"></div>
+    <div class="loja-desc" id="lojaDesc"></div>
+    <div class="stats-row">
+      <div class="stat-loja">
+        <div class="stat-loja-num" id="statProdutos">0</div>
+        <div class="stat-loja-label">Produtos</div>
+      </div>
+      <div class="stat-loja">
+        <div class="stat-loja-num" id="statVisitas">—</div>
+        <div class="stat-loja-label">Visitas</div>
+      </div>
+    </div>
+    <div class="loja-contactos" id="lojaContactos"></div>
+  </div>
+
+  <!-- CORPO -->
+  <div class="loja-body">
+    <div class="categoria-titulo">Produtos e Serviços</div>
+    <div id="listaProdutos">
+      <div class="sem-produtos">A carregar produtos...</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="loja-footer">
+    Loja criada em <a href="index.html">RondaP2P</a><br>
+    Rede financeira e de negócios de Angola
+  </div>
+</div>
+
+<div id="toastLoja"></div>
+
+<script>
+  const API_P2P = 'https://kixikila-p2p.vercel.app/';
+  let _anuncio  = null;
+
+  function esc(t) {
+    if (!t) return '';
+    const d = document.createElement('div');
+    d.textContent = String(t);
+    return d.innerHTML;
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toastLoja');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  function formatarValor(v) {
+    return new Intl.NumberFormat('pt-AO').format(v || 0);
+  }
+
+  function escurecer(hex) {
+    try {
+      const n = parseInt(hex.replace('#',''), 16);
+      const r = Math.max(0, (n>>16) - 50);
+      const g = Math.max(0, ((n>>8)&0xff) - 50);
+      const b = Math.max(0, (n&0xff) - 50);
+      return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+    } catch { return '#5a0000'; }
+  }
+
+  const CATEGORIAS = {
+    alimentacao: 'Alimentação',
+    moda:        'Moda',
+    tecnologia:  'Tecnologia',
+    beleza:      'Beleza',
+    servicos:    'Serviços',
+    imoveis:     'Imóveis',
+    saude:       'Saúde',
+    educacao:    'Educação',
+    geral:       'Geral',
+  };
+
+  async function carregarLoja() {
+    const params = new URLSearchParams(window.location.search);
+    const codigo = params.get('c') || params.get('codigo');
+    if (!codigo) {
+      document.getElementById('lojaNome').textContent = 'Loja não encontrada';
+      return;
+    }
+
+    try {
+      const res  = await fetch(API_P2P + 'anuncios/' + codigo);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.erro || 'Erro');
+      _anuncio = data;
+      renderLoja(data);
+    } catch(e) {
+      document.getElementById('lojaNome').textContent = 'Erro ao carregar';
+    }
+  }
+
+  function renderLoja(a) {
+    const cor = a.cor || '#8B0000';
+    document.title = a.nome + ' — RondaP2P';
+
+    // Hero
+    document.getElementById('lojaHero').style.background =
+      `linear-gradient(160deg, ${cor} 0%, ${escurecer(cor)} 100%)`;
+    document.getElementById('lojaLogo').textContent = (a.nome?.[0] || 'R').toUpperCase();
+    document.getElementById('lojaNome').textContent  = a.nome || '';
+    document.getElementById('lojaSlogan').textContent = a.slogan || '';
+    document.getElementById('lojaLocal').textContent  = a.localizacao || '';
+    document.getElementById('lojaBadge').textContent  = CATEGORIAS[a.categoria] || a.categoria || '';
+    document.getElementById('lojaDesc').textContent   = a.descricao || '';
+    document.getElementById('statProdutos').textContent = (a.produtos || []).filter(p => p.disponivel).length;
+
+    // Contactos
+    const cont = document.getElementById('lojaContactos');
+    cont.innerHTML = '';
+    if (a.whatsapp) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-contacto';
+      btn.innerHTML = '&#128222; WhatsApp';
+      btn.onclick   = () => {
+        const msg = encodeURIComponent(`Olá! Vi a vossa loja no RondaP2P e gostaria de saber mais sobre ${a.nome}.`);
+        window.open(`https://wa.me/${a.whatsapp.replace(/\D/g,'')}?text=${msg}`);
+      };
+      cont.appendChild(btn);
+    }
+    if (a.telefone) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-contacto';
+      btn.innerHTML = '&#128222; Ligar';
+      btn.onclick   = () => window.open(`tel:${a.telefone}`);
+      cont.appendChild(btn);
+    }
+
+    // Produtos
+    const lista = document.getElementById('listaProdutos');
+    const produtos = (a.produtos || []).filter(p => p.disponivel);
+    if (!produtos.length) {
+      lista.innerHTML = '<div class="sem-produtos">Sem produtos disponíveis de momento.</div>';
+      return;
+    }
+    lista.innerHTML = '';
+    produtos.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'produto-card';
+      div.innerHTML = `
+        <div class="produto-info">
+          <div class="produto-nome">${esc(p.nome)}</div>
+          ${p.descricao ? `<div class="produto-desc">${esc(p.descricao)}</div>` : ''}
+          <div class="produto-preco" style="color:${cor}">${formatarValor(p.preco)} KZ</div>
+        </div>
+        <button class="btn-encomendar" style="background:${cor}" onclick="encomendar('${esc(p.nome)}','${formatarValor(p.preco)}')">
+          Encomendar
+        </button>`;
+      lista.appendChild(div);
+    });
+  }
+
+  function encomendar(produto, preco) {
+    if (!_anuncio?.whatsapp) { toast('Sem WhatsApp disponível'); return; }
+    const msg = encodeURIComponent(`Olá! Vi no RondaP2P e quero encomendar:\n*${produto}* — ${preco} KZ`);
+    window.open(`https://wa.me/${_anuncio.whatsapp.replace(/\D/g,'')}?text=${msg}`);
+  }
+
+  function partilharLoja() {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: _anuncio?.nome || 'Loja', url });
+    } else {
+      navigator.clipboard?.writeText(url);
+      toast('Link copiado!');
+    }
+  }
+
+  carregarLoja();
+</script>
+
+</body>
+</html>
