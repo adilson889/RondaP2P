@@ -597,8 +597,8 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
           Adicionar produto ou serviço
         </div>
-        <div class="campo"><label>Nome</label><input id="novoProdNome" type="text" placeholder="Ex: Arroz 5kg"></div>
-        <div class="campo"><label>Preço (KZ)</label><input id="novoProdPreco" type="number" placeholder="Ex: 2500"></div>
+        <div class="campo"><label>Nome</label><input id="novoProdNome" type="text" placeholder="------"></div>
+        <div class="campo"><label>Preço</label><input id="novoProdPreco" type="number" placeholder="0.00"></div>
         <div class="campo"><label>Descrição (opcional)</label><input id="novoProdDesc" type="text" placeholder="Breve descrição"></div>
         <button class="btn-primary w100" onclick="adicionarProduto()" style="display:flex;align-items:center;justify-content:center;gap:7px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -663,6 +663,7 @@
 </div>
 
 <div id="toastAn"></div>
+<script src="moeda.js"></script>
 
 <script>
   const API_P2P = 'https://kixikila-p2p.vercel.app/';
@@ -948,7 +949,7 @@
         </div>
         <div class="produto-item-info">
           <div class="produto-item-nome">${esc(p.nome)}</div>
-          <div class="produto-item-preco">${formatarValor(p.preco)} KZ</div>
+          `<div class="produto-item-preco">${formatarMoeda(p.preco)}</div>`
         </div>
         <div class="produto-item-acoes">
           <button class="toggle-disponivel ${p.disponivel?'on':''}" onclick="toggleDisponivel(${i})" title="${p.disponivel?'Disponível':'Indisponível'}"></button>
