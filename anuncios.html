@@ -949,8 +949,7 @@
         </div>
         <div class="produto-item-info">
           <div class="produto-item-nome">${esc(p.nome)}</div>
-          `<div class="produto-item-preco">${formatarMoeda(p.preco)}</div>`
-        </div>
+          <div class="produto-item-preco">${formatarMoeda(p.preco)}</div>
         <div class="produto-item-acoes">
           <button class="toggle-disponivel ${p.disponivel?'on':''}" onclick="toggleDisponivel(${i})" title="${p.disponivel?'Disponível':'Indisponível'}"></button>
           <button class="btn-remover" onclick="removerProduto(${i})">
