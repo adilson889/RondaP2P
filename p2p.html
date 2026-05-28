@@ -4,27 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Kixikila - Mensagens</title>
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
   <style>
-    .p2p-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .p2p-tab {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-weight: 600;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-    }
-    .p2p-tab.activo {
-      color: var(--r);
-      border-bottom-color: var(--r);
-    }
     .conversa-item {
       display: flex;
       align-items: center;
@@ -32,11 +15,11 @@
       padding: 14px 16px;
       border-bottom: 1px solid var(--border);
       cursor: pointer;
+      transition: background .15s;
     }
-    .conversa-item:hover { background: var(--bg3); }
+    .conversa-item:active { background: var(--bg3); }
     .conversa-avatar {
-      width: 48px;
-      height: 48px;
+      width: 48px; height: 48px;
       border-radius: 50%;
       background: var(--bg3);
       background-size: cover;
@@ -46,21 +29,21 @@
       justify-content: center;
       font-weight: 800;
       color: var(--r);
+      flex-shrink: 0;
     }
-    .conversa-info { flex: 1; }
-    .conversa-nome { font-weight: 700; }
-    .conversa-msg { font-size: .8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .conversa-data { font-size: .7rem; color: var(--muted); }
+    .conversa-info { flex: 1; min-width: 0; }
+    .conversa-nome { font-weight: 700; font-size: .93rem; }
+    .conversa-msg  { font-size: .8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conversa-data { font-size: .72rem; color: var(--muted); flex-shrink: 0; }
     .parceiro-card {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
+      padding: 14px 16px;
       border-bottom: 1px solid var(--border);
     }
     .parceiro-avatar {
-      width: 48px;
-      height: 48px;
+      width: 48px; height: 48px;
       border-radius: 50%;
       background: var(--bg3);
       background-size: cover;
@@ -70,94 +53,162 @@
       justify-content: center;
       font-weight: 800;
       color: var(--r);
+      flex-shrink: 0;
     }
     .parceiro-info { flex: 1; }
-    .parceiro-nome { font-weight: 700; }
+    .parceiro-nome { font-weight: 700; font-size: .93rem; }
     .btn-conversar {
       background: var(--r);
-      color: white;
+      color: #fff;
       border: none;
-      padding: 6px 16px;
-      border-radius: 30px;
+      padding: 7px 16px;
+      border-radius: 99px;
+      font-size: .82rem;
+      font-weight: 700;
       cursor: pointer;
+      font-family: var(--sans);
     }
   </style>
 </head>
 <body>
 
-<div class="pagina">
-  <div class="top-bar">
-    <button class="btn-voltar" onclick="window.location.href='index.html'">←</button>
+<!-- SIDEBAR (PC) -->
+<aside class="sidebar">
+  <div class="sidebar-logo"><span style="color:var(--r)">K</span>ixikila</div>
+  <button class="sidebar-btn" onclick="window.location.href='index.html'">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    Descobrir
+  </button>
+  <button class="sidebar-btn" onclick="window.location.href='index.html'">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    Os meus grupos
+  </button>
+  <button class="sidebar-btn activo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Mensagens
+  </button>
+  <div class="sidebar-spacer"></div>
+  <button class="sidebar-btn" onclick="window.location.href='index.html'">
+    <div class="sidebar-avatar" id="sidebarAvatar"></div>
+    <span id="sidebarNome">Perfil</span>
+  </button>
+</aside>
+
+<div class="pagina com-sidebar">
+
+  <!-- Top bar (mobile + PC) -->
+  <div class="top-bar" style="display:flex">
+    <button class="btn-voltar" onclick="history.back()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
     <span class="top-titulo">Mensagens</span>
   </div>
 
-  <div class="p2p-tabs">
-    <button class="p2p-tab activo" id="tabConversas" onclick="mostrarTabP2P('conversas')">Conversas</button>
-    <button class="p2p-tab" id="tabEncontrar" onclick="mostrarTabP2P('encontrar')">Encontrar</button>
+  <div class="tabs">
+    <button class="tab activo" id="tabConversas" onclick="mostrarTabP2P('conversas')">Conversas</button>
+    <button class="tab" id="tabEncontrar" onclick="mostrarTabP2P('encontrar')">Encontrar</button>
   </div>
 
   <div class="pagina-scroll">
     <div id="conteudoConversas"></div>
     <div id="conteudoEncontrar" style="display:none"></div>
   </div>
+
+  <nav class="bottom-nav">
+    <button class="bottom-nav-btn" onclick="window.location.href='index.html'">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <button class="bottom-nav-btn" onclick="window.location.href='index.html'">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    </button>
+    <button class="bottom-nav-btn" onclick="window.location.href='index.html'">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    </button>
+    <button class="bottom-nav-btn activo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <button class="bottom-nav-btn" onclick="window.location.href='index.html'">
+      <div class="bottom-nav-avatar" id="bnAvatar"></div>
+    </button>
+  </nav>
 </div>
 
 <!-- MODAL CHAT PRIVADO -->
-<div id="modalChatPrivado" class="modal-overlay" style="display:none">
+<div id="modalChatPrivado" class="modal-overlay" style="display:none" onclick="if(event.target===this)fecharModal('modalChatPrivado')">
   <div class="modal" style="max-height:85dvh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h3 id="chatPrivadoTitulo">Chat</h3>
-      <button onclick="fecharModal('modalChatPrivado')" style="background:none;border:none;font-size:1.2rem">✕</button>
+      <button onclick="fecharModal('modalChatPrivado')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
     </div>
-    <div id="chatPrivadoMensagens" style="flex:1;overflow-y:auto;margin-bottom:16px"></div>
-    <div style="display:flex;gap:8px">
+    <div id="chatPrivadoMensagens" style="flex:1;overflow-y:auto;margin-bottom:16px;min-height:200px"></div>
+    <div style="display:flex;gap:8px;border-top:1px solid var(--border);padding-top:12px">
       <input id="chatPrivadoInput" type="text" placeholder="Mensagem..."
-        style="flex:1;padding:10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text)"
+        style="flex:1;padding:11px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:var(--sans);font-size:.9rem;outline:none"
         onkeydown="if(event.key==='Enter')enviarMsgPrivada()">
-      <button class="btn-primary" onclick="enviarMsgPrivada()">Enviar</button>
+      <button class="btn-enviar" onclick="enviarMsgPrivada()">&#10148;</button>
     </div>
   </div>
 </div>
 
 <div id="toast" class="toast"></div>
-
+<script src="moeda.js"></script>
 <script src="api.js"></script>
 <script>
+  window.__P2P_PAGE__ = true;
+
+  // ── BOTÃO FÍSICO VOLTAR ──────────────────────────────────────
+  history.pushState({ pagina: 'p2p' }, '');
+
+  window.addEventListener('popstate', function() {
+    const modaisAbertos = document.querySelectorAll('.modal-overlay[style*="flex"]');
+    if (modaisAbertos.length > 0) {
+      modaisAbertos.forEach(m => m.style.display = 'none');
+      history.pushState({}, '');
+      return;
+    }
+    window.location.href = 'index.html';
+  });
+
+  // ── SESSÃO ───────────────────────────────────────────────────
   try {
     const g = localStorage.getItem('kx_sessao');
-    if (g) KixikilaManager.setSessao(JSON.parse(g));
+    if (g) {
+      const dados = JSON.parse(g);
+      const perfil = dados.perfil || dados;
+      KixikilaManager.setSessao(perfil);
+      const nome = perfil.nome || 'K';
+      const foto = perfil.foto_perfil || '';
+      const sa = document.getElementById('sidebarAvatar');
+      const ba = document.getElementById('bnAvatar');
+      const sn = document.getElementById('sidebarNome');
+      if (foto) {
+        if (sa) { sa.style.backgroundImage = `url(${foto})`; sa.textContent = ''; }
+        if (ba) { ba.style.backgroundImage = `url(${foto})`; ba.textContent = ''; }
+      } else {
+        if (sa) sa.textContent = nome[0].toUpperCase();
+        if (ba) ba.textContent = nome[0].toUpperCase();
+      }
+      if (sn) sn.textContent = nome;
+    }
   } catch(_) {}
 
-  if (!KixikilaManager.getSessao()) {
-    window.location.href = 'index.html';
-  }
+  if (!KixikilaManager.getSessao()) window.location.href = 'index.html';
 
   var _chatTelefone = '';
   var _chatNome = '';
 
   function mostrarTabP2P(tab) {
-    const tabConversas = document.getElementById('tabConversas');
-    const tabEncontrar = document.getElementById('tabEncontrar');
-    const conteudoConversas = document.getElementById('conteudoConversas');
-    const conteudoEncontrar = document.getElementById('conteudoEncontrar');
-    if (tab === 'conversas') {
-      tabConversas.classList.add('activo');
-      tabEncontrar.classList.remove('activo');
-      conteudoConversas.style.display = 'block';
-      conteudoEncontrar.style.display = 'none';
-      carregarConversas();
-    } else {
-      tabConversas.classList.remove('activo');
-      tabEncontrar.classList.add('activo');
-      conteudoConversas.style.display = 'none';
-      conteudoEncontrar.style.display = 'block';
-      carregarParceiros();
-    }
+    document.getElementById('tabConversas').classList.toggle('activo', tab === 'conversas');
+    document.getElementById('tabEncontrar').classList.toggle('activo', tab === 'encontrar');
+    document.getElementById('conteudoConversas').style.display = tab === 'conversas' ? 'block' : 'none';
+    document.getElementById('conteudoEncontrar').style.display = tab === 'encontrar' ? 'block' : 'none';
+    if (tab === 'conversas') carregarConversas();
+    else carregarParceiros();
   }
 
   async function carregarConversas() {
     const container = document.getElementById('conteudoConversas');
-    container.innerHTML = '<div class="vazio">A carregar conversas...</div>';
+    container.innerHTML = '<div class="vazio">A carregar...</div>';
     try {
       const [data, usuarios] = await Promise.all([
         KixikilaManager.carregarConversas(),
@@ -165,7 +216,7 @@
       ]);
       const conversas = data.conversas || [];
       if (!conversas.length) {
-        container.innerHTML = '<div class="vazio">Nenhuma conversa ainda.<br><button class="btn-primary" style="margin-top:12px" onclick="mostrarTabP2P(\'encontrar\')">Encontrar parceiros</button></div>';
+        container.innerHTML = '<div class="vazio"><p>Nenhuma conversa ainda.</p><button class="btn-primary" style="margin-top:12px" onclick="mostrarTabP2P(\'encontrar\')">Encontrar parceiros</button></div>';
         return;
       }
       container.innerHTML = '';
@@ -177,12 +228,14 @@
         div.className = 'conversa-item';
         div.onclick = () => abrirChatPrivado(c.telefone, nome);
         div.innerHTML = `
-          <div class="conversa-avatar" style="background-image:${foto ? `url('${foto}')` : 'none'}">${!foto ? (nome[0] || 'U').toUpperCase() : ''}</div>
+          <div class="conversa-avatar" style="${foto ? `background-image:url('${escapeHtml(foto)}')` : ''}">
+            ${!foto ? (nome[0]||'U').toUpperCase() : ''}
+          </div>
           <div class="conversa-info">
             <div class="conversa-nome">${escapeHtml(nome)}</div>
             <div class="conversa-msg">${escapeHtml(c.ultimaMsg || 'Clique para conversar')}</div>
           </div>
-          <div class="conversa-data">${formatarData(c.data) || ''}</div>`;
+          <div class="conversa-data">${formatarData(c.data)}</div>`;
         container.appendChild(div);
       });
     } catch(e) { container.innerHTML = '<div class="vazio">Erro ao carregar.</div>'; }
@@ -193,21 +246,20 @@
     container.innerHTML = '<div class="vazio">A carregar...</div>';
     try {
       const usuarios = await KixikilaManager.carregarUsuariosParaSeguir();
-      if (!usuarios.length) {
-        container.innerHTML = '<div class="vazio">Nenhum parceiro encontrado.</div>';
-        return;
-      }
+      if (!usuarios.length) { container.innerHTML = '<div class="vazio">Nenhum parceiro encontrado.</div>'; return; }
       container.innerHTML = '';
       usuarios.forEach(u => {
         const div = document.createElement('div');
         div.className = 'parceiro-card';
         div.innerHTML = `
-          <div class="parceiro-avatar" style="background-image:${u.foto_perfil ? `url('${u.foto_perfil}')` : 'none'}">${!u.foto_perfil ? (u.nome?.[0] || 'U').toUpperCase() : ''}</div>
+          <div class="parceiro-avatar" style="${u.foto_perfil ? `background-image:url('${escapeHtml(u.foto_perfil)}')` : ''}">
+            ${!u.foto_perfil ? (u.nome?.[0]||'U').toUpperCase() : ''}
+          </div>
           <div class="parceiro-info">
             <div class="parceiro-nome">${escapeHtml(u.nome)}</div>
-            <div class="parceiro-sub" style="font-size:.78rem;color:var(--muted)">${escapeHtml(u.provincia || '')}${u.provincia && u.municipio ? ' · ' : ''}${escapeHtml(u.municipio || '')}</div>
+            <div style="font-size:.78rem;color:var(--muted)">${escapeHtml(u.provincia||'')}${u.provincia&&u.municipio?' · ':''}${escapeHtml(u.municipio||'')}</div>
           </div>
-          <button class="btn-conversar" onclick="event.stopPropagation(); iniciarConversa('${u.telefone}','${escapeHtml(u.nome)}')">Conversar</button>`;
+          <button class="btn-conversar" onclick="event.stopPropagation();iniciarConversa('${u.telefone}','${escapeHtml(u.nome)}')">Conversar</button>`;
         container.appendChild(div);
       });
     } catch(e) { container.innerHTML = '<div class="vazio">Erro ao carregar.</div>'; }
@@ -216,7 +268,7 @@
   async function iniciarConversa(telefone, nome) {
     try {
       await KixikilaManager.enviarMsgPrivada(telefone, ' ');
-      mostrarToast(`Conversa com ${nome} iniciada!`);
+      toast('Conversa com ' + nome + ' iniciada!');
       mostrarTabP2P('conversas');
     } catch(e) { toast(e.message); }
   }
@@ -225,35 +277,31 @@
     _chatTelefone = telefone;
     _chatNome = nome;
     document.getElementById('chatPrivadoTitulo').textContent = nome;
+    history.pushState({ pagina: 'chat-privado' }, '');
     carregarMensagensPrivadas();
     document.getElementById('modalChatPrivado').style.display = 'flex';
   }
 
   async function carregarMensagensPrivadas() {
     const container = document.getElementById('chatPrivadoMensagens');
-    container.innerHTML = '<div style="text-align:center;padding:20px">A carregar...</div>';
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">A carregar...</div>';
     try {
       const data = await KixikilaManager.carregarMensagensPrivadas(_chatTelefone);
-      const msgs = data.mensagens || [];
+      const msgs = (data.mensagens || []).filter(m => m.texto?.trim() && !m.texto.includes('Conversa iniciada'));
       const perfil = KixikilaManager.getSessao()?.perfil;
       if (!msgs.length) {
-        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Sem mensagens. Diz ola!</div>';
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Sem mensagens. Diz olá! 👋</div>';
         return;
       }
-      const msgsFiltradas = msgs.filter(m => m.texto && m.texto.trim() !== '' && !m.texto.includes('Conversa iniciada'));
-      if (!msgsFiltradas.length) {
-        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Sem mensagens. Diz ola!</div>';
-        return;
-      }
-      container.innerHTML = msgsFiltradas.map(m => `
-        <div style="display:flex;justify-content:${m.de === perfil?.telefone ? 'flex-end' : 'flex-start'};margin-bottom:12px">
-          <div style="background:${m.de === perfil?.telefone ? 'var(--r)' : 'var(--bg3)'};color:${m.de === perfil?.telefone ? 'white' : 'var(--text)'};padding:8px 12px;border-radius:16px;max-width:70%">
+      container.innerHTML = msgs.map(m => `
+        <div style="display:flex;justify-content:${m.de===perfil?.telefone?'flex-end':'flex-start'};margin-bottom:10px">
+          <div style="background:${m.de===perfil?.telefone?'var(--r)':'var(--bg3)'};color:${m.de===perfil?.telefone?'#fff':'var(--text)'};padding:9px 13px;border-radius:16px;max-width:72%;font-size:.9rem;line-height:1.45">
             ${escapeHtml(m.texto)}
-            <div style="font-size:10px;opacity:0.7;margin-top:4px">${new Date(m.data).toLocaleTimeString('pt',{hour:'2-digit',minute:'2-digit'})}</div>
+            <div style="font-size:.65rem;opacity:.7;margin-top:4px">${new Date(m.data).toLocaleTimeString('pt',{hour:'2-digit',minute:'2-digit'})}</div>
           </div>
         </div>`).join('');
       container.scrollTop = container.scrollHeight;
-    } catch(e) { container.innerHTML = '<div style="text-align:center;padding:20px">Erro</div>'; }
+    } catch(e) { container.innerHTML = '<div style="text-align:center;padding:20px">Erro ao carregar.</div>'; }
   }
 
   async function enviarMsgPrivada() {
@@ -264,21 +312,18 @@
     try {
       await KixikilaManager.enviarMsgPrivada(_chatTelefone, texto);
       carregarMensagensPrivadas();
-      carregarConversas();
     } catch(e) { toast(e.message); }
   }
 
-  function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+  function fecharModal(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
-  function mostrarToast(m) {
+  function toast(m) {
     const t = document.getElementById('toast');
     if (!t) return;
     t.textContent = m;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2600);
   }
-
-  function toast(m) { mostrarToast(m); }
 
   function escapeHtml(t) {
     if (!t) return '';
@@ -287,21 +332,18 @@
     return d.innerHTML;
   }
 
-  function formatarData(dataStr) {
-    if (!dataStr) return '';
+  function formatarData(s) {
+    if (!s) return '';
     try {
-      const data = new Date(dataStr);
-      const agora = new Date();
-      const diff = Math.floor((agora - data) / 60000);
+      const diff = Math.floor((Date.now() - new Date(s)) / 60000);
       if (diff < 1) return 'agora';
       if (diff < 60) return diff + 'm';
-      if (diff < 1440) return Math.floor(diff / 60) + 'h';
-      return data.toLocaleDateString('pt-AO');
+      if (diff < 1440) return Math.floor(diff/60) + 'h';
+      return new Date(s).toLocaleDateString('pt-AO');
     } catch { return ''; }
   }
 
   mostrarTabP2P('conversas');
 </script>
-
 </body>
 </html>
