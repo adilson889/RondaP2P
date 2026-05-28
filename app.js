@@ -815,6 +815,7 @@ function renderGrupo(grupo, perfil) {
   document.getElementById('btnEncerrar').style.display   = eCriador ? 'block' : 'none';
 
   renderMembros(grupo, perfil);
+renderPedidos(grupo, perfil);
   renderRodas(grupo);
 }
 
@@ -861,6 +862,50 @@ function renderMembros(grupo, perfil) {
     lista.appendChild(div);
   });
 }
+function renderPedidos(grupo, perfil) {
+  const eCriador = grupo.criador?.telefone === perfil?.telefone;
+  const pedidos  = grupo.pedidos || [];
+
+  let secao = document.getElementById('secaoPedidos');
+  if (!secao) {
+    secao = document.createElement('div');
+    secao.id = 'secaoPedidos';
+    const lista = document.getElementById('listaMembros');
+    lista?.parentNode?.insertBefore(secao, lista.nextSibling);
+  }
+
+  if (!eCriador || !pedidos.length) {
+    secao.innerHTML = '';
+    return;
+  }
+
+  secao.innerHTML = `
+    <div style="margin:16px 16px 0;padding:14px;background:var(--bg3);border-radius:14px;border:1px solid var(--border)">
+      <div style="font-size:.72rem;font-weight:700;color:var(--r);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
+        Pedidos de entrada (${pedidos.length})
+      </div>
+      ${pedidos.map(p => `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--r);flex-shrink:0;font-size:1rem">
+            ${(p.nome?.[0] || '?').toUpperCase()}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:.9rem">${esc(p.nome)}</div>
+            <div style="font-size:.75rem;color:var(--muted)">${esc(p.telefone)}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button onclick="responderPedido('${esc(grupo.codigo)}','${esc(p.id)}','aceitar')"
+              style="background:var(--r);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--sans)">
+              Aceitar
+            </button>
+            <button onclick="responderPedido('${esc(grupo.codigo)}','${esc(p.id)}','recusar')"
+              style="background:var(--bg2);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--sans)">
+              Recusar
+            </button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
 
 function renderRodas(grupo) {
   const lista = document.getElementById('listaRodas');
@@ -883,6 +928,13 @@ function renderRodas(grupo) {
       </span>`;
     lista.appendChild(div);
   });
+}
+async function responderPedido(codigo, pedidoId, acao) {
+  try {
+    await KixikilaManager.responderPedido(codigo, pedidoId, acao);
+    toast(acao === 'aceitar' ? 'Membro aceite!' : 'Pedido recusado.');
+    await recarregarGrupo();
+  } catch (e) { toast(e.message); }
 }
 
 
@@ -1213,7 +1265,8 @@ async function abrirPerfil() {
   try {
     const stats = await KixikilaManager.carregarStats();
     document.getElementById('statGruposAtivos').textContent  = stats.grupos_activos || 0;
-    document.getElementById('statReputacao').textContent     = stats.reputacao ? stats.reputacao.toFixed(1) + '★' : '—';
+    document.getElementById('statReputacao').textContent =
+  stats.total_avaliacoes > 0 ? stats.reputacao.toFixed(1) + '★' : '—';
     document.getElementById('statConcluidos').textContent    = stats.grupos_concluidos || 0;
   } catch(_) {}
 }
