@@ -288,6 +288,7 @@
 </div>
 
 <div id="toastLoja"></div>
+<script src="moeda.js"></script>
 
 <script>
 const API_P2P = 'https://kixikila-p2p.vercel.app/';
@@ -550,11 +551,11 @@ function renderProdutos(a) {
       <div class="produto-info">
         <div class="produto-nome">${esc(p.nome)}</div>
         ${p.descricao ? `<div class="produto-desc">${esc(p.descricao)}</div>` : ''}
-        <div class="produto-preco">${formatarValor(p.preco)} KZ</div>
+        `<div class="produto-preco">${formatarMoeda(p.preco)}</div>`
       </div>
-      <button class="btn-encomendar" onclick="encomendar('${esc(p.nome)}','${formatarValor(p.preco)}')">
+      <button class="btn-encomendar" onclick="encomendar('${esc(p.nome)}','${formatarMoeda(p.preco)}')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Pedir
+        Comprar
       </button>`;
     lista.appendChild(div);
   });
@@ -562,7 +563,7 @@ function renderProdutos(a) {
 
 function encomendar(produto, preco) {
   if (!_anuncio?.whatsapp) { toast('Sem WhatsApp disponível'); return; }
-  const msg = encodeURIComponent(`Olá! Vi no RondaP2P e quero encomendar:\n*${produto}* — ${preco} KZ`);
+  const msg = encodeURIComponent(`Olá! Vi no RondaP2P e quero encomendar:\n*${produto}* — ${preco}`);
   window.open(`https://wa.me/${_anuncio.whatsapp.replace(/\D/g,'')}?text=${msg}`);
 }
 
