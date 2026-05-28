@@ -364,6 +364,13 @@ async function verificarIdentidade() {
   }
 }
 
+function abrirSuporte()    { document.getElementById('modalSuporte').style.display    = 'flex'; }
+function abrirTermos()     { document.getElementById('modalTermos').style.display     = 'flex'; }
+function abrirPrivacidade(){ document.getElementById('modalPrivacidade').style.display = 'flex'; }
+function abrirSuporte() {
+  document.getElementById('modalSuporte').style.display = 'flex';
+}
+
 async function redefinirSenha() {
   if (!_tokenRec) { mostrarToast('Sessão expirada. Recomeça o processo.'); fecharRecuperar(); return; }
 
