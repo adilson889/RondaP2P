@@ -157,10 +157,13 @@ function validarStep(n) {
     return true;
   }
   if (n === 3) {
+    const pais     = document.getElementById('regPais')?.value     || '';
     const provincia = document.getElementById('regProvincia')?.value || '';
     const municipio = document.getElementById('regMunicipio')?.value.trim() || '';
-    if (!provincia) { mostrarToast('Seleciona a província'); return false; }
-    if (!municipio) { mostrarToast('Município é obrigatório'); return false; }
+    if (!pais)      { mostrarToast('Seleciona o país'); return false; }
+    if (!municipio) { mostrarToast('Cidade / Bairro é obrigatório'); return false; }
+    // Define moeda com base no país escolhido
+    definirPais(pais);
     return true;
   }
   return true;
@@ -252,8 +255,14 @@ async function registar() {
     const res = await fetch(API_URL + '/auth/registar', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ telefone, nome, senha, foto_perfil: _fotoRegTemp || undefined, data_nasc: dataNasc, email, provincia, municipio })
-    });
+      body: JSON.stringify({
+  telefone, nome, senha,
+  foto_perfil: _fotoRegTemp || undefined,
+  data_nasc: dataNasc, email,
+  pais: document.getElementById('regPais')?.value || 'AO',
+  provincia: document.getElementById('regProvincia')?.value || '',
+  municipio: document.getElementById('regMunicipio')?.value.trim() || ''
+});
     const dados = await res.json();
     if (!res.ok) throw new Error(dados.erro);
     guardarSessao(dados.perfil);
@@ -295,6 +304,35 @@ async function entrar() {
     mostrarToast(e.message);
     if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
   }
+}
+
+const REGIOES_POR_PAIS = {
+  AO: ['Luanda','Benguela','Huíla','Bié','Cabinda','Cuando Cubango','Cuanza Norte','Cuanza Sul','Cunene','Huambo','Lunda Norte','Lunda Sul','Malanje','Moxico','Namibe','Uíge','Zaire'],
+  BR: ['São Paulo','Rio de Janeiro','Minas Gerais','Bahia','Paraná','Rio Grande do Sul','Pernambuco','Ceará','Pará','Maranhão','Amazonas','Goiás','Espírito Santo','Paraíba','Mato Grosso'],
+  PT: ['Lisboa','Porto','Braga','Setúbal','Faro','Aveiro','Coimbra','Leiria','Santarém','Viseu','Viana do Castelo','Évora','Beja','Portalegre','Bragança','Vila Real','Guarda','Castelo Branco','Açores','Madeira'],
+  MZ: ['Maputo','Gaza','Inhambane','Sofala','Manica','Tete','Zambézia','Nampula','Cabo Delgado','Niassa'],
+  CV: ['Santiago','São Vicente','Santo Antão','Fogo','Sal','Boavista','Maio','São Nicolau','Brava'],
+  ST: ['São Tomé','Príncipe'],
+  GW: ['Bissau','Bafatá','Biombo','Bolama','Cacheu','Gabú','Oio','Quinara','Tombali'],
+  TL: ['Díli','Ainaro','Aileu','Baucau','Bobonaro','Covalima','Ermera','Lautém','Liquiçá','Manatuto','Manufahi','Oecusse','Viqueque'],
+};
+
+function atualizarProvinciasPorPais() {
+  const pais     = document.getElementById('regPais')?.value;
+  const select   = document.getElementById('regProvincia');
+  const campo    = document.getElementById('campoRegiao');
+  const regioes  = REGIOES_POR_PAIS[pais] || [];
+
+  if (regioes.length) {
+    select.innerHTML = '<option value="">Selecionar</option>' +
+      regioes.map(r => `<option value="${r}">${r}</option>`).join('');
+    campo.style.display = 'block';
+  } else {
+    campo.style.display = 'none';
+  }
+
+  // Actualiza moeda em tempo real
+  if (typeof definirPais === 'function') definirPais(pais);
 }
 
 // ── RECUPERAR SENHA ───────────────────────────────────────────
