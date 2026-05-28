@@ -403,21 +403,34 @@
       <button class="btn-primary w100" onclick="avancarStep(2)">Continuar</button>
     </div>
 
-    <!-- PASSO 3: Localização -->
-    <div id="step3" style="display:none">
-      <div class="campo">
-        <label>Província</label>
-        <select id="regProvincia">
-          <option value="">Selecionar</option>
-          <option>Luanda</option><option>Benguela</option><option>Huíla</option><option>Bié</option>
-          <option>Cabinda</option><option>Cuando Cubango</option><option>Cuanza Norte</option><option>Cuanza Sul</option>
-          <option>Cunene</option><option>Huambo</option><option>Lunda Norte</option><option>Lunda Sul</option>
-          <option>Malanje</option><option>Moxico</option><option>Namibe</option><option>Uíge</option><option>Zaire</option>
-        </select>
-      </div>
-      <div class="campo"><label>Município / Bairro</label><input id="regMunicipio" type="text" placeholder="Ex: Kilamba Kiaxi"></div>
-      <button class="btn-primary w100" onclick="avancarStep(3)">Continuar</button>
-    </div>
+   <!-- PASSO 3: Localização -->
+<div id="step3" style="display:none">
+  <div class="campo">
+    <label>País</label>
+    <select id="regPais" onchange="atualizarProvinciasPorPais()">
+      <option value="">Selecionar país</option>
+      <option value="AO">🇦🇴 Angola</option>
+      <option value="BR">🇧🇷 Brasil</option>
+      <option value="PT">🇵🇹 Portugal</option>
+      <option value="MZ">🇲🇿 Moçambique</option>
+      <option value="CV">🇨🇻 Cabo Verde</option>
+      <option value="ST">🇸🇹 São Tomé e Príncipe</option>
+      <option value="GW">🇬🇼 Guiné-Bissau</option>
+      <option value="TL">🇹🇱 Timor-Leste</option>
+    </select>
+  </div>
+  <div class="campo" id="campoRegiao" style="display:none">
+    <label>Região / Província</label>
+    <select id="regProvincia">
+      <option value="">Selecionar</option>
+    </select>
+  </div>
+  <div class="campo">
+    <label>Cidade / Bairro</label>
+    <input id="regMunicipio" type="text" placeholder="Ex: Luanda, Lisboa, São Paulo...">
+  </div>
+  <button class="btn-primary w100" onclick="avancarStep(3)">Continuar</button>
+</div>
 
     <!-- PASSO 4: Senha + Termos -->
     <div id="step4" style="display:none">
@@ -523,6 +536,7 @@
 </div>
 
 <div id="toast" class="toast"></div>
+<script src="moeda.js"></script>
 <script src="auth.js"></script>
 </body>
 </html>
