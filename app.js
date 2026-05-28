@@ -586,7 +586,7 @@ function criarCardFeed(g) {
       </div>
       <span class="pill ${pillClass(g.estado)}">${pillTexto(g.estado)}</span>
     </div>
-    `<div class="feed-valor">${formatarMoeda(g.valor)}</div>`
+    <div class="feed-valor">${formatarMoeda(g.valor)}</div>
     <div class="feed-progress"><div class="feed-progress-bar" style="width:${pct}%"></div></div>
     <div class="feed-rodape">
       <span>${vagas} vaga${vagas!==1?'s':''}</span>
@@ -676,7 +676,7 @@ function criarCardMeu(g) {
       </div>
       <span class="pill ${pillClass(g.estado)}">${pillTexto(g.estado)}</span>
     </div>
-    `<div class="feed-valor">${formatarMoeda(g.valor)}</div>`
+    <div class="feed-valor">${formatarMoeda(g.valor)}</div>
     <div class="feed-progress"><div class="feed-progress-bar" style="width:${pct}%"></div></div>
     <div class="feed-rodape">
       <span>${pagos}/${g.membros.length} pagamentos</span>
