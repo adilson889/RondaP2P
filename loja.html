@@ -3,535 +3,588 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>RondaP2P</title>
+  <title>RondaP2P — Loja</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="main.css">
-  <meta http-equiv="X-Frame-Options" content="DENY">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
   <style>
-    textarea {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      background: var(--bg3);
-      color: var(--text);
-      font-size: .9rem;
-      font-family: var(--sans);
-      outline: none;
-      resize: none;
+    html, body { overflow-y: auto; height: auto; background: #f8f4ef; }
+
+    .loja-hero {
+      min-height: 340px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
     }
-    textarea:focus { border-color: var(--r); }
-    .membro-stars .star { font-size: 1.4rem; color: var(--border); }
-.membro-stars .star.on { color: #f1c40f; }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: var(--loja-cor, #8B0000); z-index: 0;
+    }
+
+    .hero-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(160deg, transparent 40%, rgba(0,0,0,0.35) 100%);
+    }
+
+    .hero-pattern {
+      position: absolute; inset: 0; z-index: 1;
+      opacity: 0.07;
+      background-image: var(--loja-pattern);
+      background-size: var(--loja-pattern-size, 40px 40px);
+    }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 52px 20px 28px;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center; flex: 1;
+    }
+
+    .hero-btn-voltar,
+    .hero-btn-partilhar {
+      position: absolute; z-index: 3; top: 14px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .hero-btn-voltar  { left: 14px; }
+    .hero-btn-partilhar { right: 14px; }
+    .hero-btn-voltar:hover,
+    .hero-btn-partilhar:hover { background: rgba(255,255,255,0.28); }
+
+    .loja-logo {
+      width: 84px; height: 84px;
+      border-radius: var(--loja-logo-radius, 22px);
+      background: rgba(255,255,255,0.18);
+      border: 2.5px solid rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem; font-weight: 900; color: #fff;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+      font-family: var(--loja-font, 'DM Sans', sans-serif);
+      letter-spacing: var(--loja-logo-spacing, 0);
+      backdrop-filter: blur(4px);
+      margin-bottom: 16px;
+    }
+
+    .loja-nome {
+      font-family: var(--loja-font, 'DM Sans', sans-serif);
+      font-size: var(--loja-nome-size, 2rem);
+      font-weight: var(--loja-nome-weight, 900);
+      color: #fff;
+      letter-spacing: var(--loja-nome-spacing, -0.5px);
+      line-height: 1.1;
+      text-transform: var(--loja-nome-transform, none);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .loja-slogan {
+      font-size: .88rem; color: rgba(255,255,255,0.8);
+      margin-top: 8px;
+      font-style: var(--loja-slogan-style, normal);
+      font-family: var(--loja-font-body, 'DM Sans', sans-serif);
+    }
+
+    .loja-local {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .75rem; color: rgba(255,255,255,0.65); margin-top: 6px;
+    }
+
+    .loja-desc {
+      font-size: .85rem; color: rgba(255,255,255,0.78);
+      margin-top: 10px; max-width: 320px; line-height: 1.6;
+    }
+
+    .badge-categoria {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 99px;
+      font-size: .7rem; font-weight: 700;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; margin-top: 10px;
+      backdrop-filter: blur(4px);
+    }
+
+    .badge-categoria svg { flex-shrink: 0; }
+
+    .stats-row {
+      display: flex; gap: 10px; margin-top: 20px;
+    }
+
+    .stat-loja {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px; padding: 10px 20px;
+      text-align: center; backdrop-filter: blur(4px);
+    }
+
+    .stat-loja-num   { font-size: 1.2rem; font-weight: 900; color: #fff; }
+    .stat-loja-label { font-size: .62rem; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+    .loja-contactos {
+      display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center;
+    }
+
+    .btn-contacto {
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: #fff; padding: 10px 20px;
+      border-radius: 99px;
+      font-size: .85rem; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: background .2s;
+      font-family: var(--loja-font-body, 'DM Sans', sans-serif);
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-contacto:hover { background: rgba(255,255,255,0.28); }
+    .btn-contacto svg { flex-shrink: 0; }
+
+    /* ── CORPO ── */
+    .loja-body {
+      background: #f8f4ef;
+      min-height: 50vh;
+      padding: 24px 16px 60px;
+      max-width: 600px;
+      margin: 0 auto; width: 100%;
+    }
+
+    .secao-titulo {
+      font-size: .7rem; font-weight: 700; color: #9A8A7E;
+      text-transform: uppercase; letter-spacing: .8px;
+      margin: 0 0 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .secao-titulo::after {
+      content: ''; flex: 1; height: 1px; background: #DDD5CB;
+    }
+
+    .produto-card {
+      background: #fff;
+      border: 1px solid #E8E0D6;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 14px;
+      transition: box-shadow .2s, transform .15s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .produto-card:active { transform: scale(0.99); }
+
+    .produto-icone {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      background: var(--loja-cor-soft, rgba(139,0,0,0.08));
+      color: var(--loja-cor, #8B0000);
+    }
+
+    .produto-info { flex: 1; min-width: 0; }
+    .produto-nome  { font-weight: 700; font-size: .95rem; }
+    .produto-desc  { font-size: .78rem; color: #7A6A5E; margin-top: 3px; line-height: 1.4; }
+    .produto-preco {
+      font-size: 1.05rem; font-weight: 900; margin-top: 6px;
+      color: var(--loja-cor, #8B0000);
+    }
+
+    .btn-encomendar {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: .82rem; font-weight: 700;
+      cursor: pointer; color: #fff;
+      flex-shrink: 0;
+      font-family: var(--loja-font-body, 'DM Sans', sans-serif);
+      background: var(--loja-cor, #8B0000);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: opacity .2s, transform .1s;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .btn-encomendar:active { opacity: .85; transform: scale(0.97); }
+
+    .sem-produtos {
+      text-align: center; padding: 56px 20px; color: #7A6A5E;
+    }
+
+    .sem-produtos svg { margin: 0 auto 12px; display: block; opacity: .4; }
+
+    .loja-footer {
+      text-align: center; padding: 24px;
+      font-size: .75rem; color: #7A6A5E;
+      border-top: 1px solid #E8E0D6; margin-top: 16px;
+    }
+
+    .loja-footer a { color: #8B0000; font-weight: 700; text-decoration: none; }
+
+    #toastLoja {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1A1A1A; color: #fff;
+      padding: 10px 20px; border-radius: 99px;
+      font-size: .85rem; font-weight: 600;
+      opacity: 0; pointer-events: none;
+      transition: all .3s; z-index: 200; white-space: nowrap;
+    }
+
+    #toastLoja.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-<!-- SIDEBAR (PC) -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><span style="color:var(--r)">R</span>ondaP2P</div>
-  <button class="sidebar-btn activo" id="sbFeed" onclick="mostrarTabMain('feed')">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    Descobrir
-  </button>
-  <button class="sidebar-btn" id="sbMeus" onclick="mostrarTabMain('meus')">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-    Os meus grupos
-  </button>
-  <button class="sidebar-btn" onclick="abrirListaConversas()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    Mensagens
-  </button>
-  <button class="sidebar-btn" onclick="abrirNotificacoes()" style="position:relative">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-    Notificações
-    <span id="sinoBadgeSidebar" style="display:none;background:var(--r);color:#fff;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:99px;margin-left:auto"></span>
-  </button>
-  <button class="sidebar-btn" onclick="window.location.href='anuncios.html'">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    Minha loja
-  </button>
-  <div class="sidebar-spacer"></div>
-  <button class="sidebar-btn" onclick="abrirPerfil()">
-    <div class="sidebar-avatar" id="sidebarAvatar"></div>
-    <span id="sidebarNome">Perfil</span>
-  </button>
-</aside>
+<div id="paginaLoja">
+  <div class="loja-hero" id="lojaHero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-pattern" id="heroPattern"></div>
 
-<!-- APP PRINCIPAL -->
-<div id="paginaMain" class="pagina com-sidebar" style="display:none">
-  <div class="tabs">
-    <button class="tab activo" id="tabFeed" onclick="mostrarTabMain('feed')">Descobrir</button>
-    <button class="tab" id="tabMeus" onclick="mostrarTabMain('meus')">Os meus</button>
-  </div>
-  <div class="pagina-scroll">
-    <div id="conteudoFeed"><div id="feedLista"></div></div>
-    <div id="conteudoMeus" style="display:none">
-      <div id="meusLista"></div>
-      <div id="meusVazio" class="vazio" style="display:none">
-        <p>Ainda não tens grupos.</p>
-        <button class="btn-outline" onclick="mostrarTabMain('feed')">Descobrir grupos</button>
-      </div>
-    </div>
-  </div>
-  <button class="fab" onclick="abrirCriar()">+</button>
-  <nav class="bottom-nav">
-    <button class="bottom-nav-btn activo" id="bnFeed" onclick="mostrarTabMain('feed')">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <button class="hero-btn-voltar" onclick="history.back()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     </button>
-    <button class="bottom-nav-btn" id="bnMeus" onclick="mostrarTabMain('meus')">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    <button class="hero-btn-partilhar" onclick="partilharLoja()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
     </button>
-    <button class="bottom-nav-btn" onclick="abrirCriar()">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    </button>
-    <button class="bottom-nav-btn" onclick="abrirNotificacoes()" style="position:relative">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span id="sinoBadge" style="display:none;position:absolute;top:5px;right:10px;background:var(--r);color:#fff;font-size:.6rem;font-weight:800;min-width:16px;height:16px;border-radius:99px;align-items:center;justify-content:center;padding:0 4px"></span>
-    </button>
-    <button class="bottom-nav-btn" id="bnPerfil" onclick="abrirPerfil()">
-      <div class="bottom-nav-avatar" id="bnAvatar"></div>
-    </button>
-  </nav>
-</div>
 
-<!-- APP (ver grupo) -->
-<div id="paginaApp" class="pagina com-sidebar" style="display:none">
-  <div class="top-bar" style="display:flex">
-    <button class="btn-voltar" onclick="irParaMain()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    </button>
-    <span class="top-titulo" id="appNomeGrupo"></span>
-    <span id="appPill" class="pill"></span>
-  </div>
-  <div class="pagina-scroll">
-    <div class="grupo-card">
-      <div class="grupo-valor" id="appValor"></div>
-      <div class="grupo-meta" id="appMeta"></div>
-      <div class="progresso-wrap"><div class="progresso-bar" id="appProgresso"></div></div>
-      <div class="grupo-rodape"><span id="appPagamentos"></span><span id="appProximaRonda"></span></div>
-    </div>
-    <div class="tabs tabs-sm">
-      <button class="tab activo" id="tabMembros" onclick="mostrarTabApp('membros')">Membros</button>
-      <button class="tab" id="tabRodas" onclick="mostrarTabApp('rodas')">Rodas</button>
-      <button class="tab" id="tabChat" onclick="abrirChat()">Chat</button>
-    </div>
-    <div id="conteudoMembros">
-      <div id="listaMembros"></div>
-      <div class="acoes-grupo">
-        <button class="btn-primary" onclick="registarPagamento()">Confirmar pagamento</button>
-        <button class="btn-outline" id="btnEncerrar" onclick="encerrarGrupo()" style="display:none">Encerrar grupo</button>
-        <button class="btn-outline" onclick="sairDoGrupo()">Sair do grupo</button>
-      </div>
-    </div>
-    <div id="conteudoRodas" style="display:none"><div id="listaRodas"></div></div>
-  </div>
-</div>
-
-<!-- CHAT (tela cheia) -->
-<div id="paginaChat" class="pagina com-sidebar" style="display:none">
-  <div class="top-bar" style="display:flex">
-    <button class="btn-voltar" onclick="irParaApp()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    </button>
-    <div style="flex:1">
-      <div class="top-titulo" id="chatNomeGrupo"></div>
-      <div style="font-size:.75rem;color:var(--muted)" id="chatMembrosCount"></div>
-    </div>
-  </div>
-  <div id="chatMensagens" class="chat-lista"></div>
-  <div class="chat-input-wrap">
-    <textarea id="chatInput" class="chat-textarea" placeholder="Mensagem..." rows="1" oninput="crescerTextarea(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMsg()}"></textarea>
-    <button class="btn-enviar" onclick="enviarMsg()">&#10148;</button>
-  </div>
-</div>
-
-<!-- MODAL CRIAR GRUPO -->
-<div id="modalCriar" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal">
-    <h3>Criar grupo</h3>
-    <div style="margin-bottom:16px">
-      <div class="foto-picker" onclick="document.getElementById('inputFotoGrupo').click()">
-        <div class="foto-picker-inner" id="fotoGrupoPicker"><span id="fotoGrupoLetra">+</span><img id="fotoGrupoImg" src="" style="display:none"></div>
-        <span class="foto-picker-label">Foto do grupo (opcional)</span>
-      </div>
-      <input id="inputFotoGrupo" type="file" accept="image/*" style="display:none" onchange="previewFotoGrupo(event)">
-    </div>
-    <div class="campo"><label>Nome do grupo</label><input id="criarNome" type="text" placeholder="Ex: Grupo Família"></div>
-    <div class="campo"><label>Descrição</label><textarea id="criarDescricao" rows="2" placeholder="Descreva o objetivo do grupo..."></textarea></div>
-    <div class="campo"><label>Regras do grupo</label><textarea id="criarRegras" rows="2" placeholder="Ex: Pagar até dia 10 de cada mês..."></textarea></div>
-    <div class="campo"><label>Valor por ronda</label><input id="criarValor" type="number" placeholder="Ex: 500"></div>
-    <div class="campo"><label>Periodicidade</label><select id="criarPeriod"><option value="mensal">Mensal</option><option value="quinzenal">Quinzenal</option><option value="semanal">Semanal</option></select></div>
-    <div class="campo"><label>Máx. membros</label><input id="criarMax" type="number" value="6" min="2" max="20"></div>
-    <div class="campo"><label>Localização (opcional)</label><input id="criarLocalizacao" type="text" placeholder="Ex: Luanda, Kilamba"></div>
-    <div class="modal-btns"><button class="btn-outline" onclick="fecharModal('modalCriar')">Cancelar</button><button class="btn-primary" onclick="criarGrupo()">Criar</button></div>
-  </div>
-</div>
-
-<!-- MODAL PREVIEW GRUPO -->
-<div id="modalPreviewGrupo" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal" style="max-height:85dvh;overflow-y:auto">
-    <h3 id="previewTitulo"></h3>
-    <div id="previewFoto"></div>
-    <div id="previewDescricao"></div>
-    <div id="previewRegras"></div>
-    <div id="previewLocalizacao"></div>
-    <div style="margin:12px 0"><strong>Valor</strong><br><span id="previewValor"></span></div>
-    <div class="progresso-wrap" style="margin:12px 0"><div class="progresso-bar" id="previewProgresso" style="width:0%"></div></div>
-    <div style="display:flex;justify-content:space-between;margin:8px 0"><span>Membros: <span id="previewMembros"></span></span><span>Vagas: <span id="previewVagas"></span></span></div>
-    <div style="margin:8px 0"><strong>Criador</strong><br><span id="previewCriador"></span></div>
-    <div class="modal-btns" style="margin-top:16px"><button class="btn-outline" onclick="fecharModal('modalPreviewGrupo')">Fechar</button><button class="btn-primary" onclick="solicitarEntrada()">Solicitar entrada</button></div>
-  </div>
-</div>
-
-<!-- MODAL ENTRAR GRUPO -->
-<div id="modalEntrar" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal"><h3>Entrar num grupo</h3>
-    <div class="campo"><label>Código do grupo</label><input id="entrarCodigo" type="text" placeholder="Ex: ABC123" style="text-transform:uppercase"></div>
-    <div class="modal-btns"><button class="btn-outline" onclick="fecharModal('modalEntrar')">Cancelar</button><button class="btn-primary" onclick="entrarGrupo()">Entrar</button></div>
-  </div>
-</div>
-
-<!-- MODAL PERFIL -->
-<div id="modalPerfil" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal" style="padding:0;overflow:hidden;max-height:92dvh">
-
-    <!-- CAPA + AVATAR -->
-    <div style="background:linear-gradient(135deg,var(--r) 0%,#5a0000 100%);padding:28px 20px 48px;position:relative">
-      <button onclick="fecharModal('modalPerfil')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
-      <div style="display:flex;align-items:flex-end;gap:14px">
-        <div style="position:relative;cursor:pointer" onclick="document.getElementById('inputFotoPerfil').click()">
-          <div id="perfilAvatarModal" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.6);color:#fff;font-size:1.8rem;font-weight:900;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center"></div>
-          <div style="position:absolute;bottom:0;right:0;width:22px;height:22px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--r)">✏</div>
+    <div class="hero-content">
+      <div class="loja-logo" id="lojaLogo"></div>
+      <div class="loja-nome" id="lojaNome">A carregar...</div>
+      <div class="loja-slogan" id="lojaSlogan"></div>
+      <div class="badge-categoria" id="lojaBadge" style="display:none"></div>
+      <div class="loja-local" id="lojaLocal"></div>
+      <div class="loja-desc" id="lojaDesc"></div>
+      <div class="stats-row">
+        <div class="stat-loja">
+          <div class="stat-loja-num" id="statProdutos">0</div>
+          <div class="stat-loja-label">Produtos</div>
         </div>
-        <div>
-          <div id="perfilNomeModal" style="color:#fff;font-size:1.1rem;font-weight:800;line-height:1.2"></div>
-          <div id="perfilTelModal" style="color:rgba(255,255,255,0.7);font-size:.8rem;margin-top:2px"></div>
-          <div id="perfilLocalizacaoModal" style="color:rgba(255,255,255,0.6);font-size:.75rem;margin-top:2px"></div>
+        <div class="stat-loja">
+          <div class="stat-loja-num" id="statVisitas">—</div>
+          <div class="stat-loja-label">Visitas</div>
         </div>
       </div>
-      <input id="inputFotoPerfil" type="file" accept="image/*" style="display:none" onchange="previewFotoPerfil(event)">
+      <div class="loja-contactos" id="lojaContactos"></div>
     </div>
+  </div>
 
-    <!-- STATS -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:-1px">
-      <div style="background:var(--bg2);padding:14px 12px;text-align:center">
-        <div id="statGruposAtivos" style="font-size:1.4rem;font-weight:900;color:var(--r)">—</div>
-        <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Grupos</div>
-      </div>
-      <div style="background:var(--bg2);padding:14px 12px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border)">
-        <div id="statReputacao" style="font-size:1.4rem;font-weight:900;color:#FBBF24">—</div>
-        <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Reputação</div>
-      </div>
-      <div style="background:var(--bg2);padding:14px 12px;text-align:center">
-        <div id="statConcluidos" style="font-size:1.4rem;font-weight:900;color:var(--green)">—</div>
-        <div style="font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Concluídos</div>
-      </div>
+  <div class="loja-body">
+    <div class="secao-titulo">Produtos e Serviços</div>
+    <div id="listaProdutos">
+      <div class="sem-produtos">A carregar...</div>
     </div>
+  </div>
 
-    <!-- CONTEUDO SCROLLAVEL -->
-    <div style="padding:20px;overflow-y:scroll;-webkit-overflow-scrolling:touch;max-height:55dvh">
-
-      <!-- NEGOCIOS -->
-      <div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:16px">
-        <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Negócios</div>
-        <button class="btn-outline w100" onclick="fecharModal('modalPerfil');window.location.href='anuncios.html'" style="display:flex;align-items:center;justify-content:center;gap:8px;color:var(--r);border-color:var(--r)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Gerir a minha loja
-        </button>
-      </div>
-
-      <!-- EDITAR PERFIL COLAPSAVEL -->
-      <div style="background:var(--bg3);border-radius:14px;margin-bottom:16px;overflow:hidden">
-        <button onclick="toggleEditarPerfil()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;cursor:pointer;font-family:var(--sans)">
-          <span style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Editar perfil</span>
-          <span id="editarPerfilSeta" style="font-size:.75rem;color:var(--muted);transition:transform .2s">▼</span>
-        </button>
-        <div id="editarPerfilConteudo" style="display:none;padding:0 16px 16px">
-          <div class="campo" style="margin-bottom:12px">
-            <label>Nome</label>
-            <input id="editNome" type="text">
-          </div>
-          <div class="campo" style="margin-bottom:12px">
-            <label>Nova senha (opcional)</label>
-            <input id="editSenha" type="password" placeholder="Deixa vazio para manter">
-          </div>
-          <button class="btn-primary w100" onclick="guardarPerfil()">Guardar alterações</button>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <button class="btn-outline" onclick="logout()" style="display:flex;align-items:center;justify-content:center;gap:8px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Sair
-        </button>
-        <button class="btn-outline" onclick="abrirListaConversas()" style="display:flex;align-items:center;justify-content:center;gap:8px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Mensagens
-        </button>
-      </div>
-
-      <button class="btn-outline w100" style="color:var(--r);border-color:var(--r-soft);font-size:.85rem" onclick="confirmarEliminarConta()">Eliminar conta</button>
-    </div>
+  <div class="loja-footer">
+    Loja criada em <a href="index.html">RondaP2P</a><br>
+    Rede financeira e de negócios de Angola
   </div>
 </div>
 
-<!-- MODAL PERFIL MEMBRO -->
-<div id="modalMembroPerfil" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal" style="padding:0;overflow:hidden;max-height:92dvh">
-    <div style="height:100px;background:linear-gradient(135deg,var(--r) 0%,#3a0000 100%);position:relative;flex-shrink:0">
-      <button class="modal-fechar" onclick="fecharModal('modalMembroPerfil')">&#10005;</button>
-    </div>
-    <div style="padding:0 20px;position:relative;margin-top:-44px;margin-bottom:12px">
-      <div id="membroFotoGrande" style="width:88px;height:88px;border-radius:50%;border:4px solid var(--bg2);background:var(--bg3);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:900;color:var(--r);box-shadow:0 4px 16px rgba(0,0,0,0.12)"></div>
-    </div>
-    <div style="padding:0 20px 20px;overflow-y:auto">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
-        <div>
-          <div id="membroPerfilNome" style="font-size:1.2rem;font-weight:900;line-height:1.2"></div>
-          <div id="membroPerfilTel" style="font-size:.8rem;color:var(--muted);margin-top:3px"></div>
-          <div id="membroLocalizacao" style="font-size:.78rem;color:var(--muted);margin-top:2px"></div>
-        </div>
-        <button id="btnMensagemMembro" onclick="enviarMensagemMembro()" style="background:var(--r-soft);border:1px solid var(--r);color:var(--r);border-radius:20px;padding:7px 14px;font-size:.8rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:var(--sans)">
-          Mensagem
-        </button>
-      </div>
-      <div style="background:var(--bg3);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:16px">
-        <div style="text-align:center;flex-shrink:0">
-          <div id="membroScoreNum" style="font-size:2rem;font-weight:900;color:var(--r);line-height:1">—</div>
-          <div style="font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Score</div>
-        </div>
-        <div style="flex:1">
-          <div class="membro-stars" id="membroStars" style="margin-bottom:6px"></div>
-          <div id="membroStarsCount" style="font-size:.78rem;color:var(--muted)"></div>
-        </div>
-      </div>
-      <div id="membroInfoExtra" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
-      <button class="btn-primary w100" id="btnAvaliarMembro" onclick="abrirAvaliarMembro()" style="margin-bottom:10px">Avaliar membro</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL AVALIAR MEMBRO -->
-<div id="modalAvaliar" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal"><h3>Avaliar <span id="avaliarNome"></span></h3>
-    <div class="estrelas-input" id="estrelasInput"></div>
-    <div class="campo" style="margin-top:12px"><label>Comentário (opcional)</label><input id="avaliarComentario" type="text" placeholder="Ex: Sempre pagou a tempo"></div>
-    <div class="modal-btns"><button class="btn-outline" onclick="fecharModal('modalAvaliar')">Cancelar</button><button class="btn-primary" onclick="confirmarAvaliacao()">Enviar</button></div>
-  </div>
-</div>
-
-<!-- MODAL PUBLICAR POST -->
-<div id="modalPost" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3>Nova publicação</h3>
-      <button onclick="fecharModal('modalPost')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
-    </div>
-    <div class="campo"><textarea id="postTexto" rows="4" placeholder="Partilha uma dica, pergunta ou ideia sobre poupança..."></textarea></div>
-    <div class="modal-btns"><button class="btn-outline" onclick="fecharModal('modalPost')">Cancelar</button><button class="btn-primary" onclick="criarPost()">Publicar</button></div>
-  </div>
-</div>
-
-<!-- MODAL COMENTARIOS POST -->
-<div id="modalComentariosPost" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal" style="max-height:85dvh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3 id="comentariosTituloPost">Comentários</h3>
-      <button onclick="fecharModal('modalComentariosPost')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
-    </div>
-    <div id="comentariosListaPost" style="flex:1;overflow-y:auto;margin-bottom:16px"></div>
-    <div style="display:flex;gap:8px;border-top:1px solid var(--border);padding-top:12px">
-      <input id="comentarioTextoPost" type="text" placeholder="Escreve um comentário..." style="flex:1;padding:11px 14px;border:1px solid var(--border);border-radius:20px;background:var(--bg3);color:var(--text);font-size:.9rem;outline:none" onkeydown="if(event.key==='Enter')enviarComentarioPost()">
-      <button class="btn-enviar" onclick="enviarComentarioPost()">&#10148;</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL NOTIFICACOES -->
-<div id="modalNotificacoes" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal" style="max-height:85dvh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3>Notificações</h3>
-      <button onclick="fecharModal('modalNotificacoes')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
-    </div>
-    <div id="notificacoesLista" style="flex:1;overflow-y:auto"></div>
-  </div>
-</div>
-
-<!-- MODAL GENERICO -->
-<div id="modal" class="modal-overlay" style="display:none" onclick="fecharModalSeClicarFora(event,this)">
-  <div class="modal"><h3 id="modalTitulo"></h3><p id="modalMsg" style="color:var(--muted);font-size:.9rem;margin:8px 0 16px"></p><div class="modal-btns" id="modalBtns"></div></div>
-</div>
-
-<div id="toast" class="toast"></div>
-
+<div id="toastLoja"></div>
 <script src="moeda.js"></script>
-<script src="api.js"></script>
-<script src="app.js"></script>
+
 <script>
-var _paginaAtual = 'main';
+const API_P2P = 'https://kixikila-p2p.vercel.app/';
+let _anuncio = null;
 
-function irPara(id) {
-  document.querySelectorAll('.pagina').forEach(p => p.style.display = 'none');
-  document.getElementById(id).style.display = 'flex';
+// ── ÍCONES SVG por categoria ──────────────────────────────────
+const ICONES_CATEGORIA = {
+  alimentacao: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
+  moda:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>',
+  tecnologia:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  beleza:      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  servicos:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>',
+  imoveis:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  saude:       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+  educacao:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+  geral:       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+};
+
+// Ícone SVG por produto (rotação por índice)
+const ICONES_PRODUTO = [
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+];
+
+const NOMES_CATEGORIA = {
+  alimentacao: 'Alimentação',
+  moda:        'Moda',
+  tecnologia:  'Tecnologia',
+  beleza:      'Beleza',
+  servicos:    'Serviços',
+  imoveis:     'Imóveis',
+  saude:       'Saúde',
+  educacao:    'Educação',
+  geral:       'Geral',
+};
+
+// ── SISTEMA DE MARCA ──────────────────────────────────────────
+const ESTILOS_MARCA = [
+  {
+    id: 'elegante',
+    font: "'Playfair Display', serif",
+    fontBody: "'DM Sans', sans-serif",
+    nomeSize: '2.2rem', nomeWeight: '700',
+    nomeSpacing: '0.5px', nomeTransform: 'none',
+    sloganStyle: 'italic', logoRadius: '50%', logoSpacing: '2px',
+    pattern: "radial-gradient(circle, rgba(255,255,255,1) 1px, transparent 1px)",
+    patternSize: '24px 24px',
+  },
+  {
+    id: 'moderno',
+    font: "'Space Grotesk', sans-serif",
+    fontBody: "'Space Grotesk', sans-serif",
+    nomeSize: '2rem', nomeWeight: '700',
+    nomeSpacing: '-1px', nomeTransform: 'none',
+    sloganStyle: 'normal', logoRadius: '16px', logoSpacing: '-2px',
+    pattern: "linear-gradient(45deg, rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(-45deg, rgba(255,255,255,1) 1px, transparent 1px)",
+    patternSize: '20px 20px',
+  },
+  {
+    id: 'arrojado',
+    font: "'Syne', sans-serif",
+    fontBody: "'DM Sans', sans-serif",
+    nomeSize: '2.4rem', nomeWeight: '800',
+    nomeSpacing: '-2px', nomeTransform: 'none',
+    sloganStyle: 'normal', logoRadius: '8px', logoSpacing: '-3px',
+    pattern: "repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(255,255,255,1) 18px, rgba(255,255,255,1) 19px)",
+    patternSize: '100% 100%',
+  },
+  {
+    id: 'impacto',
+    font: "'Bebas Neue', sans-serif",
+    fontBody: "'DM Sans', sans-serif",
+    nomeSize: '3rem', nomeWeight: '400',
+    nomeSpacing: '3px', nomeTransform: 'uppercase',
+    sloganStyle: 'normal', logoRadius: '4px', logoSpacing: '4px',
+    pattern: "repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(255,255,255,1) 28px, rgba(255,255,255,1) 29px)",
+    patternSize: '100% 100%',
+  },
+  {
+    id: 'classico',
+    font: "'Cormorant Garamond', serif",
+    fontBody: "'DM Sans', sans-serif",
+    nomeSize: '2.3rem', nomeWeight: '600',
+    nomeSpacing: '1px', nomeTransform: 'none',
+    sloganStyle: 'italic', logoRadius: '50%', logoSpacing: '1px',
+    pattern: "radial-gradient(ellipse, rgba(255,255,255,1) 1px, transparent 1px)",
+    patternSize: '16px 16px',
+  },
+  {
+    id: 'minimalista',
+    font: "'DM Sans', sans-serif",
+    fontBody: "'DM Sans', sans-serif",
+    nomeSize: '1.8rem', nomeWeight: '500',
+    nomeSpacing: '4px', nomeTransform: 'uppercase',
+    sloganStyle: 'normal', logoRadius: '0px', logoSpacing: '6px',
+    pattern: 'none', patternSize: '0',
+  },
+];
+
+function gerarMarca(nome, categoria) {
+  let hash = 0;
+  for (let i = 0; i < nome.length; i++) {
+    hash = ((hash << 5) - hash) + nome.charCodeAt(i);
+    hash |= 0;
+  }
+  const afinidades = {
+    alimentacao: [2, 3, 1], moda: [0, 4, 5],
+    tecnologia:  [1, 5, 2], beleza: [0, 4, 5],
+    servicos:    [1, 2, 3], imoveis: [0, 4, 1],
+    saude:       [5, 1, 0], educacao: [4, 0, 1],
+    geral:       [1, 2, 3],
+  };
+  const pool = afinidades[categoria] || [0,1,2,3,4,5];
+  return ESTILOS_MARCA[pool[Math.abs(hash) % pool.length]];
 }
 
-function irParaMain() {
-  pararSync();
-  _paginaAtual = 'main';
-  history.pushState({ pagina: 'main' }, '');
-  irPara('paginaMain');
-  verificarNotificacoes();
+function aplicarMarca(a) {
+  const marca = gerarMarca(a.nome || 'Loja', a.categoria || 'geral');
+  const cor   = a.cor || '#8B0000';
+  const root  = document.documentElement;
+  root.style.setProperty('--loja-cor',           cor);
+  root.style.setProperty('--loja-cor-soft',       hexToRgba(cor, 0.1));
+  root.style.setProperty('--loja-font',           marca.font);
+  root.style.setProperty('--loja-font-body',      marca.fontBody);
+  root.style.setProperty('--loja-nome-size',      marca.nomeSize);
+  root.style.setProperty('--loja-nome-weight',    marca.nomeWeight);
+  root.style.setProperty('--loja-nome-spacing',   marca.nomeSpacing);
+  root.style.setProperty('--loja-nome-transform', marca.nomeTransform);
+  root.style.setProperty('--loja-slogan-style',   marca.sloganStyle);
+  root.style.setProperty('--loja-logo-radius',    marca.logoRadius);
+  root.style.setProperty('--loja-logo-spacing',   marca.logoSpacing);
+  root.style.setProperty('--loja-pattern',        marca.pattern);
+  root.style.setProperty('--loja-pattern-size',   marca.patternSize);
+  document.getElementById('heroBg').style.background =
+    `linear-gradient(160deg, ${cor} 0%, ${escurecer(cor, 60)} 100%)`;
 }
 
-function irParaApp() {
-  _paginaAtual = 'app';
-  history.pushState({ pagina: 'app' }, '');
-  irPara('paginaApp');
+function hexToRgba(hex, alpha) {
+  try {
+    const n = parseInt(hex.replace('#',''), 16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${alpha})`;
+  } catch { return `rgba(139,0,0,${alpha})`; }
 }
 
-function irParaChat() {
-  _paginaAtual = 'chat';
-  history.pushState({ pagina: 'chat' }, '');
-  irPara('paginaChat');
+function escurecer(hex, amount = 50) {
+  try {
+    const n = parseInt(hex.replace('#',''), 16);
+    const r = Math.max(0, (n>>16) - amount);
+    const g = Math.max(0, ((n>>8)&0xff) - amount);
+    const b = Math.max(0, (n&0xff) - amount);
+    return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  } catch { return '#3a0000'; }
 }
 
-window.addEventListener('popstate', function(e) {
-  const modaisAbertos = document.querySelectorAll('.modal-overlay[style*="flex"]');
-  if (modaisAbertos.length > 0) {
-    modaisAbertos.forEach(m => m.style.display = 'none');
-    history.pushState({}, '');
+function esc(t) {
+  if (!t) return '';
+  const d = document.createElement('div');
+  d.textContent = String(t); return d.innerHTML;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toastLoja');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function formatarValor(v) {
+  return new Intl.NumberFormat('pt-AO').format(v || 0);
+}
+
+async function carregarLoja() {
+  const params = new URLSearchParams(window.location.search);
+  const codigo = params.get('c') || params.get('codigo');
+  if (!codigo) { document.getElementById('lojaNome').textContent = 'Loja não encontrada'; return; }
+  try {
+    const res  = await fetch(API_P2P + 'anuncios/' + codigo);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.erro || 'Erro');
+    _anuncio = data;
+    renderLoja(data);
+  } catch(e) { document.getElementById('lojaNome').textContent = 'Erro ao carregar'; }
+}
+
+function renderLoja(a) {
+  document.title = (a.nome || 'Loja') + ' — RondaP2P';
+
+  // Registar visita
+  fetch(API_P2P + 'anuncios/' + a.codigo + '/visita', { method: 'POST' }).catch(() => {});
+
+  // Mostrar visitas
+  document.getElementById('statVisitas').textContent = a.visitas || 0;
+
+  aplicarMarca(a);
+
+  document.getElementById('lojaLogo').textContent   = (a.nome?.[0] || 'R').toUpperCase();
+  document.getElementById('lojaNome').textContent   = a.nome || '';
+  document.getElementById('lojaSlogan').textContent = a.slogan || '';
+  document.getElementById('lojaDesc').textContent   = a.descricao || '';
+
+  // Badge categoria com ícone SVG
+  const badge = document.getElementById('lojaBadge');
+  if (a.categoria) {
+    badge.innerHTML = (ICONES_CATEGORIA[a.categoria] || ICONES_CATEGORIA.geral) + ' ' + (NOMES_CATEGORIA[a.categoria] || a.categoria);
+    badge.style.display = 'inline-flex';
+  }
+
+  // Local com ícone SVG
+  const local = document.getElementById('lojaLocal');
+  if (a.localizacao) {
+    local.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(a.localizacao)}`;
+  }
+
+  document.getElementById('statProdutos').textContent = (a.produtos || []).filter(p => p.disponivel).length;
+
+  // Botões contacto com SVG Lucide
+  const cont = document.getElementById('lojaContactos');
+  cont.innerHTML = '';
+
+  if (a.whatsapp) {
+    const btn = document.createElement('button');
+    btn.className = 'btn-contacto';
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>WhatsApp`;
+    btn.onclick = () => {
+      const msg = encodeURIComponent(`Olá! Vi a vossa loja no RondaP2P e quero saber mais sobre ${a.nome}.`);
+      window.open(`https://wa.me/${a.whatsapp.replace(/\D/g,'')}?text=${msg}`);
+    };
+    cont.appendChild(btn);
+  }
+
+  if (a.telefone) {
+    const btn = document.createElement('button');
+    btn.className = 'btn-contacto';
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Ligar`;
+    btn.onclick = () => window.open(`tel:${a.telefone}`);
+    cont.appendChild(btn);
+  }
+
+  renderProdutos(a);
+}
+
+function renderProdutos(a) {
+  const lista    = document.getElementById('listaProdutos');
+  const produtos = (a.produtos || []).filter(p => p.disponivel);
+
+  if (!produtos.length) {
+    lista.innerHTML = `
+      <div class="sem-produtos">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <div style="margin-top:8px">Sem produtos disponíveis de momento.</div>
+      </div>`;
     return;
   }
-  if (_paginaAtual === 'chat') {
-    irParaApp();
-  } else if (_paginaAtual === 'app') {
-    irParaMain();
+
+  lista.innerHTML = '';
+  produtos.forEach((p, i) => {
+    const icone = ICONES_PRODUTO[i % ICONES_PRODUTO.length];
+    const div   = document.createElement('div');
+    div.className = 'produto-card';
+    div.innerHTML = `
+      <div class="produto-icone">${icone}</div>
+      <div class="produto-info">
+        <div class="produto-nome">${esc(p.nome)}</div>
+        ${p.descricao ? `<div class="produto-desc">${esc(p.descricao)}</div>` : ''}
+        <div class="produto-preco">${formatarMoeda(p.preco)}</div>
+      </div>
+      <button class="btn-encomendar" onclick="encomendar('${esc(p.nome)}','${formatarMoeda(p.preco)}')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Comprar
+      </button>`;
+    lista.appendChild(div);
+  });
+}
+
+function encomendar(produto, preco) {
+  if (!_anuncio?.whatsapp) { toast('Sem WhatsApp disponível'); return; }
+  const msg = encodeURIComponent(`Olá! Vi no RondaP2P e quero encomendar:\n*${produto}* — ${preco}`);
+  window.open(`https://wa.me/${_anuncio.whatsapp.replace(/\D/g,'')}?text=${msg}`);
+}
+
+function partilharLoja() {
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: _anuncio?.nome || 'Loja', url });
   } else {
-    window.location.href = 'login.html';
-  }
-});
-
-(function verificarSessao() {
-  try {
-    const raw = localStorage.getItem('kx_sessao');
-    if (!raw) { window.location.href = 'login.html'; return; }
-    const dados = JSON.parse(raw);
-    const perfil = dados.perfil || dados;
-    if (dados.expira && Date.now() > dados.expira) {
-      localStorage.removeItem('kx_sessao');
-      window.location.href = 'login.html';
-      return;
-    }
-    KixikilaManager.setSessao(perfil);
-
-    const nome = perfil.nome || 'K';
-    const foto = perfil.foto_perfil || '';
-    const sa = document.getElementById('sidebarAvatar');
-    const ba = document.getElementById('bnAvatar');
-    const sn = document.getElementById('sidebarNome');
-    if (foto) {
-      if (sa) { sa.style.backgroundImage = `url(${foto})`; sa.textContent = ''; }
-      if (ba) { ba.style.backgroundImage = `url(${foto})`; ba.textContent = ''; }
-    } else {
-      if (sa) sa.textContent = nome[0].toUpperCase();
-      if (ba) ba.textContent = nome[0].toUpperCase();
-    }
-    if (sn) sn.textContent = nome;
-
-    history.pushState({ pagina: 'main' }, '');
-    irParaMain();
-    setInterval(verificarNotificacoes, 60000);
-  } catch(e) { window.location.href = 'login.html'; }
-})();
-
-function mostrarTabMain(tab) {
-  document.getElementById('sbFeed')?.classList.toggle('activo', tab === 'feed');
-  document.getElementById('sbMeus')?.classList.toggle('activo', tab === 'meus');
-  document.getElementById('bnFeed')?.classList.toggle('activo', tab === 'feed');
-  document.getElementById('bnMeus')?.classList.toggle('activo', tab === 'meus');
-  document.getElementById('tabFeed')?.classList.toggle('activo', tab === 'feed');
-  document.getElementById('tabMeus')?.classList.toggle('activo', tab === 'meus');
-  document.getElementById('conteudoFeed').style.display  = tab === 'feed' ? 'block' : 'none';
-  document.getElementById('conteudoMeus').style.display  = tab === 'meus' ? 'block' : 'none';
-  if (tab === 'feed') carregarFeed();
-  if (tab === 'meus') carregarMeus();
-}
-
-function toggleEditarPerfil() {
-  const c = document.getElementById('editarPerfilConteudo');
-  const s = document.getElementById('editarPerfilSeta');
-  const aberto = c.style.display !== 'none';
-  c.style.display = aberto ? 'none' : 'block';
-  s.style.transform = aberto ? '' : 'rotate(180deg)';
-}
-
-function atualizarSino(count) {
-  const b1 = document.getElementById('sinoBadge');
-  const b2 = document.getElementById('sinoBadgeSidebar');
-  if (count > 0) {
-    const txt = count > 9 ? '9+' : String(count);
-    if (b1) { b1.style.display = 'flex'; b1.textContent = txt; }
-    if (b2) { b2.style.display = 'inline'; b2.textContent = txt; }
-  } else {
-    if (b1) b1.style.display = 'none';
-    if (b2) b2.style.display = 'none';
+    navigator.clipboard?.writeText(url);
+    toast('Link copiado!');
   }
 }
 
-async function verificarNotificacoes() {
-  try {
-    const d = await KixikilaManager.carregarNotificacoes();
-    atualizarSino(d.nao_lidas || 0);
-  } catch (_) {}
-}
-
-async function abrirNotificacoes() {
-  document.getElementById('modalNotificacoes').style.display = 'flex';
-  const lista = document.getElementById('notificacoesLista');
-  lista.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">A carregar...</div>';
-
-  const perfil = KixikilaManager.getSessao()?.perfil;
-  if (!perfil) return;
-
-  try {
-    const d = await KixikilaManager.carregarNotificacoes();
-    atualizarSino(0);
-
-    // Marcar como lidas na API principal
-    const token = KixikilaManager.getToken();
-    fetch('https://sire-kixikila-api.vercel.app/notificacoes/' + perfil.telefone.replace(/\D/g, '') + '/marcar-lida', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({})
-    }).catch(() => {});
-
-    const notifs = d.notificacoes || [];
-    if (!notifs.length) {
-      lista.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted)">Sem notificações.</div>';
-      return;
-    }
-
-    lista.innerHTML = notifs.map(n => `
-      <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
-        <div style="width:8px;height:8px;border-radius:50%;background:${!n.lida ? 'var(--r)' : 'var(--border)'};flex-shrink:0;margin-top:6px"></div>
-        <div style="flex:1">
-          <div style="font-size:.9rem">${n.mensagem || n.msg || ''}</div>
-          <div style="font-size:.72rem;color:var(--muted);margin-top:3px">${new Date(n.criada_em || n.data).toLocaleString('pt-PT')}</div>
-        </div>
-      </div>`).join('');
-  } catch {
-    lista.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Erro ao carregar.</div>';
-  }
-}
-
-function abrirListaConversas() { window.location.href = 'p2p.html'; }
-function fecharModalSeClicarFora(e, el) { if (e.target === el) el.style.display = 'none'; }
-function fecharModal(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+carregarLoja();
 </script>
 </body>
 </html>
