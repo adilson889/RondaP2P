@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "titulo": "Criação de Site",
+    "preco": "50.000",
+    "vendas": 28,
+    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Site"
+  },
+  {
+    "id": 2,
+    "titulo": "Desenvolvimento de App",
+    "preco": "80.000",
+    "vendas": 15,
+    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=App"
+  },
+  {
+    "id": 3,
+    "titulo": "Design de Logotipo",
+    "preco": "15.000",
+    "vendas": 50,
+    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Logo"
+  },
+  {
+    "id": 4,
+    "titulo": "Consultoria em Marketing",
+    "preco": "35.000",
+    "vendas": 12,
+    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=Mkt"
+  }
+]
