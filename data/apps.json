@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "titulo": "App de Vendas Completo",
+    "preco": "15.000",
+    "vendas": 120,
+    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=App"
+  },
+  {
+    "id": 2,
+    "titulo": "Controle Financeiro",
+    "preco": "9.900",
+    "vendas": 85,
+    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Fin"
+  },
+  {
+    "id": 3,
+    "titulo": "CRM para Negócios",
+    "preco": "25.000",
+    "vendas": 45,
+    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=CRM"
+  },
+  {
+    "id": 4,
+    "titulo": "Jogo da Velha",
+    "preco": "3.500",
+    "vendas": 200,
+    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Jogo"
+  },
+  {
+    "id": 5,
+    "titulo": "App de Delivery",
+    "preco": "18.000",
+    "vendas": 67,
+    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=Food"
+  },
+  {
+    "id": 6,
+    "titulo": "Chat ao Vivo",
+    "preco": "12.500",
+    "vendas": 95,
+    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Chat"
+  }
+]
