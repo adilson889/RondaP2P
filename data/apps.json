@@ -1,44 +1,14 @@
 [
   {
     "id": 1,
-    "titulo": "App de Vendas Completo",
-    "preco": "15.000",
-    "vendas": 120,
-    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=App"
+    "html": "<div class='col-3 col-md-2 col-lg-1 col-produto'><div class='card-produto'><img src='https://placehold.co/200x200/8B0000/FFFFFF?text=App' class='w-100'><div class='card-body'><div class='card-titulo'>App de Vendas Completo</div><div class='card-preco'>Kz 15.000</div><div class='card-vendas'>120 vend</div><button class='btn btn-comprar mt-1' id='app1-btn'>Comprar</button></div></div></div>"
   },
   {
     "id": 2,
-    "titulo": "Controle Financeiro",
-    "preco": "9.900",
-    "vendas": 85,
-    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Fin"
+    "html": "<div class='col-3 col-md-2 col-lg-1 col-produto'><div class='card-produto'><img src='https://placehold.co/200x200/A52A2A/FFFFFF?text=Fin' class='w-100'><div class='card-body'><div class='card-titulo'>Controle Financeiro</div><div class='card-preco'>Kz 9.900</div><div class='card-vendas'>85 vend</div><button class='btn btn-comprar mt-1' id='app2-btn'>Comprar</button></div></div></div>"
   },
   {
     "id": 3,
-    "titulo": "CRM para Negócios",
-    "preco": "25.000",
-    "vendas": 45,
-    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=CRM"
-  },
-  {
-    "id": 4,
-    "titulo": "Jogo da Velha",
-    "preco": "3.500",
-    "vendas": 200,
-    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Jogo"
-  },
-  {
-    "id": 5,
-    "titulo": "App de Delivery",
-    "preco": "18.000",
-    "vendas": 67,
-    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=Food"
-  },
-  {
-    "id": 6,
-    "titulo": "Chat ao Vivo",
-    "preco": "12.500",
-    "vendas": 95,
-    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Chat"
+    "html": "<div class='col-3 col-md-2 col-lg-1 col-produto'><div class='card-produto'><img src='https://placehold.co/200x200/8B0000/FFFFFF?text=CRM' class='w-100'><div class='card-body'><div class='card-titulo'>CRM para Negócios</div><div class='card-preco'>Kz 25.000</div><div class='card-vendas'>45 vend</div><button class='btn btn-comprar mt-1' id='app3-btn'>Comprar</button></div></div></div>"
   }
 ]
