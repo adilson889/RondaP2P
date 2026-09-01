@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "titulo": "E-book Marketing 2026",
+    "preco": "4.500",
+    "vendas": 340,
+    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=PDF"
+  },
+  {
+    "id": 2,
+    "titulo": "Guia Financeiro 2026",
+    "preco": "6.000",
+    "vendas": 180,
+    "imagem": "https://placehold.co/200x200/A52A2A/FFFFFF?text=Fin"
+  },
+  {
+    "id": 3,
+    "titulo": "E-book Programação Web",
+    "preco": "7.500",
+    "vendas": 95,
+    "imagem": "https://placehold.co/200x200/8B0000/FFFFFF?text=Dev"
+  }
+]
