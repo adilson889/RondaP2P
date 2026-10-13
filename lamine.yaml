@@ -1,0 +1,9 @@
+lamine:
+  nome: Yamal
+  idade: 17
+  clube: barcelona
+  skills:
+    - driblar_lateral: true
+    - humilhar_real: true
+  contrato: até_2031
+  indentação: perfeita
